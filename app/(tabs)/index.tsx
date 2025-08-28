@@ -12,7 +12,7 @@ export default function HomeScreen({navigation}: {navigation: any}) {
       <Text style = {styles.titleText}>Catwise</Text>
       <Text style = {styles.subText}>Your complete guide to cat adoption</Text>
       <TouchableOpacity style = {styles.paw} onPress = {pawButton}>
-        <Text>Enter</Text>
+        <Text>Get Started</Text>
       </TouchableOpacity>
 
     </View>
@@ -37,10 +37,10 @@ const styles = StyleSheet.create({
   },
 
   paw: {
-    backgroundColor: 'gray',
-    borderRadius: 100,
-    height: 100,
-    width: 100,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    height: 50,
+    width: 200,
     justifyContent: 'center',
     alignItems: 'center'
   }
