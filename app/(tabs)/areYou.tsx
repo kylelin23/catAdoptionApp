@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
 
   paw: {
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderRadius: 15,
     height: 75,
     width: 300,
     justifyContent: 'center',
