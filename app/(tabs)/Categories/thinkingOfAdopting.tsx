@@ -5,16 +5,27 @@ export default function ThinkingOfAdopting() {
 
   const sections = ['Info', 'Trivia', 'FAQ'];
 
+  const faq = [
+    ['Is maggy the best ? ', 'YES OFC SHE IS SO AWESOME'],
+    ["What is maggy's favorite activity ? ", 'Staring out the window']
+  ];
+
   const [activeTab, setActiveTab] = useState("Info");
+  const [openIndex, setOpenIndex] = useState(-1);
+
+  const showAnswer = ( index: number ) => {
+    setOpenIndex(openIndex === index ? -1 : index);
+  }
 
   return (
     <View style = {styles.container}>
 
         <View style = {styles.bar}>
 
-          {sections.map((section) => (
+          {sections.map((section, index) => (
             <TouchableOpacity
             onPress = {() => {setActiveTab(section)}}
+            key = {index}
             >
               <Text style = {{fontSize: 15, fontWeight: 'bold'}}>{section}</Text>
             </TouchableOpacity>
@@ -35,7 +46,23 @@ export default function ThinkingOfAdopting() {
             }
 
             {activeTab == 'FAQ' &&
-              <Text>FAQ</Text>
+              <View>
+                <View style = {{alignItems: 'center'}}>
+                  <Text>Frequently Asked Questions</Text>
+                </View>
+                {faq.map((question, index) => (
+                  <View key = {index}>
+                    <TouchableOpacity
+                    onPress = {() => showAnswer(index)}
+                    style = {styles.question}>
+                      <Text>{question[0]}{openIndex === index ? "▲" : "▼"}</Text>
+                    </TouchableOpacity>
+                    {openIndex === index &&
+                      <Text>{question[1]}</Text>
+                    }
+                  </View>
+                ))}
+              </View>
             }
           </ScrollView>
 
@@ -83,6 +110,10 @@ const styles = StyleSheet.create({
 
   scrollContainer: {
     padding: 10,
-  }
+  },
+
+  question: {
+    flexDirection: 'row',
+  },
 
 });
