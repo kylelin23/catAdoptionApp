@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { Text, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, Image, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import Papa from "papaparse";
+import { MaterialIcons } from "@expo/vector-icons";
 
-export default function ThinkingOfAdopting() {
+
+export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
+
 
   const sections = ['Info', 'Trivia', 'FAQ'];
 
-  const faq = [
-    ['Is maggy the best ? ', 'YES OFC SHE IS SO AWESOME'],
-    ["What is maggy's favorite activity ? ", 'Staring out the window']
-  ];
+  const faq = useState([]);
 
   const [activeTab, setActiveTab] = useState("Info");
   const [openIndex, setOpenIndex] = useState(-1);
@@ -17,8 +18,13 @@ export default function ThinkingOfAdopting() {
     setOpenIndex(openIndex === index ? -1 : index);
   }
 
+  // Fetch FAQs
+
+
   return (
     <View style = {styles.container}>
+
+        <Image style = {styles.image} source={require('../../../assets/images/maggyPic.jpeg')} />
 
         <View style = {styles.bar}>
 
@@ -69,6 +75,9 @@ export default function ThinkingOfAdopting() {
 
 
         </View>
+        <TouchableOpacity onPress = {() => {navigation.navigate('Home')}}>
+          <MaterialIcons name="home" size={75} color="white" />
+        </TouchableOpacity>
 
     </View>
   );
@@ -104,7 +113,7 @@ const styles = StyleSheet.create({
   content: {
     backgroundColor: 'white',
     borderRadius: 10,
-    height: .6 * screenHeight,
+    height: .4 * screenHeight,
     width: screenWidth * .75,
   },
 
@@ -115,5 +124,11 @@ const styles = StyleSheet.create({
   question: {
     flexDirection: 'row',
   },
+
+  image: {
+    height: 200,
+    width: screenWidth * .75,
+    borderRadius: 10,
+  }
 
 });
