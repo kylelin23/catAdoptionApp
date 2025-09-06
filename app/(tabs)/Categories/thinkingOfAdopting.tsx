@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Text, Image, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import Papa from "papaparse";
 import { MaterialIcons } from "@expo/vector-icons";
+
+
 
 
 export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
@@ -9,10 +10,15 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 
   const sections = ['Info', 'Trivia', 'FAQ'];
 
-  const faq = useState([]);
+  const [faq, setFAQ] = useState([
+    // OVER HERE
+    ['question', 'answer'],
+    ['', '']
+  ]);
 
   const [activeTab, setActiveTab] = useState("Info");
   const [openIndex, setOpenIndex] = useState(-1);
+
 
   const showAnswer = ( index: number ) => {
     setOpenIndex(openIndex === index ? -1 : index);
@@ -33,7 +39,7 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
             onPress = {() => {setActiveTab(section)}}
             key = {index}
             >
-              <Text style = {{fontSize: 15, fontWeight: 'bold'}}>{section}</Text>
+              <Text style = {{fontSize: 20, fontWeight: 'bold'}}>{section}</Text>
             </TouchableOpacity>
           ))}
 
@@ -61,7 +67,9 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
                     <TouchableOpacity
                     onPress = {() => showAnswer(index)}
                     style = {styles.question}>
+
                       <Text>{question[0]}{openIndex === index ? "▲" : "▼"}</Text>
+
                     </TouchableOpacity>
                     {openIndex === index &&
                       <Text>{question[1]}</Text>
@@ -87,10 +95,6 @@ const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
-  titleText: {
-    fontSize: 50,
-    textAlign: 'center'
-  },
 
   container: {
     flex: 1,
@@ -102,12 +106,12 @@ const styles = StyleSheet.create({
 
   bar: {
     flexDirection: 'row',
-    backgroundColor: 'lightgray',
+    backgroundColor: 'lightblue',
     borderRadius: 20,
     width: screenWidth * .75,
     justifyContent: 'space-around',
     alignItems: 'center',
-    height: 30,
+    height: 40,
   },
 
   content: {
