@@ -41,7 +41,7 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
   return (
     <View style = {styles.container}>
 
-        <Image style = {styles.image} source={require('../../../assets/images/maggyPic.jpeg')} />
+        {/* <Image style = {styles.image} source={require('../../../assets/images/maggyPic.jpeg')} /> */}
 
         <View style = {styles.bar}>
 
@@ -55,8 +55,7 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
           ))}
 
         </View>
-        <View style = {styles.content}>
-          <ScrollView
+        <ScrollView
             style = {styles.scrollContainer}
             showsVerticalScrollIndicator={true}
           >
@@ -73,18 +72,18 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
                 <View style = {{alignItems: 'center'}}>
                   <Text style = {styles.titleText}>Frequently Asked Questions</Text>
                 </View>
-                <View style = {{gap: 15, marginBottom: 15}}>
+                <View style = {styles.faqContainer}>
                   {faq.map((question, index) => (
                     <View style = {styles.questionContainer} key = {index}>
                       <TouchableOpacity
                       onPress = {() => showAnswer(index)}
                       style = {styles.question}>
-
-                        <Text style = {{color: '#c99257', fontSize: 15}}>{question[0]} {openIndex === index ? "▲" : "▼"}</Text>
+                        <Text style = {{fontSize: 20, width: screenWidth * .7,}}>{question[0]}</Text>
+                        <Text style = {{fontSize: 20}}>{openIndex === index ? "▲" : "▼"}</Text>
 
                       </TouchableOpacity>
                       {openIndex === index &&
-                        <Text>{question[1]}</Text>
+                        <Text style = {{fontSize: 20, color: 'blue'}}>{question[1]}</Text>
                       }
                     </View>
                   ))}
@@ -95,7 +94,6 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 
 
 
-        </View>
         <TouchableOpacity onPress = {() => {navigation.navigate('Home')}}>
           <MaterialIcons name="home" size={75} color="white" />
         </TouchableOpacity>
@@ -115,6 +113,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 15,
+    paddingTop: 70,
+    paddingBottom: 30,
   },
 
   bar: {
@@ -135,11 +135,15 @@ const styles = StyleSheet.create({
   },
 
   scrollContainer: {
-    padding: 10,
+    padding: 25,
   },
 
   question: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+    justifyContent: 'space-between',
+
   },
 
   image: {
@@ -155,8 +159,16 @@ const styles = StyleSheet.create({
   },
 
   questionContainer: {
-    flex: 1,
+    gap: 10,
+    borderColor: 'darkblue',
+    borderWidth: 2,
+    padding: 10,
+  },
+
+  faqContainer: {
     gap: 15,
-  }
+    marginBottom: 15,
+    width: screenWidth - 50,
+  },
 
 });
