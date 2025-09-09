@@ -11,7 +11,7 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
   const sections = ['Info', 'Trivia', 'FAQ'];
 
   const [faq, setFAQ] = useState([
-    // OVER HERE
+    // CHANGE THE FAQs OVER HERE
     ['question', 'answer'],
     ['', '']
   ]);
