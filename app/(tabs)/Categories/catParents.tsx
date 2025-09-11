@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 
 export default function CatParents() {
+
+  const [faq, setFAQ] = useState([
+    // CHANGE THE FAQs OVER HERE
+    ['question', 'answer'],
+    ['question', 'answer']
+  ]);
 
 
   return (
