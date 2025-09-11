@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { Text, Image, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
+import { TabView, TabBar } from 'react-native-tab-view';
+
 
 
 
 
 export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
-
-
-  const sections = ['Info', 'Trivia', 'FAQ'];
 
   const [faq, setFAQ] = useState([
     // CHANGE THE FAQs OVER HERE
@@ -25,114 +24,128 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
     ['What is the most important thing I should know before adopting?', "Nothing! We all learn as we go along. Welcome to our cat community!"],
   ]);
 
-  const [activeTab, setActiveTab] = useState("Info");
   const [openIndex, setOpenIndex] = useState(-1);
-
 
   const showAnswer = ( index: number ) => {
     setOpenIndex(openIndex === index ? -1 : index);
   }
 
-  // Fetch FAQs
+  const Info = () => (
+    <ScrollView
+      style = {styles.scrollContainer}
+      showsVerticalScrollIndicator={true}
+    >
+      <Text>Info</Text>
+    </ScrollView>
+  );
+
+
+  const Trivia = () => (
+    <ScrollView
+      style = {styles.scrollContainer}
+      showsVerticalScrollIndicator={true}
+    >
+      <Text>Trivia</Text>
+    </ScrollView>
+  );
+
+  const FAQs = () => (
+    <ScrollView
+      style = {styles.scrollContainer}
+      showsVerticalScrollIndicator={true}
+    >
+      <View>
+        <View style = {{alignItems: 'center'}}>
+          <Text style = {styles.titleText}>Frequently Asked Questions</Text>
+        </View>
+        <View style = {styles.faqContainer}>
+          {faq.map((question, index) => (
+            <View style = {styles.questionContainer} key = {index}>
+              <TouchableOpacity
+                onPress = {() => showAnswer(index)}
+                style = {styles.question}>
+                  <Text style = {{fontSize: 20, width: screenWidth * .7,}}>{question[0]}</Text>
+                  <Text style = {{fontSize: 20}}>{openIndex === index ? "▲" : "▼"}</Text>
+              </TouchableOpacity>
+              {openIndex === index &&
+                <Text style = {{fontSize: 20, color: 'blue'}}>{question[1]}</Text>
+              }
+            </View>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
+  );
+
+  const [index, setIndex] = React.useState(0);
+
+  const [routes] = React.useState([
+      { key: 'info', title: 'Info' },
+      { key: 'trivia', title: 'Trivia' },
+      { key: 'faqs', title: 'FAQs' }
+    ]);
+
+    const renderScene = ({ route }: {route: any}) => {
+      switch (route.key) {
+        case 'info':
+          return <Info />;
+        case 'trivia':
+          return <Trivia />;
+        case 'faqs':
+          return <FAQs />
+        default:
+          return null;
+      }
+    };
+
 
 
   return (
     <View style = {styles.container}>
-
-        {/* <Image style = {styles.image} source={require('../../../assets/images/maggyPic.jpeg')} /> */}
-
-        <View style = {styles.bar}>
-
-          {sections.map((section, index) => (
-            <TouchableOpacity
-            onPress = {() => {setActiveTab(section)}}
-            key = {index}
-            >
-              <Text style = {{fontSize: 20, fontWeight: 'bold'}}>{section}</Text>
-            </TouchableOpacity>
-          ))}
-
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{width: screenWidth}}
+          renderTabBar={(props) => (
+            <View style = {{alignItems: 'center'}}>
+              <TabBar
+                {...props}
+                style={{
+                  borderRadius: 10,
+                  backgroundColor: 'lightblue',
+                  width: screenWidth * .8,
+                }}
+                indicatorStyle={{ backgroundColor: 'transparent' }}
+                activeColor = 'black'
+                inactiveColor='gray'
+              />
+            </View>
+          )}
+        />
+        <View style = {{alignItems: 'center'}}>
+          <TouchableOpacity onPress = {() => {navigation.navigate('Home')}}>
+            <MaterialIcons name="home" size={75} color="white" />
+          </TouchableOpacity>
         </View>
-        <ScrollView
-            style = {styles.scrollContainer}
-            showsVerticalScrollIndicator={true}
-          >
-            {activeTab == 'Info' &&
-              <Text>Info</Text>
-            }
-
-            {activeTab == 'Trivia' &&
-              <Text>Trivia</Text>
-            }
-
-            {activeTab == 'FAQ' &&
-              <View>
-                <View style = {{alignItems: 'center'}}>
-                  <Text style = {styles.titleText}>Frequently Asked Questions</Text>
-                </View>
-                <View style = {styles.faqContainer}>
-                  {faq.map((question, index) => (
-                    <View style = {styles.questionContainer} key = {index}>
-                      <TouchableOpacity
-                      onPress = {() => showAnswer(index)}
-                      style = {styles.question}>
-                        <Text style = {{fontSize: 20, width: screenWidth * .7,}}>{question[0]}</Text>
-                        <Text style = {{fontSize: 20}}>{openIndex === index ? "▲" : "▼"}</Text>
-
-                      </TouchableOpacity>
-                      {openIndex === index &&
-                        <Text style = {{fontSize: 20, color: 'blue'}}>{question[1]}</Text>
-                      }
-                    </View>
-                  ))}
-                </View>
-              </View>
-            }
-          </ScrollView>
-
-
-
-        <TouchableOpacity onPress = {() => {navigation.navigate('Home')}}>
-          <MaterialIcons name="home" size={75} color="white" />
-        </TouchableOpacity>
 
     </View>
   );
 }
 
 const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
 
   container: {
     flex: 1,
     backgroundColor: 'rgb(154, 182, 212)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 15,
     paddingTop: 70,
     paddingBottom: 30,
   },
 
-  bar: {
-    flexDirection: 'row',
-    backgroundColor: 'lightblue',
-    borderRadius: 20,
-    width: screenWidth * .75,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    height: 40,
-  },
-
-  content: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    height: .4 * screenHeight,
-    width: screenWidth * .75,
-  },
-
   scrollContainer: {
+    flex: 1,
     padding: 25,
   },
 
@@ -142,12 +155,6 @@ const styles = StyleSheet.create({
     gap: 20,
     justifyContent: 'space-between',
 
-  },
-
-  image: {
-    height: 200,
-    width: screenWidth * .75,
-    borderRadius: 10,
   },
 
   titleText: {
