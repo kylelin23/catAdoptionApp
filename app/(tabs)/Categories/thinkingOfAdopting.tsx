@@ -21,7 +21,7 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
     ['Does the cat stay indoor and/or outdoor?', 'Indoor please! Being indoor protects them from cars, other predatory animals, and diseases.'],
     ['How much does it cost?', 'Providing cat food, water and litter are a necessity. On average, expect to pay a minimum of $30-50 each month.'],
     ["What if my current pet can't get along with the new cat?", "Expect time for the transition. But if you're worried about whether the cats will get along, introducing kittens are generally an easier transition."],
-    ['What is the most important thing I should know before adopting?', "Nothing! We all learn as we go along. Welcome to our cat community!"],
+    ['What is the most important thing I should know before adopting?', "Cats are not toys and they become part of your family when you adopt them. Please do not abandon them. You are their entire lives."],
   ]);
 
   const [openIndex, setOpenIndex] = useState(-1);
