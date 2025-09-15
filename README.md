@@ -1,10 +1,17 @@
 # Cat Adoption App
 
-**Project Description:** The goal of this app is to let new cat adopters have a more smooth adoption. There are countless things to remember and worry about when adopting a cat, such as what to feed them, whether or not to let them outside, and much more. So, this app's goal is to create a user-friendly way for new cat adopters to easily access reliable information on cat adoption. 
+## Project Description:
+The goal of this app is to let new cat adopters have a more smooth adoption. There are countless things to remember and worry about when adopting a cat, such as what to feed them, whether or not to let them outside, and much more. So, this app's goal is to create a **user-friendly way for new cat adopters to easily access reliable information on cat adoption.**
 
-**Technologies Used:** React Native, Expo Go
+**Technologies Used:**
+React Native, Expo Go
 
 **Frontend UI Design:** [Figma](https://www.figma.com/design/DDKC8hf5LSOV17jN65XbSx/Cat-Adoption-App?node-id=0-1&t=lS9hk7dvvQ5xKScA-1)
+
+## Features  
+- Personalized information based off of your current situation
+- Trivias to test your knowledge
+- FAQs for easy access information
 
 ## How to Start
 ### Prerequisites
