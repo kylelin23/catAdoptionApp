@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Text, Image, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
 import { TabView, TabBar } from 'react-native-tab-view';
+
+
 
 
 
@@ -45,7 +47,10 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
       style = {styles.scrollContainer}
       showsVerticalScrollIndicator={true}
     >
-      <Text>Trivia</Text>
+      <TouchableOpacity style = {styles.square}
+        onPress = {() => {navigation.navigate("Trivia")}}
+      >
+      </TouchableOpacity>
     </ScrollView>
   );
 
@@ -175,5 +180,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     width: screenWidth - 50,
   },
+
+  square: {
+    height: 50,
+    width: 50,
+    backgroundColor: 'red'
+  }
 
 });

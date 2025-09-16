@@ -6,6 +6,8 @@ import NewCatParents from '../(tabs)/Categories/newCatParents'
 import CatParents from '../(tabs)/Categories/catParents'
 import CatLovers from '../(tabs)/Categories/catLovers'
 
+
+
 const StartingStack = createStackNavigator();
 
 export default function App (){
