@@ -126,11 +126,11 @@ export default function NewCatParents({navigation}: {navigation: any}) {
             </View>
           )}
         />
-        <View style = {{alignItems: 'center'}}>
+        {/* <View style = {{alignItems: 'center'}}>
           <TouchableOpacity onPress = {() => {navigation.navigate('Home')}}>
             <MaterialIcons name="home" size={75} color="white" />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
     </View>
   );
