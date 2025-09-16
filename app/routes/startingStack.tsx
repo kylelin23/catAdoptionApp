@@ -12,11 +12,19 @@ const StartingStack = createStackNavigator();
 
 export default function App (){
     return(
-        <StartingStack.Navigator initialRouteName = "Start">
+        <StartingStack.Navigator
+            initialRouteName = "Start"
+            screenOptions={{
+                headerStyle: {
+                backgroundColor: '#c1d6f7',
+                },
+                headerTintColor: 'black',
+            }}
+            >
             <StartingStack.Screen name = "Start" component = {Start} options = {{headerShown: false}}/>
-            <StartingStack.Screen name = "Home" component = {Home} options = {{headerShown: false}}/>
+            <StartingStack.Screen name = " " component = {Home} options = {{headerShown: false}}/>
 
-            <StartingStack.Screen name = "Thinking of Adopting" component = {ThinkingOfAdopting} options = {{headerShown: false}}/>
+            <StartingStack.Screen name = "Thinking of Adopting" component = {ThinkingOfAdopting} />
             <StartingStack.Screen name = "New Cat Parents" component = {NewCatParents} options = {{headerShown: false}}/>
             <StartingStack.Screen name = "Cat Parents" component = {CatParents} options = {{headerShown: false}}/>
             <StartingStack.Screen name = "Cat Lovers" component = {CatLovers} options = {{headerShown: false}}/>

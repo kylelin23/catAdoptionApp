@@ -4,7 +4,7 @@ import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 export default function HomeScreen({navigation}: {navigation: any}) {
 
   const pawButton = () => {
-    navigation.navigate("Home");
+    navigation.navigate(" ");
   }
 
   return (

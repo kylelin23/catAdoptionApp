@@ -33,12 +33,14 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
   }
 
   const Info = () => (
-    <ScrollView
-      style = {styles.scrollContainer}
-      showsVerticalScrollIndicator={true}
-    >
-      <Text>Info</Text>
-    </ScrollView>
+    <View style = {{alignItems: 'center', gap: 50, justifyContent: 'center', flex: 1}}>
+      <TouchableOpacity style = {styles.square}>
+        <Text style = {styles.proConText}>Pros</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style = {styles.square}>
+        <Text style = {styles.proConText}>Cons</Text>
+      </TouchableOpacity>
+    </View>
   );
 
 
@@ -47,10 +49,7 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
       style = {styles.scrollContainer}
       showsVerticalScrollIndicator={true}
     >
-      <TouchableOpacity style = {styles.square}
-        onPress = {() => {navigation.navigate("Trivia")}}
-      >
-      </TouchableOpacity>
+
     </ScrollView>
   );
 
@@ -107,6 +106,7 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 
   return (
     <View style = {styles.container}>
+
         <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}
@@ -128,11 +128,11 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
             </View>
           )}
         />
-        <View style = {{alignItems: 'center'}}>
+        {/* <View style = {{alignItems: 'center'}}>
           <TouchableOpacity onPress = {() => {navigation.navigate('Home')}}>
             <MaterialIcons name="home" size={75} color="white" />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
     </View>
   );
@@ -145,8 +145,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'rgb(154, 182, 212)',
-    paddingTop: 70,
-    paddingBottom: 30,
+    paddingTop: 30,
+    paddingBottom: 50,
   },
 
   scrollContainer: {
@@ -182,9 +182,18 @@ const styles = StyleSheet.create({
   },
 
   square: {
-    height: 50,
-    width: 50,
-    backgroundColor: 'red'
+    height: 200,
+    width: 200,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+
+  proConText: {
+    fontWeight: 'bold',
+    fontSize: 25
   }
+
 
 });
