@@ -4,19 +4,19 @@ import { Text, View, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 export default function AreYou({navigation}: {navigation: any}) {
 
   const thinkingOfAdopting = () => {
-    navigation.navigate("  ");
+    navigation.navigate("Thinking of Adopting");
   }
 
   const newCatParents = () => {
-    navigation.navigate("   ");
+    navigation.navigate("New Cat Parents");
   }
 
   const catParents = () => {
-    navigation.navigate("    ");
+    navigation.navigate("Cat Parents");
   }
 
   const catLovers = () => {
-    navigation.navigate("     ");
+    navigation.navigate("Cat Lovers");
   }
 
   return (
