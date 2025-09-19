@@ -12,6 +12,7 @@ export default function Pros() {
   const [pros, setPros] = useState([
     // CHANGE THE PROS OVER HERE
     ['Add a pro here'],
+    ['Here is another pro'],
   ]);
 
 
