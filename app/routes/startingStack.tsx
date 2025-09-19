@@ -5,6 +5,9 @@ import ThinkingOfAdopting from '../(tabs)/Categories/thinkingOfAdopting'
 import NewCatParents from '../(tabs)/Categories/newCatParents'
 import CatParents from '../(tabs)/Categories/catParents'
 import CatLovers from '../(tabs)/Categories/catLovers'
+import Pros from '../(tabs)/Categories/pros'
+import Cons from '../(tabs)/Categories/cons'
+
 
 
 
@@ -24,10 +27,12 @@ export default function App (){
             <StartingStack.Screen name = "Start" component = {Start} options = {{headerShown: false}}/>
             <StartingStack.Screen name = " " component = {Home} options = {{headerShown: false}}/>
 
-            <StartingStack.Screen name = "Thinking of Adopting" component = {ThinkingOfAdopting} />
-            <StartingStack.Screen name = "New Cat Parents" component = {NewCatParents} />
-            <StartingStack.Screen name = "Cat Parents" component = {CatParents} />
-            <StartingStack.Screen name = "Cat Lovers" component = {CatLovers} />
+            <StartingStack.Screen name = "  " component = {ThinkingOfAdopting} />
+            <StartingStack.Screen name = "   " component = {NewCatParents} />
+            <StartingStack.Screen name = "    " component = {CatParents} />
+            <StartingStack.Screen name = "     " component = {CatLovers} />
+            <StartingStack.Screen name = "Pros" component = {Pros} />
+            <StartingStack.Screen name = "Cons" component = {Cons} />
         </StartingStack.Navigator>
     );
 }

@@ -34,10 +34,10 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 
   const Info = () => (
     <View style = {{alignItems: 'center', gap: 50, justifyContent: 'center', flex: 1}}>
-      <TouchableOpacity style = {styles.square}>
+      <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Pros")}>
         <Text style = {styles.proConText}>Pros</Text>
       </TouchableOpacity>
-      <TouchableOpacity style = {styles.square}>
+      <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Cons")}>
         <Text style = {styles.proConText}>Cons</Text>
       </TouchableOpacity>
     </View>
