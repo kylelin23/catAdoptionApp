@@ -11,8 +11,7 @@ export default function Pros() {
 
   const [pros, setPros] = useState([
     // CHANGE THE PROS OVER HERE
-    ['Add a pro here'],
-    ['Here is another pro'],
+    ["Icon", "Title", ["Bullet Point 1, Bullet Point 2"]],
   ]);
 
 
@@ -21,7 +20,9 @@ export default function Pros() {
     <View style = {styles.container}>
 
         {pros.map((pro, index) => (
-            <Text key={index}>{pro}</Text>
+            <View key={index}>
+              <Text>{pro[1]}: {pro[2]}</Text>
+            </View>
         ))}
 
     </View>

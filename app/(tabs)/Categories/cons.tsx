@@ -11,7 +11,7 @@ export default function Cons() {
 
   const [cons, setCons] = useState([
     // CHANGE THE CONS OVER HERE
-    ['Add a con here'],
+    ["Icon", "Title", ["Bullet Point 1, Bullet Point 2"]],
   ]);
 
 
@@ -19,8 +19,10 @@ export default function Cons() {
   return (
     <View style = {styles.container}>
 
-        {cons.map((con, index) => (
-            <Text key={index}>{con}</Text>
+      {cons.map((con, index) => (
+            <View key={index}>
+              <Text>{con[1]}: {con[2]}</Text>
+            </View>
         ))}
 
     </View>
