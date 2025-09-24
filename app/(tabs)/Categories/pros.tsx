@@ -15,6 +15,7 @@ export default function Pros() {
     ["Icon", "Cats are independent", ["They don't need to be taken out for walks!", "Cats can entertain themselves", "Cats sleep quite a bit"]],
     ["Icon", "Doesn't require too much space", ["Great for apartments", "Windows are a must though", "Can provide a catio outdoors", "Cats are already litter trained"]],
     ["Icon", "Cats are family", ["Creates strong bonds with humans", "Develop a deep sense of attachment and affection", "Cat antics are stress relieving!"]],
+    ["Icon", "It will change you", ["Having a cat will change you", "They will tug at your heartstrings", "They will remind you that what's truly important is being present in the present"]],
   ]);
 
 
