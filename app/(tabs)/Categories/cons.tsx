@@ -11,7 +11,9 @@ export default function Cons() {
 
   const [cons, setCons] = useState([
     // CHANGE THE CONS OVER HERE
-    ["Icon", "Title", ["Bullet Point 1, Bullet Point 2"]],
+    ["Icon", "Cost", ["As with all pets, vet visits are the bulk of the expenses", "Ongoing costs include food, litter, toys and vaccinations", "Pet insurance is optional but will help during unexpected visits"]],
+    ["Icon", "Commitment", ["Cats are family and can live for 15-20 years", "Cats will fall sick and need at-home care with medication", "While independent, cats also need playtime and bonding time"]],
+    ["Icon", "Change", ["Be prepared to adapt your lifestyle to include your cat", "Find a reliable pet sitter while travelling", "Cats will shed, throw up hairballs and scratch furniture", "Cats at all stages need love and care"]],
   ]);
 
 
