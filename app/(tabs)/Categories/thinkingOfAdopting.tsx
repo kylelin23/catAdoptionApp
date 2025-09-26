@@ -36,9 +36,11 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
     <View style = {{alignItems: 'center', gap: 50, justifyContent: 'center', flex: 1}}>
       <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Pros")}>
         <Text style = {styles.proConText}>Pros</Text>
+        <Text>Key benefits</Text>
       </TouchableOpacity>
       <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Cons")}>
         <Text style = {styles.proConText}>Cons</Text>
+        <Text>Things to Consider</Text>
       </TouchableOpacity>
     </View>
   );
@@ -188,6 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
+    gap: 5
   },
 
   proConText: {

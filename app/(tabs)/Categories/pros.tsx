@@ -18,6 +18,14 @@ export default function Pros() {
     ["Icon", "It will change you", ["Having a cat will change you", "They will tug at your heartstrings", "They will remind you that what's truly important is being present in the present"]],
   ]);
 
+  const colors = [
+    '#87e8a8',
+    '#6fd190',
+    '#7abf91',
+    '#67a17a',
+    '#548f68',
+  ]
+
 
 
   return (
@@ -26,10 +34,12 @@ export default function Pros() {
 
 
         {pros.map((pro, index) => (
-            <View key={index} style = {styles.card}>
+            <View key={index} style = {
+              [styles.card, {backgroundColor: colors[index]}]
+              }>
               <Text style = {styles.title}>{pro[1]}</Text>
               {(pro[2] as string[]).map((bullet, index) => (
-                <Text key = {index} style = {styles.bullets}>{bullet}</Text>
+                <Text key = {index} style = {styles.bullets}>- {bullet}</Text>
               ))}
             </View>
         ))}
@@ -54,10 +64,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
+    paddingBottom: 50
   },
 
   card: {
-    backgroundColor: 'white',
     padding: 20,
     width: .8*screenWidth,
     gap: 10,

@@ -16,6 +16,12 @@ export default function Cons() {
     ["Icon", "Change", ["Be prepared to adapt your lifestyle to include your cat", "Find a reliable pet sitter while travelling", "Cats will shed, throw up hairballs and scratch furniture", "Cats at all stages need love and care"]],
   ]);
 
+  const colors = [
+    '#f2c068',
+    '#dbab56',
+    '#d49e3f'
+  ]
+
 
 
   return (
@@ -23,7 +29,9 @@ export default function Cons() {
       <View style = {styles.containerInner}>
 
         {cons.map((con, index) => (
-            <View key={index} style = {styles.card}>
+            <View key={index} style = {
+              [styles.card, {backgroundColor: colors[index]}]
+            }>
               <Text style = {styles.title}>{con[1]}</Text>
               {(con[2] as string[]).map((bullet, index) => (
                 <Text key = {index} style = {styles.bullets}>{bullet}</Text>
