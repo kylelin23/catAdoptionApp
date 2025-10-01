@@ -13,7 +13,7 @@ export default function Cons() {
     // CHANGE THE CONS OVER HERE
     ["Icon", "Cost", ["As with all pets, vet visits are the bulk of the expenses", "Ongoing costs include food, litter, toys and vaccinations", "Pet insurance is optional but will help during unexpected visits"]],
     ["Icon", "Commitment", ["Cats are family and can live for 15-20 years", "Cats will fall sick and need at-home care with medication", "While independent, cats also need playtime and bonding time"]],
-    ["Icon", "Change", ["Be prepared to adapt your lifestyle to include your cat", "Find a reliable pet sitter while travelling", "Cats will shed, throw up hairballs and scratch furniture", "Cats at all stages need love and care"]],
+    ["Icon", "Change", ["Be prepared to adapt your lifestyle to include your cat", "Finding a reliable pet sitter while travelling", "Cats will shed, throw up hairballs and scratch furniture"]],
   ]);
 
   const colors = [
