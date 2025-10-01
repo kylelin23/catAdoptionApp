@@ -44,3 +44,7 @@ React Native, Expo Go
 - Go to app/(tabs)/Categories/thinkingOfAdopting.tsx
 - Change the list right under the comment that says: CHANGE THE FAQs OVER HERE
 - It will be in the form of ['This is where you put the question', 'This is where you put the answer']
+
+**How to Change Quiz:** 
+- Go to app/(tabs)/Categories/thinkingOfAdopting.tsx
+- Change the quiz right under the comment that says: CHANGE QUIZ OVER HERE
