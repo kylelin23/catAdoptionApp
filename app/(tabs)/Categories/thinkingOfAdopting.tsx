@@ -11,6 +11,12 @@ import { TabView, TabBar } from 'react-native-tab-view';
 
 export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 
+  const [quiz, setQuiz] = useState ([
+    // CHANGE QUIZ OVER HERE
+    ['question1', 'choice1', 'choice2', 'choice3', 'choice4', 'answer'],
+    ['question2', 'choice1', 'choice2', 'choice3', 'choice4', 'answer'],
+  ])
+
   const [faq, setFAQ] = useState([
     // CHANGE THE FAQs OVER HERE
     ['Should I adopt one or more cats? Will one cat be lonely?', "It all depends! Many households start out with one cat and add a second cat later while some find out that their cat may prefer to be the only cat."],
@@ -47,12 +53,18 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 
 
   const Trivia = () => (
-    <ScrollView
-      style = {styles.scrollContainer}
-      showsVerticalScrollIndicator={true}
-    >
-
-    </ScrollView>
+    <View>
+      <Text>Are You Ready to Adopt?</Text>
+      {quiz.map((question, index) => (
+        <View key = {index}>
+          <Text>{question[0]}</Text>
+          <Text>{question[1]}</Text>
+          <Text>{question[2]}</Text>
+          <Text>{question[3]}</Text>
+          <Text>{question[4]}</Text>
+        </View>
+      ))}
+    </View>
   );
 
   const FAQs = () => (
