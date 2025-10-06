@@ -13,10 +13,23 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 
   const [quiz, setQuiz] = useState ([
     // CHANGE QUIZ OVER HERE
-    ['question1', 'choice1', 'choice2', 'choice3', 'choice4', 'answer'],
-    ['question2', 'choice1', 'choice2', 'choice3', 'choice4', 'answer'],
+    ['1. Can you comfortably afford recurring expenses like food, litter, toys, and vet care (~$50–$100/month)?', "A. Yes I've budgeted for it", 'B. I could make it work', 'C. Not really sure', 'answer'],
+    ['2. What if your cat needs a $500+ emergency procedure?', 'A. I have savings or plan to get pet insurance', 'B. I might panic but will find a way', 'C. I would have to loan from my family or friends', 'answer'],
+    ['3. Are you prepared for annual costs such as vaccinations, check-ups, flea meds, or pet-sitting?', "A. Yes, I'm prepared for it", "B. It's on my mind", 'C. Not really', 'answer'],
+    ['4. Cats can live 15–20 years. Are you ready for that length of commitment?', "A. Yes, I'm in it for the long haul", "B. Sounds a bit daunting but I'm ready", "C. Errrr... I can't plan past 2 years", 'answer'],
+    ['5. How often are you away from home (work, travel, social life)?', "A. I'm home most days", "B. I'm out but there's always someone else home", "C. I travel for my work and don't have too much backup", 'answer'],
+    ['6. Cats are independent but need loving care and attention daily. Are you ready to provide love and attention?', "A. Can't wait to pour my love onto a cat and open my heart", 'B. I see myself just as a caregiver', "C. Adopting a cat isn't for me, it's for someone else in the family!", 'answer'],
+    ['7. How do you feel about cleaning up messes like hairballs or the occasional accident?', "A. Doesn’t bother me", "B. I’ll manage", 'C. Ugghhsss, no thanks', 'answer'],
+    ['8. Are you willing to adjust your home (e.g., furniture, closed doors, scratching posts)?', "A. Absolutely, I can't wait", 'B. Somewhat... ', "C. I'm not ready to adjust at all", 'answer'],
+    ['9. What if your cat scratches your favorite couch or wakes you at 3am or you develop allergies?', 'A. Not a big deal at all', "B. I'll get over it", 'C. Cat will have to go', 'answer'],
   ])
 
+  //scoring criteria
+  //A = 3 points B = 2 points C = 1 point	
+	//23–27 points – Ready to Adopt! You probably already have a name ready!	
+	//17–22 points – Almost There. Go cat sit or hang out at a shelter before taking the plunge.	
+	//9–16 points – Not Yet Ready. Nothing is ever a complete "no" but we want you to feel ready and be ready.
+    
   const [faq, setFAQ] = useState([
     // CHANGE THE FAQs OVER HERE
     ['Should I adopt one or more cats? Will one cat be lonely?', "It all depends! Many households start out with one cat and add a second cat later while some find out that their cat may prefer to be the only cat."],
