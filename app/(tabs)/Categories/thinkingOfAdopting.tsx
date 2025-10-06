@@ -74,17 +74,17 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
       {quiz.map((question, index) => (
         <View style = {{width: screenWidth, alignItems: 'center', gap: 10, marginBottom: 10}} key = {index}>
           <View style = {styles.quizQuestionContainer}>
-            <Text>{question[0]}</Text>
+            <Text style = {styles.quizQuestionText}>{question[0]}</Text>
           </View>
-          <View style = {styles.quizAnswerContainer}>
-            <Text>{question[1]}</Text>
-          </View>
-          <View style = {styles.quizAnswerContainer}>
-            <Text>{question[2]}</Text>
-          </View>
-          <View style = {styles.quizAnswerContainer}>
-            <Text>{question[3]}</Text>
-          </View>
+          <TouchableOpacity style = {styles.quizAnswerContainer}>
+            <Text style = {styles.quizAnswerText}>{question[1]}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style = {styles.quizAnswerContainer}>
+            <Text style = {styles.quizAnswerText}>{question[2]}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style = {styles.quizAnswerContainer}>
+            <Text style = {styles.quizAnswerText}>{question[3]}</Text>
+          </TouchableOpacity>
         </View>
       ))}
     </ScrollView>
@@ -229,32 +229,38 @@ const styles = StyleSheet.create({
   },
 
   quizTitleContainer: {
-    backgroundColor: 'white',
-    width: .5 * screenWidth,
     alignItems: 'center',
-    padding: 20,
-    borderRadius: 5,
     marginVertical: 20,
+    paddingHorizontal: 20,
   },
 
   quizTitleText: {
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 35,
     textAlign: 'center',
   },
 
   quizQuestionContainer: {
-    backgroundColor: 'white',
-    padding: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 5,
   },
 
   quizAnswerContainer: {
-    backgroundColor: 'white',
     padding: 5,
     width: screenWidth * .8,
     borderRadius: 5,
-  }
+    borderWidth: 1,
+    borderColor: 'black',
+  },
 
+  quizAnswerText: {
+    fontSize: 20,
+  },
+
+  quizQuestionText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  }
 
 });
