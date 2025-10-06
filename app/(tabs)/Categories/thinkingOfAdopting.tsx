@@ -53,8 +53,11 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 
 
   const Trivia = () => (
-    <View>
-      <Text>Are You Ready to Adopt?</Text>
+    <View style = {{alignItems: 'center'}}>
+      <View style = {styles.quizTitleContainer}>
+        <Text style = {styles.quizTitleText}>Are You Ready to Adopt?</Text>
+      </View>
+
       {quiz.map((question, index) => (
         <View key = {index}>
           <Text>{question[0]}</Text>
@@ -208,6 +211,21 @@ const styles = StyleSheet.create({
   proConText: {
     fontWeight: 'bold',
     fontSize: 25
+  },
+
+  quizTitleContainer: {
+    backgroundColor: 'white',
+    width: .5 * screenWidth,
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 5,
+    marginVertical: 20,
+  },
+
+  quizTitleText: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
   }
 
 
