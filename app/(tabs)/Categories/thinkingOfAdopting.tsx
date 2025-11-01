@@ -236,12 +236,12 @@ const styles = StyleSheet.create({
 
   quizTitleText: {
     fontWeight: 'bold',
-    fontSize: 35,
+    fontSize: 25,
     textAlign: 'center',
   },
 
   quizQuestionContainer: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 30,
     paddingVertical: 5,
     borderRadius: 5,
   },
@@ -255,11 +255,11 @@ const styles = StyleSheet.create({
   },
 
   quizAnswerText: {
-    fontSize: 20,
+    fontSize: 15,
   },
 
   quizQuestionText: {
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: 'bold',
   }
 
