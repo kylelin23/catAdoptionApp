@@ -5,8 +5,8 @@ import ThinkingOfAdopting from '../(tabs)/Categories/thinkingOfAdopting'
 import NewCatParents from '../(tabs)/Categories/newCatParents'
 import CatParents from '../(tabs)/Categories/catParents'
 import CatLovers from '../(tabs)/Categories/catLovers'
-import Pros from '../(tabs)/Categories/pros'
-import Cons from '../(tabs)/Categories/cons'
+import Pros from '../(tabs)/pros'
+import Cons from '../(tabs)/cons'
 
 
 

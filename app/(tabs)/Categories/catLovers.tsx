@@ -60,7 +60,6 @@ export default function CatLovers({navigation}: {navigation: any}) {
       { key: 'catStories', title: 'Cat Stories' },
       { key: 'communityCats', title: 'Community Cats' },
       { key: 'typesOfCats', title: 'Types Of Cats' },
-      { key: 'shelters', title: 'Shelters' }
     ]);
 
     const renderScene = ({ route }: {route: any}) => {
