@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Text, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { MaterialIcons } from "@expo/vector-icons";
 import { TabView, TabBar } from 'react-native-tab-view';
 
 

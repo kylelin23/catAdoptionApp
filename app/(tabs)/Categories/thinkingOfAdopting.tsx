@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Text, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React from 'react';
+import { Dimensions, View, StyleSheet } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Info from '../../../components/ui/Info'
 import FAQs from '../../../components/ui/FAQs'

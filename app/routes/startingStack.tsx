@@ -32,8 +32,8 @@ export default function App (){
             <StartingStack.Screen name = "New Cat Parents" component = {NewCatParents} />
             <StartingStack.Screen name = "Cat Parents" component = {CatParents} />
             <StartingStack.Screen name = "Cat Lovers" component = {CatLovers} />
-            <StartingStack.Screen name = "Pros" component = {Pros} />
-            <StartingStack.Screen name = "Cons" component = {Cons} />
+            <StartingStack.Screen name = "Pros" component = {Pros} options = {{headerShown: true}} />
+            <StartingStack.Screen name = "Cons" component = {Cons} options = {{headerShown: true}} />
         </StartingStack.Navigator>
     );
 }
