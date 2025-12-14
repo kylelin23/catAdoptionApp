@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Text, Dimensions, View, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import faqs from '../../app/data/faqs'
+import faqs from '../../../app/data/thinkingOfAdopting/faqs'
 
 export default function FAQs () {
-    
+
     const showAnswer = ( index: number ) => {
         setOpenIndex(openIndex === index ? -1 : index);
     }

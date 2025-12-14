@@ -1,9 +1,9 @@
 import React from 'react';
 import { Dimensions, View, StyleSheet } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
-import Info from '../../../components/ui/Info'
-import FAQs from '../../../components/ui/FAQs'
-import Trivia from '../../../components/ui/trivia'
+import Info from '../../../components/ui/thinkingOfAdopting/Info'
+import FAQs from '../../../components/ui/thinkingOfAdopting/FAQs'
+import Trivia from '../../../components/ui/thinkingOfAdopting/trivia'
 
 export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
 

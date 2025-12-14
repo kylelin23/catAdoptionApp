@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, ScrollView, Dimensions, View, StyleSheet } from 'react-native';
-import cons from '../data/cons';
+import cons from '../data/thinkingOfAdopting/cons';
 
 export default function Cons() {
 

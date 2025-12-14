@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, ScrollView, Dimensions, View, StyleSheet } from 'react-native';
-import pros from '../data/pros'
+import pros from '../data/thinkingOfAdopting/pros'
 
 
 export default function Pros() {

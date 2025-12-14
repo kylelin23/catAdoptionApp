@@ -1,17 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Text, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView, TextInput, Button } from 'react-native';
-import quiz from '../../app/data/trivia'
+import quiz from '../../../app/data/newCatParents/trivia'
 
 export default function Trivia() {
 
-  //scoring criteria
-  //A = 3 points B = 2 points C = 1 point
-  //23–27 points – Ready to Adopt! You probably already have a name ready!
-  //17–22 points – Almost There. Go cat sit or hang out at a shelter before taking the plunge.
-  //9–16 points – Not Yet Ready. Nothing is ever a complete "no" but we want you to feel ready and be ready.
-
   const [questions, setQuestions] = useState(
-    Array(9).fill(0)
+    Array(10).fill(0)
   )
 
   const [total, setTotal] = useState(0);
@@ -53,9 +47,8 @@ export default function Trivia() {
   return (
     <ScrollView contentContainerStyle = {{alignItems: 'center'}}>
       <View style = {styles.quizTitleContainer}>
-        <Text style = {styles.quizTitleText}>Are You Ready to Adopt? </Text>
+        <Text style = {styles.quizTitleText}>Test Your Cat Knowledge! </Text>
       </View>
-
 
       {quiz.map((question, qIndex) => (
         <View style = {{width: screenWidth, alignItems: 'center', gap: 10, marginBottom: 10}} key = {qIndex}>
