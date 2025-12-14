@@ -1,20 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, ScrollView, Dimensions, View, StyleSheet } from 'react-native';
-
-
-
-
-
-
+import cons from '../data/cons';
 
 export default function Cons() {
-
-  const [cons, setCons] = useState([
-    // CHANGE THE CONS OVER HERE
-    ["Icon", "Cost", ["As with all pets, vet visits are the bulk of the expenses", "Ongoing costs include food, litter, toys and vaccinations", "Pet insurance is optional but will help during unexpected visits"]],
-    ["Icon", "Commitment", ["Cats are family and can live for 15-20 years", "Cats will fall sick and need at-home care with medication", "While independent, cats also need playtime and bonding time"]],
-    ["Icon", "Change", ["Be prepared to adapt your lifestyle to include your cat", "Finding a reliable pet sitter while travelling", "Cats will shed, throw up hairballs and scratch furniture"]],
-  ]);
 
   const colors = [
     '#f2c068',
@@ -22,25 +10,20 @@ export default function Cons() {
     '#d49e3f'
   ]
 
-
-
   return (
     <ScrollView style = {styles.container}>
       <View style = {styles.containerInner}>
-
         {cons.map((con, index) => (
             <View key={index} style = {
               [styles.card, {backgroundColor: colors[index]}]
             }>
-              <Text style = {styles.title}>{con[1]}</Text>
-              {(con[2] as string[]).map((bullet, index) => (
-                <Text key = {index} style = {styles.bullets}>{bullet}</Text>
-              ))}
+              <Text style = {styles.title}>{con.category}</Text>
+              <Text style = {styles.bullets}>- {con.support1}</Text>
+              <Text style = {styles.bullets}>- {con.support2}</Text>
+              <Text style = {styles.bullets}>- {con.support3}</Text>
             </View>
         ))}
       </View>
-
-
     </ScrollView>
   );
 }
@@ -78,7 +61,4 @@ const styles = StyleSheet.create({
   bullets: {
 
   }
-
-
-
 });
