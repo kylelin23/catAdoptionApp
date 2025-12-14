@@ -15,12 +15,20 @@ export default function ThinkingOfAdopting({navigation}: {navigation: any}) {
     { key: 'faqs', title: 'FAQs' }
   ]);
 
+  const [triviaKey, setTriviaKey] = React.useState(0);
+
+  React.useEffect(() => {
+    if (index != 1) {
+      setTriviaKey(triviaKey + 1);
+    }
+  }, [index]);
+
   const renderScene = ({ route }: {route: any}) => {
     switch (route.key) {
       case 'info':
         return <Info navigation = {navigation}/>;
       case 'trivia':
-        return <Trivia />;
+        return <Trivia key={triviaKey} />;
       case 'faqs':
         return <FAQs />
       default:

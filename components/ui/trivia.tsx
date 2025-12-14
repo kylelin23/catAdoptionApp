@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Text, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView, TextInput, Button } from 'react-native';
 import quiz from '../../app/data/trivia'
 
 export default function Trivia() {
@@ -16,9 +16,11 @@ export default function Trivia() {
 
   const [total, setTotal] = useState(0);
 
-  const aButton = (qIndex: number) => {
+  const [result, setResult] = useState("");
+
+  const button = (qIndex: number, points: number) => {
     const newQuestions = [...questions];
-    newQuestions[qIndex] = 3;
+    newQuestions[qIndex] = points;
     setQuestions(newQuestions);
 
     let sum = 0;
@@ -28,53 +30,57 @@ export default function Trivia() {
     setTotal(sum);
   }
 
-  const bButton = (qIndex: number) => {
-    const newQuestions = [...questions];
-    newQuestions[qIndex] = 2;
-    setQuestions(newQuestions);
-
-    let sum = 0;
+  const submit = () => {
     for (let q = 0; q < questions.length; q++){
-      sum += questions[q];
+      if (questions[q] == 0){
+        alert("Need to answer all questions first");
+        return;
+      }
     }
-    setTotal(sum);
-  }
-
-  const cButton = (qIndex: number) => {
-    const newQuestions = [...questions];
-    newQuestions[qIndex] = 1;
-    setQuestions(newQuestions);
-
-    let sum = 0;
-    for (let q = 0; q < questions.length; q++){
-      sum += questions[q];
+    if (total < 16){
+      setResult('Not Yet Ready. Nothing is ever a complete "no" but we want you to feel ready and be ready.')
     }
-    setTotal(sum);
+    else if (total < 22){
+      setResult("Almost There. Go cat sit or hang out at a shelter before taking the plunge.")
+    }
+    else {
+      setResult("Ready to Adopt! You probably already have a name ready!")
+    }
+
+
   }
 
   return (
     <ScrollView contentContainerStyle = {{alignItems: 'center'}}>
       <View style = {styles.quizTitleContainer}>
-        <Text style = {styles.quizTitleText}>Are You Ready to Adopt?{questions} Total: {total}</Text>
+        <Text style = {styles.quizTitleText}>Are You Ready to Adopt? </Text>
       </View>
+
 
       {quiz.map((question, qIndex) => (
         <View style = {{width: screenWidth, alignItems: 'center', gap: 10, marginBottom: 10}} key = {qIndex}>
-          <Text>{qIndex + 1}</Text>
           <View style = {styles.quizQuestionContainer}>
             <Text style = {styles.quizQuestionText}>{question.question}</Text>
           </View>
-          <TouchableOpacity style = {styles.quizAnswerContainer} onPress = {() => aButton(qIndex)}>
+          <TouchableOpacity style = {[styles.quizAnswerContainer, (questions[qIndex] == 3) && styles.selected]} onPress = {() => button(qIndex, 3)}>
             <Text style = {styles.quizAnswerText}>{question.answer1}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style = {styles.quizAnswerContainer} onPress = {() => bButton(qIndex)}>
+          <TouchableOpacity style = {[styles.quizAnswerContainer, (questions[qIndex] == 2) && styles.selected]} onPress = {() => button(qIndex, 2)}>
             <Text style = {styles.quizAnswerText}>{question.answer2}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style = {styles.quizAnswerContainer} onPress = {() => cButton(qIndex)}>
+          <TouchableOpacity style = {[styles.quizAnswerContainer, (questions[qIndex] == 1) && styles.selected]} onPress = {() => button(qIndex, 1)}>
             <Text style = {styles.quizAnswerText}>{question.answer3}</Text>
           </TouchableOpacity>
         </View>
       ))}
+      <TouchableOpacity style = {styles.submitButton} onPress = {submit}>
+        <Text style = {styles.submitButtonText}>
+          Submit
+        </Text>
+      </TouchableOpacity>
+      <View style = {styles.resultContainer}>
+        <Text style = {styles.resultText}>{result}</Text>
+      </View>
     </ScrollView>
   )
 }
@@ -116,5 +122,31 @@ const styles = StyleSheet.create({
   quizQuestionText: {
     fontSize: 15,
     fontWeight: 'bold',
+  },
+
+  submitButton: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+
+  submitButtonText: {
+    color: 'black',
+  },
+
+  resultContainer: {
+    width: .7 * screenWidth,
+    marginTop: 30,
+  },
+
+  resultText: {
+    color: 'red',
+    fontSize: 20,
+  },
+
+  selected: {
+    borderWidth: 3,
+    borderColor: 'red',
   }
 })
