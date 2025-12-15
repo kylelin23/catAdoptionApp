@@ -5,6 +5,19 @@ type Trivia = {
   answer3: string;
 };
 
+export const answers = [
+    'b',
+    'c',
+    'a',
+    'b',
+    'b',
+    'c',
+    'a',
+    'b',
+    'b',
+    'a',
+];
+
 const quiz: Trivia[] = [
     {
         question: '1. What does it mean when a cat shows you its belly?',

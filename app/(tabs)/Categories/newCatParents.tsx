@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Text, Dimensions, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React from 'react';
+import { Dimensions, View, StyleSheet } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import FAQs from '@/components/ui/newCatParents/FAQs';
 import Trivia from '../../../components/ui/newCatParents/Trivia'
@@ -8,6 +8,14 @@ import Info from '../../../components/ui/newCatParents/Info'
 export default function NewCatParents() {
 
   const [index, setIndex] = React.useState(0);
+
+  const [triviaKey, setTriviaKey] = React.useState(0);
+
+  React.useEffect(() => {
+    if (index != 1) {
+      setTriviaKey(triviaKey + 1);
+    }
+  }, [index]);
 
   const [routes] = React.useState([
     { key: 'info', title: 'Info' },
@@ -20,7 +28,7 @@ export default function NewCatParents() {
       case 'info':
         return <Info />;
       case 'trivia':
-        return <Trivia />;
+        return <Trivia key = {triviaKey}/>;
       case 'faqs':
         return <FAQs />
       default:
