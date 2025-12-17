@@ -1,26 +1,31 @@
 import React from 'react';
 import { Text, ScrollView, Dimensions, View, StyleSheet } from 'react-native';
-import cons from '../data/thinkingOfAdopting/cons';
+import pros from '../../data/thinkingOfAdopting/pros'
 
-export default function Cons() {
+
+export default function Pros() {
 
   const colors = [
-    '#f2c068',
-    '#dbab56',
-    '#d49e3f'
+    '#87e8a8',
+    '#6fd190',
+    '#7abf91',
+    '#67a17a',
+    '#548f68',
   ]
 
   return (
     <ScrollView style = {styles.container}>
       <View style = {styles.containerInner}>
-        {cons.map((con, index) => (
+
+        {pros.map((pro, index) => (
             <View key={index} style = {
               [styles.card, {backgroundColor: colors[index]}]
-            }>
-              <Text style = {styles.title}>{con.category}</Text>
-              <Text style = {styles.bullets}>- {con.support1}</Text>
-              <Text style = {styles.bullets}>- {con.support2}</Text>
-              <Text style = {styles.bullets}>- {con.support3}</Text>
+              }>
+              <Text style = {styles.title}>{pro.fact}</Text>
+              <Text style = {styles.bullets}>- {pro.support1}</Text>
+              <Text style = {styles.bullets}>- {pro.support2}</Text>
+              <Text style = {styles.bullets}>- {pro.support3}</Text>
+              {pro.support4 != "" && <Text style = {styles.bullets}>- {pro.support4}</Text>}
             </View>
         ))}
       </View>
@@ -42,10 +47,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
+    paddingBottom: 50
   },
 
   card: {
-    backgroundColor: 'white',
     padding: 20,
     width: .8*screenWidth,
     gap: 10,

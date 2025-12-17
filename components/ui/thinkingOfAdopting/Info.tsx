@@ -3,16 +3,16 @@ import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function Info({navigation}: {navigation: any}) {
     return (
-        <View style = {{alignItems: 'center', gap: 50, justifyContent: 'center', flex: 1}}>
-              <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Pros")}>
-                <Text style = {styles.proConText}>Pros</Text>
-                <Text>Key benefits</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Cons")}>
-                <Text style = {styles.proConText}>Cons</Text>
-                <Text>Things to Consider</Text>
-              </TouchableOpacity>
-            </View>
+      <View style = {{alignItems: 'center', gap: 50, justifyContent: 'center', flex: 1}}>
+        <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Pros")}>
+          <Text style = {styles.proConText}>Pros</Text>
+          <Text>Key benefits</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Cons")}>
+          <Text style = {styles.proConText}>Cons</Text>
+          <Text>Things to Consider</Text>
+        </TouchableOpacity>
+      </View>
     )
 }
 

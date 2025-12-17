@@ -5,7 +5,7 @@ import FAQs from '@/components/ui/newCatParents/FAQs';
 import Trivia from '../../../components/ui/newCatParents/Trivia'
 import Info from '../../../components/ui/newCatParents/Info'
 
-export default function NewCatParents() {
+export default function NewCatParents({navigation} : {navigation: any}) {
 
   const [index, setIndex] = React.useState(0);
 
@@ -26,7 +26,7 @@ export default function NewCatParents() {
   const renderScene = ({ route }: {route: any}) => {
     switch (route.key) {
       case 'info':
-        return <Info />;
+        return <Info navigation = {navigation}/>;
       case 'trivia':
         return <Trivia key = {triviaKey}/>;
       case 'faqs':
