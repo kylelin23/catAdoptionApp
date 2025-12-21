@@ -5,7 +5,7 @@ import expectCards from '../../data/newCatParents/expect'
 export default function Expect() {
 
     return (
-        <ScrollView style = {styles.container}>
+      <ScrollView style = {styles.container}>
         <View style = {styles.containerInner}>
 
             {expectCards.map((card, index) => (
@@ -21,7 +21,7 @@ export default function Expect() {
                 </View>
             ))}
         </View>
-        </ScrollView>
+      </ScrollView>
     );
 }
 

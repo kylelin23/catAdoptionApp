@@ -10,6 +10,9 @@ import Cons from "../(tabs)/thinkingOfAdoptingInfo/cons";
 import Preparation from '../(tabs)/newCatParentsInfo/preparation'
 import Expect from '../(tabs)/newCatParentsInfo/expect'
 import Checklist from "../(tabs)/newCatParentsInfo/checklist";
+import CatList1 from '../(tabs)/newCatParentsInfo/checklist/catList1'
+import CatLanguage from '../(tabs)/newCatParentsInfo/checklist/catLanguage'
+import PoopMonitoring from '../(tabs)/newCatParentsInfo/checklist/poopMonitoring'
 
 const StartingStack = createStackNavigator();
 
@@ -66,6 +69,21 @@ export default function App() {
       <StartingStack.Screen
         name="Checklist"
         component={Checklist}
+        options={{ headerShown: true }}
+      />
+      <StartingStack.Screen
+        name="Toxic Foods, Plants and Items"
+        component={CatList1}
+        options={{ headerShown: true }}
+      />
+      <StartingStack.Screen
+        name="Cat Language"
+        component={CatLanguage}
+        options={{ headerShown: true }}
+      />
+      <StartingStack.Screen
+        name="Poop Monitoring Scores"
+        component={PoopMonitoring}
         options={{ headerShown: true }}
       />
     </StartingStack.Navigator>
