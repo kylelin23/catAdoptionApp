@@ -6,8 +6,6 @@ The goal of this app is to let new cat adopters have a more smooth adoption. The
 **Technologies Used:**
 React Native, Expo Go
 
-**Frontend UI Design:** [Figma](https://www.figma.com/design/DDKC8hf5LSOV17jN65XbSx/Cat-Adoption-App?node-id=0-1&t=lS9hk7dvvQ5xKScA-1)
-
 **App Outline:** [Lucid Chart](https://lucid.app/lucidchart/0acb1c8e-a834-45c1-968c-c90e666027a9/edit?invitationId=inv_150ff306-57ce-496f-81bb-c18887997127&page=0_0#)
 
 ## Features  
