@@ -86,16 +86,26 @@ export default function CatList1 () {
             <Text style = {styles.titleText}>Are These Items Toxic to Cats? </Text>
             {currentList.map((item, index) => (
                 <View key = {index} style = {styles.choiceContainer}>
-                    { !(invisibleItem.includes(index)) &&
-                        <TouchableOpacity onPress = {() => itemPress(index, item.answer)} style = {[styles.item, selectedItemIndex == index && {borderWidth : 2}]}>
-                            <Text style = {{textAlign: 'center'}}>{item.item}</Text>
-                        </TouchableOpacity>
-                    }
-                    { !(invisibleAnswer.includes(index)) &&
-                        <TouchableOpacity onPress = {() => answerPress(index, item.fakeAnswer)} style = {[styles.item, selectedAnswerIndex == index && {borderWidth : 2}]}>
-                            <Text style = {{textAlign: 'center'}}>{item.fakeAnswer}</Text>
-                        </TouchableOpacity>
-                    }
+                    <TouchableOpacity onPress = {() => itemPress(index, item.answer)} style = {
+                        [
+                            styles.item,
+                            selectedItemIndex == index && {borderWidth : 2},
+                            invisibleItem.includes(index) && styles.invisible
+                        ]
+                    }>
+                        <Text style = {[{textAlign: 'center'}, invisibleItem.includes(index) && styles.invisible]}>{item.item}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress = {() => answerPress(index, item.fakeAnswer)} style = {
+                        [
+                            styles.item,
+                            selectedAnswerIndex == index && {borderWidth : 2},
+                            invisibleAnswer.includes(index) && styles.invisible
+                        ]
+                    }>
+                        <Text style = {[{textAlign: 'center'}, invisibleAnswer.includes(index) && styles.invisible]}>{item.fakeAnswer}</Text>
+                    </TouchableOpacity>
+
                 </View>
             ))}
             {nextButton &&
@@ -156,5 +166,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 100,
         width: screenWidth,
+    },
+
+    invisible: {
+        borderWidth: 0,
+        color: 'transparent',
     }
 });
