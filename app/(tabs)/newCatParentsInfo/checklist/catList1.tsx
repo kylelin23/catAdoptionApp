@@ -7,8 +7,18 @@ export default function CatList1 () {
     const [currentList, setCurrentList] = useState(food);
     const [nextButton, setNextButton] = useState(true);
     const [backButton, setBackButton] = useState(false);
+    const [selectedItemIndex, setSelectedItemIndex] = useState(-1);
+    const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(-1);
+    const [fakeAnswer, setFakeAnswer] = useState('');
+    const [realAnswer, setRealAnswer] = useState('');
+    const [invisibleAnswer, setInvisibleAnswer] = useState([-1]);
+    const [invisibleItem, setInvisibleItem] = useState([-1]);
 
     const nextButtonPress = () => {
+        setSelectedItemIndex(-1);
+        setSelectedAnswerIndex(-1);
+        setInvisibleItem([-1]);
+        setInvisibleAnswer([-1]);
         if(currentList == food){
             setCurrentList(plants);
             setBackButton(true);
@@ -23,6 +33,10 @@ export default function CatList1 () {
     }
 
     const backButtonPress = () => {
+        setSelectedItemIndex(-1);
+        setSelectedAnswerIndex(-1);
+        setInvisibleItem([-1]);
+        setInvisibleAnswer([-1]);
         if(currentList == plants){
             setCurrentList(food);
             setBackButton(false);
@@ -36,17 +50,52 @@ export default function CatList1 () {
         }
     }
 
+    const itemPress = (itemIdx: number, answer: string) => {
+        setSelectedItemIndex(itemIdx);
+
+        if (answer === fakeAnswer && answer !== '') {
+            setInvisibleItem(prev => [...prev, itemIdx]);
+            setInvisibleAnswer(prev => [...prev, selectedAnswerIndex]);
+            setSelectedItemIndex(-1);
+            setSelectedAnswerIndex(-1);
+            setRealAnswer('');
+            setFakeAnswer('');
+        } else {
+            setRealAnswer(answer);
+        }
+    };
+
+    const answerPress = (ansIdx: number, fake: string) => {
+        setSelectedAnswerIndex(ansIdx);
+
+        if (realAnswer === fake && fake !== '') {
+            setInvisibleItem(prev => [...prev, selectedItemIndex]);
+            setInvisibleAnswer(prev => [...prev, ansIdx]);
+            setSelectedItemIndex(-1);
+            setSelectedAnswerIndex(-1);
+            setRealAnswer('');
+            setFakeAnswer('');
+        } else {
+            setFakeAnswer(fake);
+        }
+    };
+
+
     return (
         <View style = {styles.container}>
             <Text style = {styles.titleText}>Are These Items Toxic to Cats? </Text>
-            {currentList.map((item) => (
-                <View style = {styles.choiceContainer}>
-                    <TouchableOpacity style = {styles.item}>
-                        <Text style = {{textAlign: 'center'}}>{item.item}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style = {styles.item}>
-                        <Text style = {{textAlign: 'center'}}>{item.fakeAnswer}</Text>
-                    </TouchableOpacity>
+            {currentList.map((item, index) => (
+                <View key = {index} style = {styles.choiceContainer}>
+                    { !(invisibleItem.includes(index)) &&
+                        <TouchableOpacity onPress = {() => itemPress(index, item.answer)} style = {[styles.item, selectedItemIndex == index && {borderWidth : 2}]}>
+                            <Text style = {{textAlign: 'center'}}>{item.item}</Text>
+                        </TouchableOpacity>
+                    }
+                    { !(invisibleAnswer.includes(index)) &&
+                        <TouchableOpacity onPress = {() => answerPress(index, item.fakeAnswer)} style = {[styles.item, selectedAnswerIndex == index && {borderWidth : 2}]}>
+                            <Text style = {{textAlign: 'center'}}>{item.fakeAnswer}</Text>
+                        </TouchableOpacity>
+                    }
                 </View>
             ))}
             {nextButton &&
