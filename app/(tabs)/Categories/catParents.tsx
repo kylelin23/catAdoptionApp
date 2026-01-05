@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { Text, Dimensions, View, StyleSheet, ScrollView } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
-
-
-
-
+import Checklist from '../../../components/ui/catParents/checklist'
 
 
 
@@ -19,9 +16,10 @@ export default function CatParents({navigation}: {navigation: any}) {
   const CatssentialLists = () => (
     <ScrollView
       style = {styles.scrollContainer}
+      contentContainerStyle = {styles.scrollContent}
       showsVerticalScrollIndicator={true}
     >
-      <Text>Cat-ssential Lists</Text>
+      <Checklist navigation = {navigation}/>
     </ScrollView>
   );
 
@@ -38,8 +36,9 @@ export default function CatParents({navigation}: {navigation: any}) {
   const [index, setIndex] = React.useState(0);
 
   const [routes] = React.useState([
-      { key: 'catssentialLists', title: 'Cat-ssential Lists' },
-      { key: 'introducingNewCats', title: 'Introducing New Cats' },
+      { key: 'catssentialLists', title: 'Essentials' },
+      { key: 'introducingNewCats', title: 'New Cats' },
+      { key: 'cationary', title: 'Cationary' },
     ]);
 
     const renderScene = ({ route }: {route: any}) => {
@@ -47,6 +46,8 @@ export default function CatParents({navigation}: {navigation: any}) {
         case 'catssentialLists':
           return <CatssentialLists />;
         case 'introducingNewCats':
+          return <IntroducingNewCats />;
+        case 'cationary':
           return <IntroducingNewCats />;
         default:
           return null;
@@ -96,7 +97,12 @@ const styles = StyleSheet.create({
 
   scrollContainer: {
     flex: 1,
-    padding: 25,
   },
+
+  scrollContent: {
+    flexGrow: 1,
+    padding: 25,
+    justifyContent: 'center',
+  }
 
 });

@@ -12,10 +12,10 @@ export default function Info({navigation}: {navigation: any}) {
           <Text style = {styles.proConText}>What to Expect in the First Week</Text>
           <Text style = {{textAlign: 'center'}}>Know what to expect!</Text>
         </TouchableOpacity>
-        <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Checklist")}>
+        {/* <TouchableOpacity style = {styles.square} onPress = {() => navigation.navigate("Checklist")}>
           <Text style = {styles.proConText}>Checklist</Text>
           <Text style = {{textAlign: 'center'}}>Make sure you check all boxes!</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ScrollView>
     )
 }

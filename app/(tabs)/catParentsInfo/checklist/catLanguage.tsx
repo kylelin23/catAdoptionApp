@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, ScrollView, Dimensions, View, StyleSheet, TouchableOpacity } from 'react-native';
-import cards from '../../../data/newCatParents/catLang'
+import cards from '../../../data/catParents/catLang'
 
 export default function CatLanguage() {
 

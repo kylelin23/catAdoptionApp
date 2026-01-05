@@ -7,12 +7,12 @@ import CatParents from "../(tabs)/Categories/catParents";
 import CatLovers from "../(tabs)/Categories/catLovers";
 import Pros from "../(tabs)/thinkingOfAdoptingInfo/pros";
 import Cons from "../(tabs)/thinkingOfAdoptingInfo/cons";
-import Preparation from '../(tabs)/newCatParentsInfo/preparation'
-import Expect from '../(tabs)/newCatParentsInfo/expect'
-import Checklist from "../(tabs)/newCatParentsInfo/checklist";
-import CatList1 from '../(tabs)/newCatParentsInfo/checklist/catList1'
-import CatLanguage from '../(tabs)/newCatParentsInfo/checklist/catLanguage'
-import PoopMonitoring from '../(tabs)/newCatParentsInfo/checklist/poopMonitoring'
+import Preparation from '../(tabs)/newCatParentsInfo/preparation';
+import Expect from '../(tabs)/newCatParentsInfo/expect';
+import Checklist from "../../components/ui/catParents/checklist";
+import CatList1 from '../(tabs)/catParentsInfo/checklist/catList1'
+import CatLanguage from '../(tabs)/catParentsInfo/checklist/catLanguage'
+import PoopMonitoring from '../(tabs)/catParentsInfo/checklist/poopMonitoring'
 
 const StartingStack = createStackNavigator();
 

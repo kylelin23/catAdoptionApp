@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
-import food, { plants, householdItems, others } from '../../../data/newCatParents/catList1'
+import food, { plants, householdItems, others } from '../../../data/catParents/catList1'
 import { useState } from "react";
 
 export default function CatList1 () {
