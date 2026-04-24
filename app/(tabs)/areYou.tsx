@@ -39,16 +39,11 @@ const CATEGORIES = [
 ];
 
 const TRAIL = [
-  { x: SCREEN_WIDTH * 0.05,  y: SCREEN_HEIGHT * 0.75, rotation: '-10deg' },
-  { x: SCREEN_WIDTH * 0.20,  y: SCREEN_HEIGHT * 0.80, rotation: '20deg'  },
-  { x: SCREEN_WIDTH * 0.38,  y: SCREEN_HEIGHT * 0.76, rotation: '-5deg'  },
-  { x: SCREEN_WIDTH * 0.55,  y: SCREEN_HEIGHT * 0.82, rotation: '25deg'  },
-  { x: SCREEN_WIDTH * 0.70,  y: SCREEN_HEIGHT * 0.77, rotation: '-15deg' },
-  { x: SCREEN_WIDTH * 0.82,  y: SCREEN_HEIGHT * 0.83, rotation: '10deg'  },
-  { x: SCREEN_WIDTH * 0.12,  y: SCREEN_HEIGHT * 0.87, rotation: '-20deg' },
-  { x: SCREEN_WIDTH * 0.30,  y: SCREEN_HEIGHT * 0.91, rotation: '15deg'  },
-  { x: SCREEN_WIDTH * 0.50,  y: SCREEN_HEIGHT * 0.88, rotation: '-8deg'  },
-  { x: SCREEN_WIDTH * 0.68,  y: SCREEN_HEIGHT * 0.93, rotation: '22deg'  },
+  { x: SCREEN_WIDTH * 0.05,  y: SCREEN_HEIGHT * 0.80, rotation: '-10deg' },
+  { x: SCREEN_WIDTH * 0.22,  y: SCREEN_HEIGHT * 0.77, rotation: '15deg'  },
+  { x: SCREEN_WIDTH * 0.40,  y: SCREEN_HEIGHT * 0.83, rotation: '-5deg'  },
+  { x: SCREEN_WIDTH * 0.60,  y: SCREEN_HEIGHT * 0.78, rotation: '20deg'  },
+  { x: SCREEN_WIDTH * 0.78,  y: SCREEN_HEIGHT * 0.82, rotation: '-15deg' },
 ];
 
 const PAW_SIZE = 52;
