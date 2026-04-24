@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { Text, View, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
 const SAND = '#E8C9A0';
 const WARM = '#D4956A';
 const WHITE = '#FFFAF5';
+
+const PAW = require('../../assets/images/paw.png');
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const CATEGORIES = [
   {
@@ -34,13 +38,98 @@ const CATEGORIES = [
   },
 ];
 
+const TRAIL = [
+  { x: SCREEN_WIDTH * 0.05,  y: SCREEN_HEIGHT * 0.75, rotation: '-10deg' },
+  { x: SCREEN_WIDTH * 0.20,  y: SCREEN_HEIGHT * 0.80, rotation: '20deg'  },
+  { x: SCREEN_WIDTH * 0.38,  y: SCREEN_HEIGHT * 0.76, rotation: '-5deg'  },
+  { x: SCREEN_WIDTH * 0.55,  y: SCREEN_HEIGHT * 0.82, rotation: '25deg'  },
+  { x: SCREEN_WIDTH * 0.70,  y: SCREEN_HEIGHT * 0.77, rotation: '-15deg' },
+  { x: SCREEN_WIDTH * 0.82,  y: SCREEN_HEIGHT * 0.83, rotation: '10deg'  },
+  { x: SCREEN_WIDTH * 0.12,  y: SCREEN_HEIGHT * 0.87, rotation: '-20deg' },
+  { x: SCREEN_WIDTH * 0.30,  y: SCREEN_HEIGHT * 0.91, rotation: '15deg'  },
+  { x: SCREEN_WIDTH * 0.50,  y: SCREEN_HEIGHT * 0.88, rotation: '-8deg'  },
+  { x: SCREEN_WIDTH * 0.68,  y: SCREEN_HEIGHT * 0.93, rotation: '22deg'  },
+];
+
+const PAW_SIZE = 52;
+const STEP_GAP = 380;
+const HOLD_DURATION = 1800;
+const FADE_OUT_DURATION = 900;
+
+function PawTrail() {
+  const opacities = useRef(TRAIL.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    const runTrail = () => {
+      opacities.forEach(o => o.setValue(0));
+
+      const stampSequence = TRAIL.map((_, i) =>
+        Animated.sequence([
+          Animated.delay(i * STEP_GAP),
+          Animated.spring(opacities[i], {
+            toValue: 1,
+            friction: 4,
+            tension: 120,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+
+      Animated.sequence([
+        Animated.parallel(stampSequence),
+        Animated.delay(HOLD_DURATION),
+        Animated.parallel(
+          opacities.map(o =>
+            Animated.timing(o, {
+              toValue: 0,
+              duration: FADE_OUT_DURATION,
+              useNativeDriver: true,
+            })
+          )
+        ),
+        Animated.delay(600),
+      ]).start(() => runTrail());
+    };
+
+    runTrail();
+  }, []);
+
+  return (
+    <>
+      {TRAIL.map((step, i) => (
+        <Animated.Image
+          key={i}
+          source={PAW}
+          style={[
+            styles.paw,
+            {
+              left: step.x,
+              top: step.y,
+              opacity: opacities[i],
+              transform: [
+                { rotate: step.rotation },
+                {
+                  scale: opacities[i].interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.4, 1],
+                  }),
+                },
+              ],
+            },
+          ]}
+        />
+      ))}
+    </>
+  );
+}
+
 export default function AreYou({ navigation }: { navigation: any }) {
   const [pressed, setPressed] = useState<string | null>(null);
 
   return (
     <View style={styles.container}>
 
-      {/* Top band */}
+      {/* Top band — renders on top of paws */}
       <View style={styles.topBand}>
         <TouchableOpacity
           style={styles.backButton}
@@ -56,7 +145,7 @@ export default function AreYou({ navigation }: { navigation: any }) {
         <Text style={styles.titleSub}>Select what best describes you</Text>
       </View>
 
-      {/* Cards */}
+      {/* Cards — renders on top of paws */}
       <View style={styles.cardsArea}>
         {CATEGORIES.map((cat) => (
           <TouchableOpacity
@@ -75,7 +164,6 @@ export default function AreYou({ navigation }: { navigation: any }) {
               <Text style={styles.cardSubtitle}>{cat.subtitle}</Text>
             </View>
 
-            {/* Arrow chip */}
             <View style={[
               styles.arrowChip,
               pressed === cat.key && styles.arrowChipPressed,
@@ -85,6 +173,9 @@ export default function AreYou({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         ))}
       </View>
+
+      {/* Paw trail — rendered LAST so it's on top of background but below cards */}
+      <PawTrail />
 
     </View>
   );
@@ -97,7 +188,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5EAD8',
   },
 
-  // Top band
+  paw: {
+    position: 'absolute',
+    width: PAW_SIZE,
+    height: PAW_SIZE,
+    resizeMode: 'contain',
+    tintColor: '#2C1A0E',
+    zIndex: 0,        // behind cards
+  },
+
   topBand: {
     backgroundColor: SAND,
     paddingTop: 64,
@@ -110,6 +209,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 16,
     elevation: 6,
+    zIndex: 2,        // above paws
   },
 
   backButton: {
@@ -157,12 +257,12 @@ const styles = StyleSheet.create({
     color: INK_SOFT,
   },
 
-  // Cards area
   cardsArea: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 24,
     gap: 12,
+    zIndex: 2,        // above paws
   },
 
   card: {
@@ -177,7 +277,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 4,     // above paws on Android
   },
   cardPressed: {
     backgroundColor: '#FDF3E7',
