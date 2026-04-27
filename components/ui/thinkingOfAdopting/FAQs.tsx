@@ -9,26 +9,29 @@ const WARM = '#D4956A';
 const WHITE = '#FFFAF5';
 const screenWidth = Dimensions.get('window').width;
 
+const PAW = require('../../../assets/images/paw.png');
+const CAT_PEEK = require('../../../assets/images/catWave.png');
+
 function FAQItem({ question, answer, isOpen, onPress }: {
   question: string;
   answer: string;
   isOpen: boolean;
   onPress: () => void;
 }) {
-  const heightAnim = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
+  const peekAnim = useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
     Animated.parallel([
-      Animated.spring(heightAnim, {
-        toValue: isOpen ? 1 : 0,
-        friction: 8,
-        tension: 60,
-        useNativeDriver: false,
-      }),
       Animated.timing(rotateAnim, {
         toValue: isOpen ? 1 : 0,
         duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(peekAnim, {
+        toValue: isOpen ? 1 : 0,
+        friction: 5,
+        tension: 70,
         useNativeDriver: true,
       }),
     ]).start();
@@ -39,25 +42,54 @@ function FAQItem({ question, answer, isOpen, onPress }: {
     outputRange: ['0deg', '180deg'],
   });
 
-  return (
-    <View style={[styles.faqCard, isOpen && styles.faqCardOpen]}>
-      <TouchableOpacity
-        style={styles.questionRow}
-        onPress={onPress}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.questionText}>{question}</Text>
-            <Animated.View style={[styles.chevronWrapper, { transform: [{ rotate }] }]}>
-                <View style={styles.chevron} />
-            </Animated.View>
-      </TouchableOpacity>
+  // Cat slides right enough to overlap behind the card
+  const catTranslateX = peekAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-10, 0], // right edge of cat goes well into the card
+  });
 
-      {isOpen && (
-        <View style={styles.answerWrapper}>
-          <View style={styles.answerDivider} />
-          <Text style={styles.answerText}>{answer}</Text>
-        </View>
-      )}
+  return (
+    <View style={styles.faqWrapper}>
+
+      {/* Cat — zIndex 0, renders behind card */}
+      <Animated.Image
+        source={CAT_PEEK}
+        style={[
+          styles.peekingCat,
+          {
+            opacity: peekAnim,
+            transform: [
+              { translateX: catTranslateX },
+              { rotate: '-45deg' },
+            ],
+          },
+        ]}
+        resizeMode="contain"
+      />
+
+      {/* Card — zIndex 2, renders in front of cat */}
+      <View style={[styles.faqCard, isOpen && styles.faqCardOpen]}>
+        <TouchableOpacity
+          style={styles.questionRow}
+          onPress={onPress}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.questionText}>{question}</Text>
+          <Animated.Image
+            source={PAW}
+            style={[styles.pawChevron, { transform: [{ rotate }] }]}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        {isOpen && (
+          <View style={styles.answerWrapper}>
+            <View style={styles.answerDivider} />
+            <Text style={styles.answerText}>{answer}</Text>
+          </View>
+        )}
+      </View>
+
     </View>
   );
 }
@@ -85,7 +117,7 @@ export default function FAQs() {
         />
       ))}
 
-      <View style={{ height: 20 }} />
+      <View style={{ height: 40 }} />
     </ScrollView>
   );
 }
@@ -98,21 +130,40 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingLeft: 0,
+    paddingRight: 20,
     paddingTop: 20,
     gap: 12,
   },
 
+  faqWrapper: {
+    position: 'relative',
+  },
+
+  // Cat behind the card — zIndex 0
+  peekingCat: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    left: 0,
+    top: '50%',
+    marginTop: -60,
+    zIndex: 0,
+  },
+
+  // Card in front — zIndex 2
   faqCard: {
     backgroundColor: WHITE,
     borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 5,  // higher elevation on Android keeps card above cat
+    zIndex: 2,
+    marginLeft: 55,
   },
 
   faqCardOpen: {
@@ -130,30 +181,17 @@ const styles = StyleSheet.create({
   questionText: {
     flex: 1,
     fontFamily: 'Georgia',
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '700',
     color: INK,
-    lineHeight: 22,
+    lineHeight: 19,
   },
 
-  chevronWrapper: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: SAND,
-    alignItems: 'center',
-    justifyContent: 'center',
+  pawChevron: {
+    width: 28,
+    height: 28,
+    tintColor: WARM,
     flexShrink: 0,
-  },
-
-  chevron: {
-    width: 10,
-    height: 10,
-    borderRightWidth: 2,
-    borderBottomWidth: 2,
-    borderColor: INK,
-    transform: [{ rotate: '45deg' }],
-    marginTop: -4,
   },
 
   answerWrapper: {
@@ -168,9 +206,9 @@ const styles = StyleSheet.create({
   },
 
   answerText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '400',
     color: INK_SOFT,
-    lineHeight: 22,
+    lineHeight: 18,
   },
 });

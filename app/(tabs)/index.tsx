@@ -3,8 +3,8 @@ import { Text, View, StyleSheet, TouchableOpacity, StatusBar, Image, Animated } 
 
 const IMAGES = [
   require('../../assets/images/catWave.png'),
-  require('../../assets/images/catCute.png'),
   require('../../assets/images/catStretch.png'),
+  require('../../assets/images/cat.png'),
 ];
 
 export default function HomeScreen({ navigation }: { navigation: any }) {
