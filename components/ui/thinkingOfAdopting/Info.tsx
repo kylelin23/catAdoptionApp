@@ -1,16 +1,22 @@
-import React, { useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Animated, Dimensions, Image } from 'react-native';
+import React, { useRef } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+  Image,
+} from "react-native";
 
-const INK = '#2C1A0E';
-const SAND = '#E8C9A0';
+const INK = "#2C1A0E";
+const SAND = "#E8C9A0";
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get("window").width;
 
-const PROS = require('../../../assets/images/pros.png');
-const CONS = require('../../../assets/images/cons.png');
+const PROS = require("../../../assets/images/pros.png");
+const CONS = require("../../../assets/images/cons.png");
 
 export default function Info({ navigation }: { navigation: any }) {
-
   const prosScale = useRef(new Animated.Value(1)).current;
   const consScale = useRef(new Animated.Value(1)).current;
 
@@ -31,55 +37,48 @@ export default function Info({ navigation }: { navigation: any }) {
 
   return (
     <View style={styles.container}>
-
       {/* Pros */}
-      <Animated.View style={[styles.cardWrapper, { transform: [{ scale: prosScale }] }]}>
+      <Animated.View
+        style={[styles.cardWrapper, { transform: [{ scale: prosScale }] }]}
+      >
         <TouchableOpacity
           style={styles.card}
-          onPress={() => animatePress(prosScale, 'Pros')}
+          onPress={() => animatePress(prosScale, "Pros")}
           activeOpacity={1}
         >
-          <Image
-            source={PROS}
-            style={styles.cardImage}
-            resizeMode="contain"
-          />
+          <Image source={PROS} style={styles.cardImage} resizeMode="contain" />
         </TouchableOpacity>
       </Animated.View>
 
       {/* Cons */}
-      <Animated.View style={[styles.cardWrapper, { transform: [{ scale: consScale }] }]}>
+      <Animated.View
+        style={[styles.cardWrapper, { transform: [{ scale: consScale }] }]}
+      >
         <TouchableOpacity
           style={styles.card}
-          onPress={() => animatePress(consScale, 'Cons')}
+          onPress={() => animatePress(consScale, "Cons")}
           activeOpacity={1}
         >
-          <Image
-            source={CONS}
-            style={styles.cardImage}
-            resizeMode="contain"
-          />
+          <Image source={CONS} style={styles.cardImage} resizeMode="contain" />
         </TouchableOpacity>
       </Animated.View>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 60,
     paddingBottom: 24,
     gap: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
 
   cardWrapper: {
-    width: '100%',
+    width: "100%",
     shadowColor: INK,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
@@ -88,171 +87,15 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: '100%',
+    width: "100%",
     borderRadius: 28,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   cardImage: {
-    width: '100%',
+    width: "100%",
     height: 180,
   },
 });
-
-// import React, { useRef } from 'react';
-// import { Text, View, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
-
-// const INK = '#2C1A0E';
-// const INK_SOFT = '#6B4C35';
-// const SAND = '#E8C9A0';
-// const WARM = '#D4956A';
-// const WHITE = '#FFFAF5';
-
-// const screenWidth = Dimensions.get('window').width;
-
-// export default function Info({ navigation }: { navigation: any }) {
-
-//   const prosScale = useRef(new Animated.Value(1)).current;
-//   const consScale = useRef(new Animated.Value(1)).current;
-
-//   const animatePress = (anim: Animated.Value, destination: string) => {
-//     Animated.spring(anim, {
-//       toValue: 0.96,
-//       useNativeDriver: true,
-//       friction: 5,
-//     }).start(() => {
-//       Animated.spring(anim, {
-//         toValue: 1,
-//         useNativeDriver: true,
-//         friction: 5,
-//       }).start();
-//       navigation.navigate(destination);
-//     });
-//   };
-
-//   return (
-//     <View style={styles.container}>
-
-//       <Text style={styles.sectionLabel}>Choose a topic</Text>
-
-//       {/* Pros */}
-//       <Animated.View style={[styles.bannerWrapper, { transform: [{ scale: prosScale }] }]}>
-//         <TouchableOpacity
-//           style={[styles.banner, styles.bannerPros]}
-//           onPress={() => animatePress(prosScale, 'Pros')}
-//           activeOpacity={1}
-//         >
-//           <View style={styles.bannerLeft}>
-//             <Text style={styles.bannerTitle}>Pros</Text>
-//           </View>
-//           <View style={styles.bannerArrow}>
-//             <Text style={styles.bannerArrowText}>→</Text>
-//           </View>
-//         </TouchableOpacity>
-//       </Animated.View>
-
-//       {/* Cons */}
-//       <Animated.View style={[styles.bannerWrapper, { transform: [{ scale: consScale }] }]}>
-//         <TouchableOpacity
-//           style={[styles.banner, styles.bannerCons]}
-//           onPress={() => animatePress(consScale, 'Cons')}
-//           activeOpacity={1}
-//         >
-//           <View style={styles.bannerLeft}>
-//             <Text style={styles.bannerTitle}>Cons</Text>
-//           </View>
-//           <View style={styles.bannerArrow}>
-//             <Text style={styles.bannerArrowText}>→</Text>
-//           </View>
-//         </TouchableOpacity>
-//       </Animated.View>
-
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-
-//   container: {
-//     flex: 1,
-//     paddingHorizontal: 20,
-//     paddingTop: 32,
-//     paddingBottom: 24,
-//     gap: 14,
-//   },
-
-//   sectionLabel: {
-//     fontSize: 11,
-//     fontWeight: '700',
-//     color: 'rgba(44,26,14,0.45)',
-//     letterSpacing: 1.8,
-//     textTransform: 'uppercase',
-//     paddingLeft: 4,
-//     marginBottom: 4,
-//   },
-
-//   bannerWrapper: {
-//     borderRadius: 28,
-//     shadowColor: INK,
-//     shadowOffset: { width: 0, height: 4 },
-//     shadowOpacity: 0.09,
-//     shadowRadius: 12,
-//     elevation: 4,
-//   },
-
-//   banner: {
-//     borderRadius: 28,
-//     padding: 28,
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//     minHeight: 140,
-//   },
-
-//   bannerPros: {
-//     backgroundColor: '#C8D8E8',
-//   },
-
-//   bannerCons: {
-//     backgroundColor: '#E8C8B8',
-//   },
-
-//   bannerLeft: {
-//     flex: 1,
-//     gap: 6,
-//   },
-
-//   bannerTitle: {
-//     fontFamily: 'Georgia',
-//     fontSize: 34,
-//     fontWeight: '900',
-//     color: INK,
-//     letterSpacing: -1,
-//     lineHeight: 36,
-//   },
-
-//   bannerSubtitle: {
-//     fontSize: 13,
-//     fontWeight: '400',
-//     color: INK_SOFT,
-//     lineHeight: 18,
-//     maxWidth: 200,
-//   },
-
-//   bannerArrow: {
-//     width: 44,
-//     height: 44,
-//     borderRadius: 22,
-//     backgroundColor: 'rgba(44,26,14,0.08)',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-
-//   bannerArrowText: {
-//     fontSize: 18,
-//     color: INK,
-//     fontWeight: '600',
-//   },
-// });
