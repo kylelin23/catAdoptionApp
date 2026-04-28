@@ -5,8 +5,6 @@ import pros from '../../../app/data/thinkingOfAdopting/pros';
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
 const WHITE = '#FFFAF5';
-const SAND = '#E8C9A0';
-const WARM = '#D4956A';
 const GREEN = '#7BAE6E';
 const GREEN_LIGHT = '#C4DDB0';
 const screenWidth = Dimensions.get('window').width;
@@ -20,10 +18,7 @@ const CAT_IMAGES = [
   require('../../../assets/images/catWave.png'),
 ];
 
-// Slight tilts per card for a scrapbook feel
-const TILTS = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg'];
-
-function FlipCard({ pro, index, color, tilt }: { pro: any, index: number, color: string, tilt: string }) {
+function FlipCard({ pro, index, color }: { pro: any, index: number, color: string }) {
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
 
@@ -58,7 +53,7 @@ function FlipCard({ pro, index, color, tilt }: { pro: any, index: number, color:
   };
 
   return (
-    <TouchableOpacity onPress={flip} activeOpacity={1} style={[styles.flipContainer, { transform: [{ rotate: tilt }] }]}>
+    <TouchableOpacity onPress={flip} activeOpacity={1} style={styles.flipContainer}>
 
       {/* Front */}
       <Animated.View style={[
@@ -66,15 +61,8 @@ function FlipCard({ pro, index, color, tilt }: { pro: any, index: number, color:
         { backgroundColor: color },
         { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
       ]}>
-        {/* Big background number */}
-        <Text style={styles.bigNumber}>0{index + 1}</Text>
+        <Text style={styles.frontTitle}>{pro.fact}</Text>
 
-        <View style={styles.frontContent}>
-          <Text style={styles.frontLabel}>DID YOU KNOW?</Text>
-          <Text style={styles.frontTitle}>{pro.fact}</Text>
-        </View>
-
-        {/* Cat sticker */}
         <Image
           source={CAT_IMAGES[index % CAT_IMAGES.length]}
           style={styles.catSticker}
@@ -185,14 +173,12 @@ export default function Pros({ navigation }: { navigation: any }) {
             pro={pros[currentIndex]}
             index={currentIndex}
             color={GREEN_LIGHT}
-            tilt={TILTS[currentIndex % TILTS.length]}
           />
         </Animated.View>
       </View>
 
       {/* Bottom */}
       <View style={styles.bottomArea}>
-        {/* Dots */}
         <View style={styles.dotsRow}>
           {pros.map((_, i) => (
             <TouchableOpacity key={i} onPress={() => goToIndex(i)}>
@@ -205,7 +191,6 @@ export default function Pros({ navigation }: { navigation: any }) {
           ))}
         </View>
 
-        {/* Nav */}
         <View style={styles.navRow}>
           <TouchableOpacity
             style={[styles.navButton, currentIndex === 0 && styles.navButtonDisabled]}
@@ -248,7 +233,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  // Top
   topArea: {
     gap: 16,
   },
@@ -305,7 +289,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,250,245,0.7)',
   },
 
-  // Card
   cardArea: {
     flex: 1,
     justifyContent: 'center',
@@ -328,56 +311,33 @@ const styles = StyleSheet.create({
     elevation: 8,
     backfaceVisibility: 'hidden',
     overflow: 'hidden',
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
 
   cardBack: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 
-  // Big background number
-  bigNumber: {
-    position: 'absolute',
-    right: 16,
-    top: 10,
-    fontFamily: 'Georgia',
-    fontSize: 100,
-    fontWeight: '900',
-    color: 'rgba(44,26,14,0.06)',
-    lineHeight: 100,
-  },
-
-  frontContent: {
-    gap: 8,
-    flex: 1,
-    justifyContent: 'center',
-  },
-  frontLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: 'rgba(44,26,14,0.4)',
-    letterSpacing: 2,
-  },
   frontTitle: {
     fontFamily: 'Georgia',
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '900',
     color: INK,
     letterSpacing: -0.5,
-    lineHeight: 30,
+    lineHeight: 32,
+    textAlign: 'center',
+    alignSelf: 'stretch',
   },
 
-  // Cat sticker
   catSticker: {
-    width: 90,
-    height: 90,
-    position: 'absolute',
-    right: 12,
-    bottom: 48,
+    width: 140,
+    height: 140,
   },
 
-  // Back
   backHeading: {
     fontFamily: 'Georgia',
     fontSize: 16,
@@ -385,18 +345,21 @@ const styles = StyleSheet.create({
     color: INK,
     letterSpacing: -0.3,
     lineHeight: 22,
+    alignSelf: 'stretch',
   },
 
   divider: {
     height: 1.5,
     backgroundColor: 'rgba(44,26,14,0.1)',
     borderRadius: 1,
+    alignSelf: 'stretch',
   },
 
   bulletsArea: {
     gap: 10,
     flex: 1,
     justifyContent: 'center',
+    alignSelf: 'stretch',
   },
   bulletRow: {
     flexDirection: 'row',
@@ -418,7 +381,6 @@ const styles = StyleSheet.create({
   },
 
   tapHint: {
-    alignSelf: 'flex-start',
     backgroundColor: 'rgba(44,26,14,0.1)',
     borderRadius: 50,
     paddingVertical: 5,
@@ -426,7 +388,6 @@ const styles = StyleSheet.create({
   },
   tapHintDark: {
     backgroundColor: 'rgba(44,26,14,0.06)',
-    alignSelf: 'center',
   },
   tapHintText: {
     fontSize: 11,
@@ -435,7 +396,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Bottom
   bottomArea: {
     gap: 14,
   },

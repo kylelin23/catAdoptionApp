@@ -55,7 +55,7 @@ export default function App() {
       <StartingStack.Screen
         name="Cons"
         component={Cons}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <StartingStack.Screen
         name="What to Buy in Preparation"
