@@ -44,7 +44,11 @@ export default function App() {
         component={ThinkingOfAdopting}
         options={{ headerShown: false }}
       />
-      <StartingStack.Screen name="New Cat Parents" component={NewCatParents} />
+      <StartingStack.Screen
+        name="New Cat Parents"
+        component={NewCatParents}
+        options={{ headerShown: false }}
+      />
       <StartingStack.Screen name="Cat Parents" component={CatParents} />
       <StartingStack.Screen name="Cat Lovers" component={CatLovers} />
       <StartingStack.Screen
