@@ -64,12 +64,12 @@ export default function App() {
       <StartingStack.Screen
         name="What to Buy in Preparation"
         component={Preparation}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <StartingStack.Screen
         name="What to Expect in the First Week"
         component={Expect}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <StartingStack.Screen
         name="Checklist"
