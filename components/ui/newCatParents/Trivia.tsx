@@ -127,7 +127,11 @@ export default function Trivia() {
   };
 
   const button = (letter: string) => {
-    setSelected(letter);
+    if (selected === letter) {
+      setSelected('');
+    } else {
+      setSelected(letter);
+    }
     setResult('');
     setNextShown(false);
   };
