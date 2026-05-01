@@ -49,7 +49,11 @@ export default function App() {
         component={NewCatParents}
         options={{ headerShown: false }}
       />
-      <StartingStack.Screen name="Cat Parents" component={CatParents} />
+      <StartingStack.Screen
+        name="Cat Parents"
+        component={CatParents}
+        options={{ headerShown: false }}
+      />
       <StartingStack.Screen name="Cat Lovers" component={CatLovers} />
       <StartingStack.Screen
         name="Pros"
@@ -74,22 +78,22 @@ export default function App() {
       <StartingStack.Screen
         name="Checklist"
         component={Checklist}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <StartingStack.Screen
         name="Toxic Foods, Plants and Items"
         component={CatList1}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <StartingStack.Screen
         name="Cat Language"
         component={CatLanguage}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <StartingStack.Screen
         name="Poop Monitoring Scores"
         component={PoopMonitoring}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
     </StartingStack.Navigator>
   );
