@@ -12,7 +12,7 @@ const WHITE = '#FFFAF5';
 
 const CatssentialLists = ({ navigation }: { navigation: any }) => (
   <ScrollView
-    style={styles.scrollContainer}
+    style={[styles.scrollContainer, { backgroundColor: 'transparent' }]}
     contentContainerStyle={styles.scrollContent}
     showsVerticalScrollIndicator={false}
   >
