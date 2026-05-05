@@ -54,7 +54,11 @@ export default function App() {
         component={CatParents}
         options={{ headerShown: false }}
       />
-      <StartingStack.Screen name="Cat Lovers" component={CatLovers} />
+      <StartingStack.Screen
+        name="Cat Lovers"
+        component={CatLovers}
+        options = {{headerShown: false}}
+      />
       <StartingStack.Screen
         name="Pros"
         component={Pros}
