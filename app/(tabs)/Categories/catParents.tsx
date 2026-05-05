@@ -3,6 +3,8 @@ import { Text, Dimensions, View, StyleSheet, ScrollView, TouchableOpacity } from
 import { TabView } from 'react-native-tab-view';
 import Checklist from '../../../components/ui/catParents/checklist';
 import NewCats from '../../../components/ui/catParents/newCats';
+import Cationary from '../../../components/ui/catParents/cationary';
+
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -46,9 +48,9 @@ export default function CatParents({ navigation }: { navigation: any }) {
       case 'catssentialLists':
         return <CatssentialLists navigation={navigation} />;
       case 'introducingNewCats':
-        return <NewCats navigation={navigation}/>;
+        return <NewCats />;
       case 'cationary':
-        return <IntroducingNewCats />;
+        return <Cationary />;
       default:
         return null;
     }
