@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, StatusBar, Image, Animated, Dimensions } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, StatusBar, Image, Animated, Dimensions, SafeAreaView } from 'react-native';
 
 const { width: W, height: H } = Dimensions.get('window');
 
@@ -7,6 +7,7 @@ const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
 const SAND = '#E8C9A0';
 const WHITE = '#FFFAF5';
+const GREEN = '#7BAE6E';
 
 const IMAGES = [
   require('../../assets/images/catWave.png'),
@@ -16,92 +17,11 @@ const IMAGES = [
 
 const PAW = require('../../assets/images/paw.png');
 
-const PAWS = [
-  { x: 0.08, delay: 0,    duration: 5000, size: 18, opacity: 0.1  },
-  { x: 0.75, delay: 1200, duration: 6000, size: 14, opacity: 0.08 },
-  { x: 0.45, delay: 2400, duration: 5500, size: 16, opacity: 0.09 },
-];
+let hasVisited = false;
 
-const CONFETTI_COLORS = [
-  '#D4956A', '#E8C9A0', '#7BAE6E', '#C8D8E8',
-  '#E8C8B8', '#2C1A0E', '#F2C9A0', '#C4DDB0',
-];
-
-const NUM_CONFETTI = 24;
-
-const CONFETTI_PIECES = Array.from({ length: NUM_CONFETTI }).map((_, i) => {
-  const angle = (i / NUM_CONFETTI) * 2 * Math.PI;
-  const dist  = 100 + Math.random() * 80;
-  return {
-    tx:      Math.cos(angle) * dist,
-    ty:      Math.sin(angle) * dist,
-    color:   CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-    size:    6 + Math.random() * 6,
-    isRound: Math.random() > 0.5,
-  };
-});
-
-function ConfettiBurst({ show }: { show: boolean }) {
-  const anims = useRef(
-    CONFETTI_PIECES.map(() => ({
-      translate: new Animated.ValueXY({ x: 0, y: 0 }),
-      opacity:   new Animated.Value(0),
-      scale:     new Animated.Value(0),
-    }))
-  ).current;
-
-  useEffect(() => {
-    if (!show) return;
-    const animations = anims.map((anim, i) => {
-      const piece = CONFETTI_PIECES[i];
-      return Animated.sequence([
-        Animated.delay(i * 18),
-        Animated.parallel([
-          Animated.spring(anim.translate, {
-            toValue: { x: piece.tx, y: piece.ty },
-            friction: 4, tension: 60, useNativeDriver: true,
-          }),
-          Animated.spring(anim.scale, {
-            toValue: 1, friction: 4, tension: 80, useNativeDriver: true,
-          }),
-          Animated.sequence([
-            Animated.timing(anim.opacity, { toValue: 1, duration: 100, useNativeDriver: true }),
-            Animated.delay(500),
-            Animated.timing(anim.opacity, { toValue: 0, duration: 600, useNativeDriver: true }),
-          ]),
-        ]),
-      ]);
-    });
-    Animated.parallel(animations).start();
-  }, [show]);
-
-  if (!show) return null;
-
-  return (
-    <>
-      {CONFETTI_PIECES.map((piece, i) => (
-        <Animated.View
-          key={i}
-          style={{
-            position: 'absolute',
-            width: piece.size,
-            height: piece.size,
-            borderRadius: piece.isRound ? piece.size / 2 : 2,
-            backgroundColor: piece.color,
-            opacity: anims[i].opacity,
-            transform: [
-              { translateX: anims[i].translate.x },
-              { translateY: anims[i].translate.y },
-              { scale: anims[i].scale },
-            ],
-          }}
-        />
-      ))}
-    </>
-  );
-}
-
-function FloatingPaw({ x, delay, duration, size, opacity }: typeof PAWS[0]) {
+function FloatingPaw({ x, delay, duration, size, opacity }: {
+  x: number, delay: number, duration: number, size: number, opacity: number
+}) {
   const y    = useRef(new Animated.Value(H + 40)).current;
   const fade = useRef(new Animated.Value(0)).current;
 
@@ -130,8 +50,7 @@ function FloatingPaw({ x, delay, duration, size, opacity }: typeof PAWS[0]) {
       style={{
         position: 'absolute',
         left: W * x,
-        width: size,
-        height: size,
+        width: size, height: size,
         tintColor: INK,
         opacity: fade,
         transform: [{ translateY: y }],
@@ -141,254 +60,278 @@ function FloatingPaw({ x, delay, duration, size, opacity }: typeof PAWS[0]) {
   );
 }
 
+const PAWS = [
+  { x: 0.08, delay: 0,    duration: 5000, size: 18, opacity: 0.08 },
+  { x: 0.75, delay: 1200, duration: 6000, size: 14, opacity: 0.06 },
+  { x: 0.45, delay: 2400, duration: 5500, size: 16, opacity: 0.07 },
+];
+
 export default function HomeScreen({ navigation }: { navigation: any }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showConfetti, setShowConfetti] = useState(false);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadedRef   = useRef(false);
 
-  const catScale    = useRef(new Animated.Value(0)).current;
-  const catOpacity  = useRef(new Animated.Value(0)).current;
+  const catScale    = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const catOpacity  = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const catBounce   = useRef(new Animated.Value(0)).current;
   const circlePulse = useRef(new Animated.Value(1)).current;
   const imgOpacity  = useRef(new Animated.Value(1)).current;
 
-  const titleY   = useRef(new Animated.Value(30)).current;
-  const titleOp  = useRef(new Animated.Value(0)).current;
-  const subY     = useRef(new Animated.Value(20)).current;
-  const subOp    = useRef(new Animated.Value(0)).current;
-  const pillsOp  = useRef(new Animated.Value(0)).current;
-  const btnOp    = useRef(new Animated.Value(0)).current;
-  const tapBlink = useRef(new Animated.Value(0)).current;
+  const logoOp  = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const logoY   = useRef(new Animated.Value(hasVisited ? 0 : -20)).current;
+  const tagOp   = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const tagY    = useRef(new Animated.Value(hasVisited ? 0 : 20)).current;
+  const pillsOp = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const btnOp   = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const btnY    = useRef(new Animated.Value(hasVisited ? 0 : 30)).current;
 
-  useEffect(() => {
-    // 1. Cat springs in
+  const startIdleAnimations = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(catBounce, { toValue: -6, duration: 1000, useNativeDriver: true }),
+        Animated.timing(catBounce, { toValue: 0,  duration: 1000, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(circlePulse, { toValue: 1.05, duration: 1200, useNativeDriver: true }),
+        Animated.timing(circlePulse, { toValue: 1,    duration: 1200, useNativeDriver: true }),
+      ])
+    ).start();
+
+    intervalRef.current = setInterval(() => {
+      Animated.timing(imgOpacity, { toValue: 0, duration: 350, useNativeDriver: true })
+        .start(() => {
+          setCurrentIndex(prev => (prev + 1) % IMAGES.length);
+          Animated.timing(imgOpacity, { toValue: 1, duration: 350, useNativeDriver: true }).start();
+        });
+    }, 2400);
+  };
+
+  const loadContent = () => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
     Animated.sequence([
-      Animated.delay(200),
       Animated.parallel([
-        Animated.spring(catScale, { toValue: 1, friction: 4, tension: 80, useNativeDriver: true }),
-        Animated.timing(catOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.spring(logoY, { toValue: 0, friction: 7, tension: 100, useNativeDriver: true }),
+        Animated.timing(logoOp, { toValue: 1, duration: 250, useNativeDriver: true }),
+      ]),
+      Animated.delay(50),
+      Animated.parallel([
+        Animated.spring(tagY, { toValue: 0, friction: 7, tension: 100, useNativeDriver: true }),
+        Animated.timing(tagOp, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.timing(pillsOp, { toValue: 1, duration: 280, useNativeDriver: true }),
+      ]),
+      Animated.delay(60),
+      Animated.parallel([
+        Animated.spring(btnY, { toValue: 0, friction: 6, tension: 90, useNativeDriver: true }),
+        Animated.timing(btnOp, { toValue: 1, duration: 250, useNativeDriver: true }),
       ]),
     ]).start(() => {
-      // 2. Confetti fires when cat lands
-      setShowConfetti(true);
-
-      // 3. Content loads after confetti finishes
-      setTimeout(() => {
-        Animated.sequence([
-          Animated.parallel([
-            Animated.spring(titleY, { toValue: 0, friction: 7, tension: 100, useNativeDriver: true }),
-            Animated.timing(titleOp, { toValue: 1, duration: 250, useNativeDriver: true }),
-          ]),
-          Animated.delay(80),
-          Animated.parallel([
-            Animated.spring(subY,  { toValue: 0, friction: 7, tension: 100, useNativeDriver: true }),
-            Animated.timing(subOp, { toValue: 1, duration: 250, useNativeDriver: true }),
-            Animated.timing(pillsOp, { toValue: 1, duration: 300, useNativeDriver: true }),
-          ]),
-          Animated.delay(100),
-          Animated.timing(btnOp, { toValue: 1, duration: 400, useNativeDriver: true }),
-        ]).start(() => {
-          // 4. Image cycling starts AFTER everything is loaded in
-          intervalRef.current = setInterval(() => {
-            Animated.timing(imgOpacity, { toValue: 0, duration: 350, useNativeDriver: true })
-              .start(() => {
-                setCurrentIndex(prev => (prev + 1) % IMAGES.length);
-                Animated.timing(imgOpacity, { toValue: 1, duration: 350, useNativeDriver: true }).start();
-              });
-          }, 3500);
-        });
-
-        Animated.timing(tapBlink, { toValue: 1, duration: 1000, useNativeDriver: true }).start();
-      }, 2500);
+      startIdleAnimations();
     });
+  };
 
-    // Circle pulse starts after cat appears
-    setTimeout(() => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(circlePulse, { toValue: 1.07, duration: 1200, useNativeDriver: true }),
-          Animated.timing(circlePulse, { toValue: 1,    duration: 1200, useNativeDriver: true }),
-        ])
-      ).start();
-    }, 600);
+  useEffect(() => {
+    if (hasVisited) {
+      loadedRef.current = true;
+      startIdleAnimations();
+      return;
+    }
+
+    Animated.sequence([
+      Animated.delay(150),
+      Animated.parallel([
+        Animated.spring(catScale, { toValue: 1, friction: 4, tension: 70, useNativeDriver: true }),
+        Animated.timing(catOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+      ]),
+      Animated.spring(catBounce, { toValue: -12, friction: 3, tension: 120, useNativeDriver: true }),
+      Animated.spring(catBounce, { toValue: 0,   friction: 4, tension: 80,  useNativeDriver: true }),
+    ]).start(() => {
+      hasVisited = true;
+      timeoutRef.current = setTimeout(loadContent, 600);
+    });
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={() => navigation.navigate('Home')}
-      activeOpacity={1}
-    >
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
+
+      <View style={styles.bgTop} />
+      <View style={styles.bgBottom} />
 
       {PAWS.map((p, i) => <FloatingPaw key={i} {...p} />)}
 
-      <View style={styles.blobTL} />
-      <View style={styles.blobBR} />
-      <View style={styles.blobCenter} />
-
-      {/* Cat circle */}
-      <Animated.View style={[
-        styles.catWrapper,
-        {
-          opacity: catOpacity,
-          transform: [{ scale: Animated.multiply(catScale, circlePulse) }],
-        },
-      ]}>
-        <ConfettiBurst show={showConfetti} />
-
-        <View style={styles.catCircle}>
-          <Animated.Image
-            source={IMAGES[currentIndex]}
-            style={[styles.catImage, { opacity: imgOpacity }]}
-            resizeMode="contain"
-          />
-        </View>
+      {/* Logo */}
+      <Animated.View style={[styles.logoArea, { opacity: logoOp, transform: [{ translateY: logoY }] }]}>
+        <Text style={styles.logoText}>catwise</Text>
       </Animated.View>
 
-      {/* Title */}
-      <Animated.View style={[styles.titleArea, { opacity: titleOp, transform: [{ translateY: titleY }] }]}>
-        <Text style={styles.titleText}>Catwise</Text>
-      </Animated.View>
-
-      {/* Subtitle */}
-      <Animated.View style={[styles.subArea, { opacity: subOp, transform: [{ translateY: subY }] }]}>
-        <Text style={styles.subText}>Your complete guide to cat adoption</Text>
-      </Animated.View>
-
-      {/* Divider */}
-      <Animated.View style={[styles.dividerRow, { opacity: pillsOp }]}>
-        <View style={styles.dividerLine} />
-        <Image source={PAW} style={styles.dividerPaw} resizeMode="contain" />
-        <View style={styles.dividerLine} />
-      </Animated.View>
-
-      {/* Pills */}
-      <Animated.View style={[styles.pillsRow, { opacity: pillsOp }]}>
-        {['Food', 'Health', 'Toys', 'Behavior'].map((label) => (
-          <View key={label} style={styles.pill}>
-            <Text style={styles.pillText}>{label}</Text>
+      {/* Mascot */}
+      <View style={styles.mascotArea}>
+        <Animated.View style={[styles.shadowRing, { transform: [{ scale: circlePulse }] }]} />
+        <Animated.View style={[
+          styles.catWrapper,
+          {
+            opacity: catOpacity,
+            transform: [{ scale: catScale }, { translateY: catBounce }],
+          },
+        ]}>
+          <View style={styles.catCircle}>
+            <Animated.Image
+              source={IMAGES[currentIndex]}
+              style={[styles.catImage, { opacity: imgOpacity }]}
+              resizeMode="contain"
+            />
           </View>
-        ))}
-      </Animated.View>
-
-      {/* Tap to get started */}
-      <Animated.View style={[styles.tapArea, { opacity: btnOp }]}>
-        <Animated.View style={[styles.tapRow, { opacity: tapBlink }]}>
-          <Image source={PAW} style={styles.tapPaw} resizeMode="contain" />
-          <Text style={styles.tapText}>Tap to get started</Text>
-          <Image source={PAW} style={[styles.tapPaw, { transform: [{ scaleX: -1 }] }]} resizeMode="contain" />
         </Animated.View>
-      </Animated.View>
+      </View>
 
-    </TouchableOpacity>
+      {/* White area content — centered */}
+      <View style={styles.whiteContent}>
+
+        <Animated.View style={[styles.tagArea, { opacity: tagOp, transform: [{ translateY: tagY }] }]}>
+          <Text style={styles.tagTitle}>Your complete guide{'\n'}to cat adoption</Text>
+        </Animated.View>
+
+        <Animated.View style={[styles.pillsRow, { opacity: pillsOp }]}>
+          {['Food', 'Health', 'Toys', 'Home'].map((label) => (
+            <View key={label} style={styles.pill}>
+              <Text style={styles.pillText}>{label}</Text>
+            </View>
+          ))}
+        </Animated.View>
+
+        <Animated.View style={[styles.btnStack, { opacity: btnOp, transform: [{ translateY: btnY }] }]}>
+          <TouchableOpacity
+            style={styles.ctaPrimary}
+            onPress={() => navigation.navigate('Home')}
+            activeOpacity={0.88}
+          >
+            <Text style={styles.ctaPrimaryText}>Get Started</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+      </View>
+
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: SAND,
+    backgroundColor: WHITE,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
     overflow: 'hidden',
   },
 
-  blobTL: {
+  bgTop: {
     position: 'absolute',
-    width: 300, height: 300, borderRadius: 150,
-    backgroundColor: '#F2DCBC',
-    top: -80, left: -80, opacity: 0.65,
+    top: 0, left: 0, right: 0,
+    height: H * 0.55,
+    backgroundColor: SAND,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
   },
-  blobBR: {
+  bgBottom: {
     position: 'absolute',
-    width: 240, height: 240, borderRadius: 120,
-    backgroundColor: '#C47A45',
-    bottom: 60, right: -70, opacity: 0.28,
-  },
-  blobCenter: {
-    position: 'absolute',
-    width: 180, height: 180, borderRadius: 90,
-    backgroundColor: '#E8C9A0',
-    top: H * 0.3, left: -60, opacity: 0.4,
+    bottom: 0, left: 0, right: 0,
+    height: H * 0.48,
+    backgroundColor: WHITE,
   },
 
-  catWrapper: {
-    width: 180, height: 180, borderRadius: 90,
-    marginBottom: 28,
-    shadowColor: '#A0622A',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 24,
-    elevation: 10,
+  logoArea: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+    logoText: {
+    fontFamily: 'Avenir',
+    fontSize: 28, fontWeight: '900',
+    color: INK, letterSpacing: -0.5,
+  },
+
+  mascotArea: {
+    height: H * 0.32,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  shadowRing: {
+    position: 'absolute',
+    width: 220, height: 220, borderRadius: 110,
+    backgroundColor: 'rgba(44,26,14,0.06)',
+  },
+  catWrapper: {
+    width: 200, height: 200, borderRadius: 100,
+    shadowColor: '#A0622A',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25, shadowRadius: 24, elevation: 12,
   },
   catCircle: {
-    width: 180, height: 180, borderRadius: 90,
+    width: 200, height: 200, borderRadius: 100,
     overflow: 'hidden',
-    borderWidth: 3,
-    borderColor: 'rgba(255,250,245,0.7)',
-    backgroundColor: 'rgba(255,250,245,0.2)',
+    borderWidth: 4,
+    borderColor: 'rgba(255,250,245,0.8)',
+    backgroundColor: 'rgba(255,250,245,0.3)',
   },
-  catImage: {
-    width: '100%', height: '100%',
+  catImage: { width: '100%', height: '100%' },
+
+  whiteContent: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    gap: 18,
   },
 
-  titleArea: { alignItems: 'center', marginBottom: 6 },
-  titleText: {
-    fontFamily: 'Georgia',
-    fontSize: 62, fontWeight: '900',
-    color: INK, letterSpacing: -2, lineHeight: 66,
+  tagArea: {
+    alignItems: 'center',
   },
-
-  subArea: { alignItems: 'center', marginBottom: 20 },
-  subText: {
-    fontSize: 15, fontWeight: '400',
-    color: INK_SOFT, textAlign: 'center',
-    lineHeight: 22, letterSpacing: 0.2,
-  },
-
-  dividerRow: {
-    flexDirection: 'row', alignItems: 'center',
-    gap: 10, marginBottom: 18, width: '60%',
-  },
-  dividerLine: {
-    flex: 1, height: 1.5,
-    backgroundColor: 'rgba(44,26,14,0.18)', borderRadius: 1,
-  },
-  dividerPaw: {
-    width: 16, height: 16,
-    tintColor: INK, opacity: 0.3,
+  tagTitle: {
+    fontFamily: 'Avenir',
+    fontSize: 24, fontWeight: '900',
+    color: INK, letterSpacing: -0.5,
+    textAlign: 'center', lineHeight: 32,
   },
 
   pillsRow: {
-    flexDirection: 'row', flexWrap: 'wrap',
-    gap: 8, justifyContent: 'center', marginBottom: 40,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'center',
   },
   pill: {
-    backgroundColor: 'rgba(255,250,245,0.5)',
-    borderWidth: 1.5, borderColor: 'rgba(255,250,245,0.7)',
-    borderRadius: 50, paddingVertical: 8, paddingHorizontal: 16,
-    shadowColor: INK, shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08, shadowRadius: 6, elevation: 2,
+    backgroundColor: 'rgba(44,26,14,0.06)',
+    borderRadius: 50, paddingVertical: 7, paddingHorizontal: 14,
   },
-  pillText: {
-    fontSize: 13, fontWeight: '600',
-    color: INK, letterSpacing: 0.2,
-  },
+  pillText: { fontSize: 13, fontWeight: '600', color: INK, fontFamily: 'Avenir' },
 
-  tapArea: { alignItems: 'center', paddingVertical: 12 },
-  tapRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  tapPaw: { width: 14, height: 14, tintColor: INK, opacity: 0.5 },
-  tapText: {
-    fontFamily: 'Georgia',
-    fontSize: 16, fontWeight: '600',
-    color: INK, letterSpacing: 0.8,
+  btnStack: {
+    width: '100%',
+  },
+  ctaPrimary: {
+    width: '100%', paddingVertical: 18,
+    backgroundColor: GREEN, borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: GREEN,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35, shadowRadius: 12, elevation: 6,
+    borderBottomWidth: 4, borderBottomColor: '#5A8F50',
+  },
+  ctaPrimaryText: {
+    color: WHITE, fontSize: 17,
+    fontWeight: '800', letterSpacing: 0.3,
+    fontFamily: 'Avenir',
   },
 });
