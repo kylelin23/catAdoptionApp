@@ -1,65 +1,87 @@
-import React from 'react';
-import { Dimensions, View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { Dimensions, View, StyleSheet, Text, TouchableOpacity, SafeAreaView, Animated, Image } from 'react-native';
 import { TabView } from 'react-native-tab-view';
 import Info from '../../../components/ui/thinkingOfAdopting/Info';
 import FAQs from '../../../components/ui/thinkingOfAdopting/FAQs';
 import Trivia from '../../../components/ui/thinkingOfAdopting/trivia';
 
 const screenWidth = Dimensions.get('window').width;
+const { height: H } = Dimensions.get('window');
 
-const INK = '#2C1A0E';
+const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
-const SAND = '#E8C9A0';
-const WHITE = '#FFFAF5';
+const SAND     = '#E8C9A0';
+const WHITE    = '#FFFAF5';
+const GREEN    = '#7BAE6E';
+
+const CAT_IMG = require('../../../assets/images/catWave.png');
 
 export default function ThinkingOfAdopting({ navigation }: { navigation: any }) {
 
   const [index, setIndex] = React.useState(0);
-
   const [routes] = React.useState([
-    { key: 'info', title: 'Info' },
+    { key: 'info',   title: 'Info'   },
     { key: 'trivia', title: 'Trivia' },
-    { key: 'faqs', title: 'FAQs' },
+    { key: 'faqs',   title: 'FAQs'   },
   ]);
-
   const [triviaKey, setTriviaKey] = React.useState(0);
 
+  const headerY     = useRef(new Animated.Value(-20)).current;
+  const headerOp    = useRef(new Animated.Value(0)).current;
+  const bubbleScale = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.parallel([
+        Animated.spring(headerY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
+        Animated.timing(headerOp, { toValue: 1, duration: 300, useNativeDriver: true }),
+      ]),
+      Animated.spring(bubbleScale, { toValue: 1, friction: 5, tension: 100, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
   React.useEffect(() => {
-    if (index !== 1) {
-      setTriviaKey(prev => prev + 1);
-    }
+    if (index !== 1) setTriviaKey(prev => prev + 1);
   }, [index]);
 
   const renderScene = ({ route }: { route: any }) => {
     switch (route.key) {
-      case 'info':
-        return <Info navigation={navigation} />;
-      case 'trivia':
-        return <Trivia key={triviaKey} />;
-      case 'faqs':
-        return <FAQs />;
-      default:
-        return null;
+      case 'info':   return <Info navigation={navigation} />;
+      case 'trivia': return <Trivia key={triviaKey} />;
+      case 'faqs':   return <FAQs />;
+      default:       return null;
     }
   };
 
   const renderTabBar = () => (
     <View style={styles.tabBarWrapper}>
 
-      {/* Back button -> Are You page */}
+      {/* Back button */}
       <TouchableOpacity
-        style={styles.backButton}
+        style={styles.backBtn}
         onPress={() => navigation.navigate('Home')}
         activeOpacity={0.7}
       >
-        <Text style={styles.backArrow}>←</Text>
-        <Text style={styles.backLabel}>Back</Text>
+        <Text style={styles.backText}>{"<"}</Text>
       </TouchableOpacity>
 
-      {/* Page title */}
-      <Text style={styles.pageTitle}>Thinking of{'\n'}Adopting</Text>
+      {/* Cat + bubble — same as AreYou */}
+      <Animated.View style={[styles.mascotArea, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
 
-      {/* Custom pill tab bar */}
+        <Image source={CAT_IMG} style={styles.catImg} resizeMode="contain" />
+
+        <Animated.View style={[styles.bubbleWrapper, { transform: [{ scale: bubbleScale }] }]}>
+          <View style={styles.bubbleRow}>
+            <View style={styles.tail} />
+            <View style={styles.bubble}>
+              <Text style={styles.bubbleText}>Thinking of Adopting?</Text>
+            </View>
+          </View>
+        </Animated.View>
+
+      </Animated.View>
+
+      {/* Tab pills */}
       <View style={styles.tabPillContainer}>
         {routes.map((route, i) => (
           <TouchableOpacity
@@ -79,11 +101,9 @@ export default function ThinkingOfAdopting({ navigation }: { navigation: any }) 
   );
 
   return (
-    <View style={styles.container}>
-
-      {/* Background blobs */}
-      <View style={styles.blobTopRight} />
-      <View style={styles.blobBottomLeft} />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.bgTop} />
+      <View style={styles.bgBottom} />
 
       <TabView
         navigationState={{ index, routes }}
@@ -91,92 +111,137 @@ export default function ThinkingOfAdopting({ navigation }: { navigation: any }) 
         onIndexChange={setIndex}
         initialLayout={{ width: screenWidth }}
         renderTabBar={renderTabBar}
+        style={{ backgroundColor: 'transparent' }}
       />
-
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: '#F5EAD8',
+    backgroundColor: WHITE,
+    overflow: 'hidden',
   },
 
-  blobTopRight: {
+  bgTop: {
     position: 'absolute',
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: '#F2DCBC',
-    top: -60,
-    right: -60,
-    opacity: 0.7,
+    top: 0, left: 0, right: 0,
+    height: H * 0.52,
+    backgroundColor: SAND,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
   },
-  blobBottomLeft: {
+  bgBottom: {
     position: 'absolute',
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: '#C47A45',
-    bottom: -40,
-    left: -40,
-    opacity: 0.3,
+    bottom: 0, left: 0, right: 0,
+    height: H * 0.55,
+    backgroundColor: 'white',
   },
 
   tabBarWrapper: {
-    backgroundColor: SAND,
-    paddingTop: 64,
-    paddingHorizontal: 28,
-    paddingBottom: 24,
-    borderBottomLeftRadius: 36,
-    borderBottomRightRadius: 36,
-    shadowColor: INK,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 6,
+    paddingTop: 16,
+    paddingHorizontal: 12,
+    paddingBottom: 16,
   },
 
-  backButton: {
+  backBtn: {
+    width: 38, height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(44,26,14,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+    marginLeft: 8,
+  },
+  backText: {
+    fontSize: 18, fontWeight: '700',
+    color: INK, lineHeight: 22,
+  },
+
+  // Same as AreYou mascotArea
+  mascotArea: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 20,
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,250,245,0.5)',
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  backArrow: {
-    fontSize: 16,
-    color: INK,
-    fontWeight: '600',
-  },
-  backLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: INK,
+    paddingHorizontal: 0,
   },
 
-  pageTitle: {
-    fontFamily: 'Georgia',
-    fontSize: 36,
+  catImg: {
+    width: 160,
+    height: 160,
+    flexShrink: 0,
+    marginRight: -32,
+  },
+
+  bubbleWrapper: {
+    flex: 1,
+    shadowColor: INK,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+
+  bubbleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  tail: {
+    width: 0, height: 0,
+    borderTopWidth: 12,
+    borderBottomWidth: 12,
+    borderRightWidth: 14,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderRightColor: WHITE,
+  },
+
+  bubble: {
+    backgroundColor: WHITE,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  bubbleText: {
+    fontFamily: 'Avenir',
+    fontSize: 18,
     fontWeight: '900',
     color: INK,
-    letterSpacing: -1,
-    lineHeight: 40,
-    marginBottom: 20,
+    letterSpacing: -0.3,
+    lineHeight: 24,
   },
 
+  // Progress dots
+  progressRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  progressDot: {
+    width: 8, height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(44,26,14,0.12)',
+  },
+  progressDotActive: {
+    backgroundColor: INK,
+    width: 22,
+  },
+  progressDotDone: {
+    backgroundColor: GREEN,
+  },
+
+  // Tab pills
   tabPillContainer: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,250,245,0.4)',
+    backgroundColor: 'rgba(44,26,14,0.06)',
     borderRadius: 50,
     padding: 4,
     gap: 4,
+    marginHorizontal: 8,
   },
   tabPill: {
     flex: 1,
@@ -194,11 +259,13 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   tabPillText: {
+    fontFamily: 'Avenir',
     fontSize: 14,
     fontWeight: '600',
     color: INK_SOFT,
   },
   tabPillTextActive: {
     color: WHITE,
+    fontWeight: '800',
   },
 });

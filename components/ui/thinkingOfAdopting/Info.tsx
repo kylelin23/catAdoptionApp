@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -8,60 +8,82 @@ import {
   Image,
 } from "react-native";
 
-const INK = "#2C1A0E";
-const SAND = "#E8C9A0";
-
-const screenWidth = Dimensions.get("window").width;
+const { height: H } = Dimensions.get("window");
 
 const PROS = require("../../../assets/images/pros.png");
 const CONS = require("../../../assets/images/cons.png");
 
-export default function Info({ navigation }: { navigation: any }) {
-  const prosScale = useRef(new Animated.Value(1)).current;
-  const consScale = useRef(new Animated.Value(1)).current;
+const CARDS = [
+  { key: 'pros', destination: 'Pros', image: PROS },
+  { key: 'cons', destination: 'Cons', image: CONS },
+];
 
-  const animatePress = (anim: Animated.Value, destination: string) => {
-    Animated.spring(anim, {
-      toValue: 0.96,
-      useNativeDriver: true,
-      friction: 5,
-    }).start(() => {
-      Animated.spring(anim, {
-        toValue: 1,
-        useNativeDriver: true,
-        friction: 5,
-      }).start();
-      navigation.navigate(destination);
+export default function Info({ navigation }: { navigation: any }) {
+  const scales      = useRef(CARDS.map(() => new Animated.Value(1))).current;
+  const translateYs = useRef(CARDS.map(() => new Animated.Value(60))).current;
+  const opacities   = useRef(CARDS.map(() => new Animated.Value(0))).current;
+  const bobs        = useRef(CARDS.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    CARDS.forEach((_, i) => {
+      Animated.sequence([
+        Animated.delay(i * 160),
+        Animated.parallel([
+          Animated.spring(translateYs[i], { toValue: 0, friction: 6, tension: 70, useNativeDriver: true }),
+          Animated.timing(opacities[i],   { toValue: 1, duration: 300, useNativeDriver: true }),
+        ]),
+      ]).start(() => {
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(bobs[i], { toValue: -8, duration: 1200, useNativeDriver: true }),
+            Animated.timing(bobs[i], { toValue: 0,  duration: 1200, useNativeDriver: true }),
+          ])
+        ).start();
+      });
     });
+  }, []);
+
+  const handlePress = (index: number, destination: string) => {
+    Animated.sequence([
+      Animated.spring(scales[index], { toValue: 0.92, useNativeDriver: true, friction: 4 }),
+      Animated.spring(scales[index], { toValue: 1,    useNativeDriver: true, friction: 4 }),
+    ]).start(() => navigation.navigate(destination));
   };
 
   return (
     <View style={styles.container}>
-      {/* Pros */}
-      <Animated.View
-        style={[styles.cardWrapper, { transform: [{ scale: prosScale }] }]}
-      >
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => animatePress(prosScale, "Pros")}
-          activeOpacity={1}
+      {CARDS.map((card, i) => (
+        <Animated.View
+          key={card.key}
+          style={[
+            styles.itemWrapper,
+            {
+              opacity:   opacities[i],
+              transform: [{ translateY: translateYs[i] }],
+            },
+          ]}
         >
-          <Image source={PROS} style={styles.cardImage} resizeMode="contain" />
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Cons */}
-      <Animated.View
-        style={[styles.cardWrapper, { transform: [{ scale: consScale }] }]}
-      >
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => animatePress(consScale, "Cons")}
-          activeOpacity={1}
-        >
-          <Image source={CONS} style={styles.cardImage} resizeMode="contain" />
-        </TouchableOpacity>
-      </Animated.View>
+          <TouchableOpacity
+            onPress={() => handlePress(i, card.destination)}
+            activeOpacity={1}
+            style={styles.touchable}
+          >
+            <Animated.Image
+              source={card.image}
+              style={[
+                styles.image,
+                {
+                  transform: [
+                    { scale: scales[i] },
+                    { translateY: bobs[i] },
+                  ],
+                },
+              ]}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      ))}
     </View>
   );
 }
@@ -69,33 +91,25 @@ export default function Info({ navigation }: { navigation: any }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 24,
-    gap: 20,
-    alignItems: "center",
-    justifyContent: "flex-start",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
 
-  cardWrapper: {
-    width: "100%",
-    shadowColor: INK,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 14,
-    elevation: 5,
+  itemWrapper: {
+    width: '100%',
+    alignItems: 'center',
   },
 
-  card: {
-    width: "100%",
-    borderRadius: 28,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
+  touchable: {
+    width: '100%',
+    alignItems: 'center',
   },
 
-  cardImage: {
-    width: "100%",
-    height: 180,
+  image: {
+    width: '75%',
+    height: H * 0.20,  // was 0.28
   },
 });
