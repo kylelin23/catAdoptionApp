@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
+// import { FlipCardSkeleton } from '../../components/ui/skeleton';
+
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -120,6 +122,16 @@ function PawTrail() {
 
 export default function AreYou({ navigation }: { navigation: any }) {
   const [pressed, setPressed] = useState<string | null>(null);
+
+  // const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   // Simulate load — replace with real data fetching if needed
+  //   const timer = setTimeout(() => setLoading(false), 1200);
+  //   return () => clearTimeout(timer);
+  // }, []);
+
+  // if (loading) return <FlipCardSkeleton />;
 
   return (
     <View style={styles.container}>
