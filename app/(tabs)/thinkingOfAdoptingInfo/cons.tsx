@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder } from 'react-native';
+import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView } from 'react-native';
 import cons from '../../../app/data/thinkingOfAdopting/cons';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
 const WHITE = '#FFFAF5';
 const ORANGE = '#D4956A';
+const ORANGE_DARK = '#B9784F';
 const ORANGE_LIGHT = '#F2C9A0';
 const screenWidth = Dimensions.get('window').width;
 
@@ -18,29 +19,14 @@ const CAT_IMAGES = [
   require('../../../assets/images/catWave.png'),
 ];
 
-function FlipCard({ con, index, color }: { con: any, index: number, color: string }) {
+function FlipCard({ con, index }: { con: any; index: number }) {
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
 
-  const frontInterpolate = flipAnim.interpolate({
-    inputRange: [0, 180],
-    outputRange: ['0deg', '180deg'],
-  });
-
-  const backInterpolate = flipAnim.interpolate({
-    inputRange: [0, 180],
-    outputRange: ['180deg', '360deg'],
-  });
-
-  const frontOpacity = flipAnim.interpolate({
-    inputRange: [89, 90],
-    outputRange: [1, 0],
-  });
-
-  const backOpacity = flipAnim.interpolate({
-    inputRange: [89, 90],
-    outputRange: [0, 1],
-  });
+  const frontInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] });
+  const backInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
+  const frontOpacity = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [1, 0] });
+  const backOpacity = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [0, 1] });
 
   const flip = () => {
     Animated.spring(flipAnim, {
@@ -49,18 +35,19 @@ function FlipCard({ con, index, color }: { con: any, index: number, color: strin
       tension: 60,
       useNativeDriver: true,
     }).start();
+
     setFlipped(!flipped);
   };
 
   return (
     <TouchableOpacity onPress={flip} activeOpacity={1} style={styles.flipContainer}>
-
-      {/* Front */}
-      <Animated.View style={[
-        styles.card,
-        { backgroundColor: color },
-        { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
-      ]}>
+      <Animated.View
+        style={[
+          styles.card,
+          { backgroundColor: ORANGE_LIGHT },
+          { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
+        ]}
+      >
         <Text style={styles.frontTitle}>{con.category}</Text>
 
         <Image
@@ -74,20 +61,21 @@ function FlipCard({ con, index, color }: { con: any, index: number, color: strin
         </View>
       </Animated.View>
 
-      {/* Back */}
-      <Animated.View style={[
-        styles.card,
-        styles.cardBack,
-        { backgroundColor: WHITE },
-        { transform: [{ rotateY: backInterpolate }], opacity: backOpacity },
-      ]}>
+      <Animated.View
+        style={[
+          styles.card,
+          styles.cardBack,
+          { backgroundColor: WHITE },
+          { transform: [{ rotateY: backInterpolate }], opacity: backOpacity },
+        ]}
+      >
         <Text style={styles.backHeading}>{con.category}</Text>
 
         <View style={styles.divider} />
 
         <View style={styles.bulletsArea}>
           {[con.support1, con.support2, con.support3]
-            .filter(s => s && s !== '')
+            .filter(support => support && support !== '')
             .map((support, i) => (
               <View key={i} style={styles.bulletRow}>
                 <Image source={PAW} style={styles.bulletPaw} resizeMode="contain" />
@@ -96,11 +84,10 @@ function FlipCard({ con, index, color }: { con: any, index: number, color: strin
             ))}
         </View>
 
-        <View style={[styles.tapHint, styles.tapHintDark]}>
+        <View style={[styles.tapHint, { backgroundColor: 'rgba(44,26,14,0.06)' }]}>
           <Text style={[styles.tapHintText, { color: INK_SOFT }]}>Tap to flip back</Text>
         </View>
       </Animated.View>
-
     </TouchableOpacity>
   );
 }
@@ -119,174 +106,174 @@ export default function Cons({ navigation }: { navigation: any }) {
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 10,
+
       onPanResponderMove: (_, gesture) => {
         translateX.setValue(gesture.dx);
       },
+
       onPanResponderRelease: (_, gesture) => {
         const idx = currentIndexRef.current;
+
         if (gesture.dx < -SWIPE_THRESHOLD && idx < cons.length - 1) {
-          Animated.timing(translateX, { toValue: -screenWidth, duration: 250, useNativeDriver: true })
-            .start(() => { goToIndex(idx + 1); translateX.setValue(0); });
+          Animated.timing(translateX, {
+            toValue: -screenWidth,
+            duration: 250,
+            useNativeDriver: true,
+          }).start(() => {
+            goToIndex(idx + 1);
+            translateX.setValue(0);
+          });
         } else if (gesture.dx > SWIPE_THRESHOLD && idx > 0) {
-          Animated.timing(translateX, { toValue: screenWidth, duration: 250, useNativeDriver: true })
-            .start(() => { goToIndex(idx - 1); translateX.setValue(0); });
+          Animated.timing(translateX, {
+            toValue: screenWidth,
+            duration: 250,
+            useNativeDriver: true,
+          }).start(() => {
+            goToIndex(idx - 1);
+            translateX.setValue(0);
+          });
         } else {
-          Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 6 }).start();
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+            friction: 6,
+          }).start();
         }
       },
     })
   ).current;
 
   return (
-    <View style={styles.container}>
-
-      {/* Top */}
-      <View style={styles.topArea}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.backText}>{"< Back"}</Text>
-        </TouchableOpacity>
-
-        <View style={styles.titleRow}>
-          <View style={styles.titleBlock}>
-            <Text style={styles.pageLabel}>THINKING OF ADOPTING</Text>
-            <Text style={styles.pageTitle}>The Cons</Text>
-          </View>
-          <View style={styles.counterBadge}>
-            <Text style={styles.counterBadgeNum}>{currentIndex + 1}</Text>
-            <Text style={styles.counterBadgeDenom}>/{cons.length}</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Card */}
-      <View style={styles.cardArea}>
-        <Animated.View
-          style={{ transform: [{ translateX }] }}
-          {...panResponder.panHandlers}
-        >
-          <FlipCard
-            key={currentIndex}
-            con={cons[currentIndex]}
-            index={currentIndex}
-            color={ORANGE_LIGHT}
-          />
-        </Animated.View>
-      </View>
-
-      {/* Bottom */}
-      <View style={styles.bottomArea}>
-        <View style={styles.dotsRow}>
-          {cons.map((_, i) => (
-            <TouchableOpacity key={i} onPress={() => goToIndex(i)}>
-              <View style={[
-                styles.dot,
-                i === currentIndex && styles.dotActive,
-                i < currentIndex && styles.dotSeen,
-              ]} />
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <View style={styles.navRow}>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
           <TouchableOpacity
-            style={[styles.navButton, currentIndex === 0 && styles.navButtonDisabled]}
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.backBtnText}>{"<"}</Text>
+          </TouchableOpacity>
+
+          <View style={styles.headerRow}>
+            <View style={styles.headerCenter}>
+              <Text style={styles.eyebrow}>THINKING OF ADOPTING</Text>
+              <Text style={styles.pageTitle}>The Cons</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.cardArea}>
+          <Animated.View
+            style={{ transform: [{ translateX }] }}
+            {...panResponder.panHandlers}
+          >
+            <FlipCard
+              key={currentIndex}
+              con={cons[currentIndex]}
+              index={currentIndex}
+            />
+          </Animated.View>
+        </View>
+
+        <View style={styles.bottomNav}>
+          <TouchableOpacity
+            style={[styles.circleNavBtn, currentIndex === 0 && styles.circleNavBtnDisabled]}
             onPress={() => currentIndex > 0 && goToIndex(currentIndex - 1)}
             disabled={currentIndex === 0}
             activeOpacity={0.8}
           >
-            <Text style={styles.navButtonText}>{"< Prev"}</Text>
+            <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowTextDisabled]}>
+              ←
+            </Text>
           </TouchableOpacity>
 
-          <View style={styles.swipeHint}>
-            <Image source={PAW} style={styles.swipeHintPaw} resizeMode="contain" />
-            <Text style={styles.swipeHintText}>Swipe or tap</Text>
-            <Image source={PAW} style={[styles.swipeHintPaw, { transform: [{ scaleX: -1 }] }]} resizeMode="contain" />
-          </View>
+          <Text style={styles.pageCounter}>
+            {currentIndex + 1} / {cons.length}
+          </Text>
 
           <TouchableOpacity
-            style={[styles.navButton, styles.navButtonNext, currentIndex === cons.length - 1 && styles.navButtonDisabled]}
+            style={[
+              styles.circleNavBtn,
+              styles.circleNavBtnNext,
+              currentIndex === cons.length - 1 && styles.circleNavBtnDisabled,
+            ]}
             onPress={() => currentIndex < cons.length - 1 && goToIndex(currentIndex + 1)}
             disabled={currentIndex === cons.length - 1}
             activeOpacity={0.8}
           >
-            <Text style={[styles.navButtonText, { color: WHITE }]}>{"Next >"}</Text>
+            <Text style={[styles.arrowText, styles.arrowTextNext]}>
+              →
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
-
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'white',
+    paddingHorizontal: 22,
+    paddingTop: 24,
+    paddingBottom: 28,
+  },
 
   container: {
     flex: 1,
-    backgroundColor: '#F5EAD8',
-    paddingHorizontal: 22,
-    paddingTop: 64,
-    paddingBottom: 28,
+    width: '100%',
+    maxWidth: 380,
+    alignSelf: 'center',
+    gap: 16,
+  },
+
+  header: {
+    gap: 10,
+  },
+
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
 
-  topArea: {
-    gap: 16,
+  backBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(44,26,14,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  backButton: {
-    alignSelf: 'flex-start',
-  },
-  backText: {
-    fontSize: 15,
+
+  backBtnText: {
+    fontSize: 18,
     fontWeight: '700',
-    color: INK_SOFT,
+    color: INK,
+    lineHeight: 22,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
-  titleBlock: {
+
+  headerCenter: {
+    flex: 1,
     gap: 2,
   },
-  pageLabel: {
+
+  eyebrow: {
+    fontFamily: 'Avenir',
     fontSize: 10,
     fontWeight: '800',
     color: 'rgba(44,26,14,0.4)',
     letterSpacing: 2,
   },
+
   pageTitle: {
-    fontFamily: 'Georgia',
-    fontSize: 44,
+    fontFamily: 'Avenir',
+    fontSize: 28,
     fontWeight: '900',
     color: INK,
-    letterSpacing: -1.5,
-    lineHeight: 46,
-  },
-  counterBadge: {
-    backgroundColor: ORANGE,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 2,
-    marginBottom: 6,
-  },
-  counterBadgeNum: {
-    fontFamily: 'Georgia',
-    fontSize: 22,
-    fontWeight: '900',
-    color: WHITE,
-    lineHeight: 26,
-  },
-  counterBadgeDenom: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: 'rgba(255,250,245,0.7)',
+    letterSpacing: -0.5,
   },
 
   cardArea: {
@@ -295,62 +282,85 @@ const styles = StyleSheet.create({
   },
 
   flipContainer: {
-    width: '100%',
-    height: 320,
+    width: '92%',
+    height: 340,
+    alignSelf: 'center',
   },
 
   card: {
     width: '100%',
-    height: 320,
-    borderRadius: 32,
+    height: 340,
+    borderRadius: 24,
     padding: 26,
     shadowColor: INK,
-    shadowOffset: { width: 4, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 6,
     backfaceVisibility: 'hidden',
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderWidth: 2,
+    borderColor: 'rgba(44,26,14,0.06)',
+    borderBottomWidth: 5,
+    borderBottomColor: 'rgba(44,26,14,0.12)',
   },
 
   cardBack: {
     position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
 
   frontTitle: {
-    fontFamily: 'Georgia',
-    fontSize: 26,
+    fontFamily: 'Avenir',
+    fontSize: 22,
     fontWeight: '900',
     color: INK,
-    letterSpacing: -0.5,
-    lineHeight: 32,
+    letterSpacing: -0.3,
+    lineHeight: 28,
     textAlign: 'center',
     alignSelf: 'stretch',
   },
 
   catSticker: {
-    width: 140,
-    height: 140,
+    width: 130,
+    height: 130,
+  },
+
+  tapHint: {
+    backgroundColor: 'rgba(44,26,14,0.1)',
+    borderRadius: 50,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+  },
+
+  tapHintText: {
+    fontFamily: 'Avenir',
+    fontSize: 11,
+    fontWeight: '700',
+    color: INK,
+    letterSpacing: 0.3,
   },
 
   backHeading: {
-    fontFamily: 'Georgia',
-    fontSize: 16,
+    fontFamily: 'Avenir',
+    fontSize: 15,
     fontWeight: '900',
     color: INK,
-    letterSpacing: -0.3,
-    lineHeight: 22,
+    letterSpacing: -0.2,
+    lineHeight: 21,
     alignSelf: 'stretch',
   },
 
   divider: {
     height: 1.5,
-    backgroundColor: 'rgba(44,26,14,0.1)',
+    backgroundColor: 'rgba(44,26,14,0.08)',
     borderRadius: 1,
     alignSelf: 'stretch',
   },
@@ -361,101 +371,77 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'stretch',
   },
+
   bulletRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
+
   bulletPaw: {
-    width: 20,
-    height: 20,
+    width: 18,
+    height: 18,
     tintColor: ORANGE,
     flexShrink: 0,
   },
+
   bulletText: {
     flex: 1,
-    fontSize: 14,
+    fontFamily: 'Avenir',
+    fontSize: 13,
     fontWeight: '400',
     color: INK_SOFT,
-    lineHeight: 20,
+    lineHeight: 19,
   },
 
-  tapHint: {
-    backgroundColor: 'rgba(44,26,14,0.1)',
-    borderRadius: 50,
-    paddingVertical: 5,
-    paddingHorizontal: 12,
-  },
-  tapHintDark: {
-    backgroundColor: 'rgba(44,26,14,0.06)',
-  },
-  tapHintText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: INK,
-    letterSpacing: 0.3,
-  },
-
-  bottomArea: {
-    gap: 14,
-  },
-  dotsRow: {
+  bottomNav: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-  },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: 'rgba(44,26,14,0.15)',
-  },
-  dotActive: {
-    backgroundColor: INK,
-    width: 22,
-  },
-  dotSeen: {
-    backgroundColor: ORANGE,
+    gap: 18,
+    paddingBottom: 4,
   },
 
-  navRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  navButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 50,
+  circleNavBtn: {
+    width: 92,
+    height: 54,
+    borderRadius: 28,
     backgroundColor: 'rgba(44,26,14,0.08)',
-  },
-  navButtonNext: {
-    backgroundColor: INK,
-  },
-  navButtonDisabled: {
-    opacity: 0.3,
-  },
-  navButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: INK,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: 'rgba(44,26,14,0.12)',
   },
 
-  swipeHint: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  circleNavBtnNext: {
+    backgroundColor: ORANGE,
+    borderBottomWidth: 4,
+    borderBottomColor: ORANGE_DARK,
   },
-  swipeHintPaw: {
-    width: 14,
-    height: 14,
-    tintColor: INK_SOFT,
-    opacity: 0.5,
+
+  circleNavBtnDisabled: {
+    opacity: 0.35,
   },
-  swipeHintText: {
-    fontSize: 12,
-    fontWeight: '600',
+
+  arrowText: {
+    fontSize: 34,
+    fontWeight: '700',
     color: INK_SOFT,
-    opacity: 0.6,
+    lineHeight: 38,
+  },
+
+  arrowTextNext: {
+    color: WHITE,
+  },
+
+  arrowTextDisabled: {
+    color: 'rgba(107,76,53,0.35)',
+  },
+
+  pageCounter: {
+    fontFamily: 'Avenir',
+    fontSize: 17,
+    fontWeight: '800',
+    color: INK_SOFT,
   },
 });
