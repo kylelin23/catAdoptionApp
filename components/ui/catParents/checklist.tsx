@@ -1,64 +1,77 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 
-const INK = '#2C1A0E';
+const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
-const SAND = '#E8C9A0';
-const WARM = '#D4956A';
-const WHITE = '#FFFAF5';
+const WHITE    = '#FFFAF5';
 
 const PAW = require('../../../assets/images/paw.png');
 
 const ITEMS = [
   {
-    route: 'Toxic Foods, Plants and Items',
-    title: 'Toxic Foods, Plants and Items',
+    route:   'Toxic Foods, Plants and Items',
+    title:   'Toxic Foods, Plants and Items',
     subtitle: 'Keep your cat safe',
-    color: '#E8C8B8',
+    border:  '#C47A45',
+    dark:    '#9E5C2E',
+    paw:     '#C47A45',
   },
   {
-    route: 'Cat Language',
-    title: 'Cat Language',
+    route:   'Cat Language',
+    title:   'Cat Language',
     subtitle: 'Understand what they are saying',
-    color: '#C8D8E8',
+    border:  '#7A9BBE',
+    dark:    '#5C7A9A',
+    paw:     '#7A9BBE',
   },
   {
-    route: 'Poop Monitoring Scores',
-    title: 'Poop Monitoring Scores',
-    subtitle: 'Track your cat\'s health',
-    color: '#C4DDB0',
+    route:   'Poop Monitoring Scores',
+    title:   'Poop Monitoring Scores',
+    subtitle: "Track your cat's health",
+    border:  '#7BAE6E',
+    dark:    '#5A8F50',
+    paw:     '#7BAE6E',
   },
 ];
 
-function InfoCard({ item, onPress }: { item: typeof ITEMS[0], onPress: () => void }) {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+function InfoCard({ item, index, onPress }: { item: typeof ITEMS[0]; index: number; onPress: () => void }) {
+  const scaleAnim  = useRef(new Animated.Value(1)).current;
+  const translateY = useRef(new Animated.Value(40)).current;
+  const opacity    = useRef(new Animated.Value(0)).current;
 
-  const handlePress = () => {
+  useEffect(() => {
     Animated.sequence([
-      Animated.spring(scaleAnim, { toValue: 0.96, useNativeDriver: true, friction: 5 }),
-      Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, friction: 5 }),
+      Animated.delay(index * 100),
+      Animated.parallel([
+        Animated.spring(translateY, { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
+        Animated.timing(opacity,    { toValue: 1, duration: 250, useNativeDriver: true }),
+      ]),
     ]).start();
-    onPress();
-  };
+  }, []);
+
+  const onPressIn  = () => Animated.spring(scaleAnim, { toValue: 0.97, useNativeDriver: true, friction: 5 }).start();
+  const onPressOut = () => Animated.spring(scaleAnim, { toValue: 1,    useNativeDriver: true, friction: 5 }).start();
 
   return (
-    <Animated.View style={[styles.cardWrapper, { transform: [{ scale: scaleAnim }] }]}>
+    <Animated.View style={[
+      styles.cardWrapper,
+      { opacity, transform: [{ translateY }, { scale: scaleAnim }] },
+    ]}>
       <TouchableOpacity
-        style={[styles.card, { backgroundColor: item.color }]}
-        onPress={handlePress}
+        style={[styles.card, { borderColor: item.border, borderBottomColor: item.dark }]}
+        onPress={onPress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
         activeOpacity={1}
       >
-        <View style={styles.cardContent}>
+        <Image source={PAW} style={[styles.paw, { tintColor: item.paw }]} resizeMode="contain" />
+
+        <View style={styles.cardText}>
           <Text style={styles.cardTitle}>{item.title}</Text>
           <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
         </View>
 
-        <View style={styles.cardFooter}>
-          <Image source={PAW} style={styles.cardPaw} resizeMode="contain" />
-          <View style={styles.arrowChip}>
-            <Text style={styles.arrowText}>{">"}</Text>
-          </View>
-        </View>
+        <Text style={[styles.arrow, { color: item.border }]}>›</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -67,15 +80,14 @@ function InfoCard({ item, onPress }: { item: typeof ITEMS[0], onPress: () => voi
 export default function CheckList({ navigation }: { navigation: any }) {
   return (
     <View style={styles.container}>
-      <View style={styles.cardsArea}>
-        {ITEMS.map((item, i) => (
-          <InfoCard
-            key={i}
-            item={item}
-            onPress={() => navigation.navigate(item.route)}
-          />
-        ))}
-      </View>
+      {ITEMS.map((item, i) => (
+        <InfoCard
+          key={i}
+          item={item}
+          index={i}
+          onPress={() => navigation.navigate(item.route)}
+        />
+      ))}
     </View>
   );
 }
@@ -84,79 +96,60 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
-    paddingHorizontal: 22,
-    paddingTop: 24,
-    paddingBottom: 24,
-  },
-
-  cardsArea: {
-    flex: 1,
-    gap: 16,
+    backgroundColor: WHITE,
+    paddingHorizontal: 20,
+    gap: 14,
     justifyContent: 'center',
   },
 
   cardWrapper: {
     shadowColor: INK,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 14,
-    elevation: 5,
-    borderRadius: 28,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    elevation: 4,
   },
 
   card: {
-    borderRadius: 28,
-    padding: 24,
-    minHeight: 120,
-    justifyContent: 'space-between',
-    overflow: 'hidden',
-  },
-
-  cardContent: {
-    gap: 6,
-    flex: 1,
-  },
-  cardTitle: {
-    fontFamily: 'Georgia',
-    fontSize: 20,
-    fontWeight: '900',
-    color: INK,
-    letterSpacing: -0.5,
-    lineHeight: 26,
-  },
-  cardSubtitle: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: INK_SOFT,
-    lineHeight: 18,
-  },
-
-  cardFooter: {
+    backgroundColor: WHITE,
+    borderRadius: 20,
+    borderWidth: 2.5,
+    borderBottomWidth: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 14,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
+    gap: 14,
   },
 
-  cardPaw: {
-    width: 24,
-    height: 24,
-    tintColor: INK,
-    opacity: 0.3,
+  paw: {
+    width: 30,
+    height: 30,
+    flexShrink: 0,
   },
 
-  arrowChip: {
-    backgroundColor: 'rgba(44,26,14,0.12)',
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
+  cardText: {
+    flex: 1,
+    gap: 4,
   },
-  arrowText: {
+  cardTitle: {
+    fontFamily: 'Avenir',
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '900',
     color: INK,
+    letterSpacing: -0.2,
+    lineHeight: 21,
+  },
+  cardSubtitle: {
+    fontFamily: 'Avenir',
+    fontSize: 12,
+    fontWeight: '400',
+    color: INK_SOFT,
+  },
+
+  arrow: {
+    fontSize: 26,
+    fontWeight: '800',
+    flexShrink: 0,
   },
 });

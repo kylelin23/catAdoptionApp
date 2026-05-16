@@ -1,39 +1,30 @@
 import React, { useState, useRef } from 'react';
-import { Text, Dimensions, View, TouchableOpacity, StyleSheet, ScrollView, Animated, Image } from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet, ScrollView, Animated, Image } from 'react-native';
 import faqs from '../../../app/data/newCatParents/faqs';
 
-const INK = '#2C1A0E';
+const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
-const SAND = '#E8C9A0';
-const WARM = '#D4956A';
-const WHITE = '#FFFAF5';
-const screenWidth = Dimensions.get('window').width;
+const WHITE    = '#FFFAF5';
+const GREEN    = '#7BAE6E';
+const GREEN_DARK = '#5A8F50';
 
-const PAW = require('../../../assets/images/paw.png');
+const PAW      = require('../../../assets/images/paw.png');
 const CAT_PEEK = require('../../../assets/images/catWave.png');
 
-function FAQItem({ question, answer, isOpen, onPress }: {
+function FAQItem({ question, answer, isOpen, onPress, index }: {
   question: string;
   answer: string;
   isOpen: boolean;
   onPress: () => void;
+  index: number;
 }) {
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  const peekAnim = useRef(new Animated.Value(0)).current;
+  const peekAnim   = useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
     Animated.parallel([
-      Animated.timing(rotateAnim, {
-        toValue: isOpen ? 1 : 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.spring(peekAnim, {
-        toValue: isOpen ? 1 : 0,
-        friction: 5,
-        tension: 70,
-        useNativeDriver: true,
-      }),
+      Animated.timing(rotateAnim, { toValue: isOpen ? 1 : 0, duration: 200, useNativeDriver: true }),
+      Animated.spring(peekAnim,   { toValue: isOpen ? 1 : 0, friction: 5, tension: 70, useNativeDriver: true }),
     ]).start();
   }, [isOpen]);
 
@@ -50,24 +41,22 @@ function FAQItem({ question, answer, isOpen, onPress }: {
   return (
     <View style={styles.faqWrapper}>
 
-      {/* Cat behind card */}
       <Animated.Image
         source={CAT_PEEK}
         style={[
           styles.peekingCat,
           {
             opacity: peekAnim,
-            transform: [
-              { translateX: catTranslateX },
-              { rotate: '-45deg' },
-            ],
+            transform: [{ translateX: catTranslateX }, { rotate: '-45deg' }],
           },
         ]}
         resizeMode="contain"
       />
 
-      {/* Card in front */}
-      <View style={[styles.faqCard, isOpen && styles.faqCardOpen]}>
+      <View style={[
+        styles.faqCard,
+        isOpen && { borderLeftWidth: 3, borderLeftColor: GREEN },
+      ]}>
         <TouchableOpacity
           style={styles.questionRow}
           onPress={onPress}
@@ -109,13 +98,13 @@ export default function FAQs() {
       {faqs.map((item, index) => (
         <FAQItem
           key={index}
+          index={index}
           question={item.question}
           answer={item.answer}
           isOpen={openIndex === index}
           onPress={() => showAnswer(index)}
         />
       ))}
-
       <View style={{ height: 40 }} />
     </ScrollView>
   );
@@ -125,7 +114,7 @@ const styles = StyleSheet.create({
 
   scroll: {
     flex: 1,
-    backgroundColor: '#F5EAD8',
+    backgroundColor: 'white',
   },
 
   scrollContent: {
@@ -153,7 +142,7 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE,
     borderRadius: 20,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 14,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -161,11 +150,10 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 2,
     marginLeft: 55,
-  },
-
-  faqCardOpen: {
-    borderLeftWidth: 4,
-    borderLeftColor: WARM,
+    borderWidth: 2,
+    borderColor: 'rgba(44,26,14,0.06)',
+    borderBottomWidth: 4,
+    borderBottomColor: 'rgba(44,26,14,0.1)',
   },
 
   questionRow: {
@@ -177,23 +165,23 @@ const styles = StyleSheet.create({
 
   questionText: {
     flex: 1,
-    fontFamily: 'Georgia',
-    fontSize: 13,
+    fontFamily: 'Avenir',
+    fontSize: 14,
     fontWeight: '700',
     color: INK,
-    lineHeight: 19,
+    lineHeight: 20,
   },
 
   pawChevron: {
-    width: 28,
-    height: 28,
-    tintColor: WARM,
+    width: 26,
+    height: 26,
+    tintColor: GREEN,
     flexShrink: 0,
   },
 
   answerWrapper: {
-    gap: 12,
-    marginTop: 4,
+    gap: 10,
+    marginTop: 6,
   },
 
   answerDivider: {
@@ -203,9 +191,10 @@ const styles = StyleSheet.create({
   },
 
   answerText: {
-    fontSize: 12,
+    fontFamily: 'Avenir',
+    fontSize: 13,
     fontWeight: '400',
     color: INK_SOFT,
-    lineHeight: 18,
+    lineHeight: 19,
   },
 });

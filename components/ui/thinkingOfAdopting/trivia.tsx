@@ -239,6 +239,7 @@ const styles = StyleSheet.create({
   answersArea: {
     flex: 1,
     paddingHorizontal: 22,
+    marginTop: 25,
     gap: 10,
     justifyContent: 'center',
   },

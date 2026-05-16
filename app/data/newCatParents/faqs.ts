@@ -33,12 +33,12 @@ const faqs: FAQ[] = [
     answer: 'Cats need different amounts of food at different phases. Kittens and nursing mothers need a lot more! Always check the suggested amount on the instructions listed on the dry and wet food and avoid overfeeding.'
   },
   {
-    question: 'Should I let my cat on the kitchen counter? Bed? Anywhere they want?',
-    answer: "Honestly, I haven't met anyone who's been successful at keeping their cat off counters or beds! If you're worried about germs, it's always a good idea to wipe down counters and avoid eating food directly from counters. As for the bed, they actually make great sleeping partners!"
-  },
-  {
     question: 'How can I make my cat a lap cat?',
     answer: "The key word here is 'make'. Cats are infamous for not being made to do anything and that is the truth, not a myth. Love your cats for who they are, not who you want them to be!"
+  },
+  {
+    question: 'Should I let my cat on the kitchen counter? Bed? Anywhere they want?',
+    answer: "Honestly, I haven't met anyone who's been successful at keeping their cat off counters or beds! If you're worried about germs, it's always a good idea to wipe down counters and avoid eating food directly from counters. As for the bed, they actually make great sleeping partners!"
   },
   {
     question: 'Do I need to bathe my cat?',
