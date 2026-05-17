@@ -1,20 +1,21 @@
 import React, { useRef } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Animated, Image } from "react-native";
 
-const INK = '#2C1A0E';
+const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
-const WHITE = '#FFFAF5';
+const WHITE    = '#FFFAF5';
 
-const PAW = require('../../../assets/images/paw.png');
+const PAW      = require('../../../assets/images/paw.png');
 const CAT_PEEK = require('../../../assets/images/catWave.png');
 
 const STEPS = [
   {
-    key: 'separate',
-    number: '01',
-    title: 'Separate Spaces',
+    key:     'separate',
+    number:  '01',
+    title:   'Separate Spaces',
     tagline: 'Keep them apart at first',
-    accent: '#7A9BBE',
+    accent:  '#7A9BBE',
+    dark:    '#5C7A9A',
     bullets: [
       'Keep the cats in separate spaces',
       'Set up the new cat in a quiet room with litter box, food, water, hiding spot and scratching post',
@@ -23,11 +24,12 @@ const STEPS = [
     ],
   },
   {
-    key: 'scent',
-    number: '02',
-    title: 'Exchange Scents',
+    key:     'scent',
+    number:  '02',
+    title:   'Exchange Scents',
     tagline: 'Cats recognize by scent before sight',
-    accent: '#D4956A',
+    accent:  '#D4956A',
+    dark:    '#A86E45',
     bullets: [
       'Exchange bedding or blankets between cats',
       'Feed cats on opposite sides of the door',
@@ -35,11 +37,12 @@ const STEPS = [
     ],
   },
   {
-    key: 'supervised',
-    number: '03',
-    title: 'Supervised Meetings',
+    key:     'supervised',
+    number:  '03',
+    title:   'Supervised Meetings',
     tagline: 'Short and sweet visits',
-    accent: '#7BAE6E',
+    accent:  '#7BAE6E',
+    dark:    '#5A8F50',
     bullets: [
       'Cats are ready when they show curious sniffing at the door',
       'After several days, open the door slightly',
@@ -48,11 +51,12 @@ const STEPS = [
     ],
   },
   {
-    key: 'slow',
-    number: '04',
-    title: 'Slow and Gradual',
+    key:     'slow',
+    number:  '04',
+    title:   'Slow and Gradual',
     tagline: 'Patience is key',
-    accent: '#C47A45',
+    accent:  '#C47A45',
+    dark:    '#9E5C2E',
     bullets: [
       'Maintain the same structure over days or weeks',
       'Keep the pace slow and gradual',
@@ -69,21 +73,12 @@ function StepItem({ step, isOpen, onPress }: {
   onPress: () => void;
 }) {
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  const peekAnim = useRef(new Animated.Value(0)).current;
+  const peekAnim   = useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
     Animated.parallel([
-      Animated.timing(rotateAnim, {
-        toValue: isOpen ? 1 : 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.spring(peekAnim, {
-        toValue: isOpen ? 1 : 0,
-        friction: 5,
-        tension: 70,
-        useNativeDriver: true,
-      }),
+      Animated.timing(rotateAnim, { toValue: isOpen ? 1 : 0, duration: 200, useNativeDriver: true }),
+      Animated.spring(peekAnim,   { toValue: isOpen ? 1 : 0, friction: 5, tension: 70, useNativeDriver: true }),
     ]).start();
   }, [isOpen]);
 
@@ -100,42 +95,47 @@ function StepItem({ step, isOpen, onPress }: {
   return (
     <View style={styles.itemWrapper}>
 
-      {/* Cat — left side, behind card */}
+      {/* Cat peeks from left */}
       <Animated.Image
         source={CAT_PEEK}
         style={[
           styles.peekingCat,
           {
             opacity: peekAnim,
-            transform: [
-              { translateX: catTranslateX },
-              { rotate: '-45deg' },
-            ],
+            transform: [{ translateX: catTranslateX }, { rotate: '-45deg' }],
           },
         ]}
         resizeMode="contain"
       />
 
-      {/* Card — in front of cat */}
-      <View style={[styles.card, isOpen && { borderLeftWidth: 4, borderLeftColor: step.accent }]}>
+      {/* Card */}
+      <View style={[
+        styles.card,
+        { borderColor: step.accent, borderBottomColor: step.dark },
+        isOpen && { borderLeftWidth: 3, borderLeftColor: step.accent },
+      ]}>
         <TouchableOpacity style={styles.headerRow} onPress={onPress} activeOpacity={0.8}>
-          <View style={[styles.numberBadge, { backgroundColor: step.accent }]}>
+
+          <View style={[styles.numberBadge, { backgroundColor: step.accent, borderBottomColor: step.dark }]}>
             <Text style={styles.numberText}>{step.number}</Text>
           </View>
+
           <View style={styles.titleArea}>
             <Text style={styles.cardTitle}>{step.title}</Text>
             <Text style={styles.cardTagline}>{step.tagline}</Text>
           </View>
+
           <Animated.Image
             source={PAW}
             style={[styles.pawChevron, { tintColor: step.accent, transform: [{ rotate }] }]}
             resizeMode="contain"
           />
+
         </TouchableOpacity>
 
         {isOpen && (
           <View style={styles.bulletsArea}>
-            <View style={[styles.divider, { backgroundColor: step.accent, opacity: 0.25 }]} />
+            <View style={styles.divider} />
             {step.bullets.map((bullet, i) => (
               <View key={i} style={styles.bulletRow}>
                 <Image source={PAW} style={[styles.bulletPaw, { tintColor: step.accent }]} resizeMode="contain" />
@@ -159,7 +159,6 @@ export default function NewCats() {
 
   return (
     <View style={styles.container}>
-
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -173,18 +172,8 @@ export default function NewCats() {
             onPress={() => toggle(index)}
           />
         ))}
-        <View style={{ height: 120 }} />
+        <View style={{ height: 40 }} />
       </ScrollView>
-
-      {/* Sticky cat at the bottom */}
-      <View style={styles.stickyCat}>
-        <Image
-          source={CAT_PEEK}
-          style={styles.bottomCat}
-          resizeMode="contain"
-        />
-      </View>
-
     </View>
   );
 }
@@ -193,18 +182,16 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F5EAD8',
+    backgroundColor: WHITE,
   },
 
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
 
   scrollContent: {
     paddingLeft: 0,
     paddingRight: 20,
-    paddingTop: 24,
-    gap: 16,
+    paddingTop: 20,
+    gap: 12,
   },
 
   itemWrapper: {
@@ -222,10 +209,10 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#FFFAF5',
+    backgroundColor: WHITE,
     borderRadius: 20,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 14,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -233,6 +220,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 2,
     marginLeft: 55,
+    borderWidth: 2.5,
+    borderBottomWidth: 4,
   },
 
   headerRow: {
@@ -242,14 +231,16 @@ const styles = StyleSheet.create({
   },
 
   numberBadge: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+    borderBottomWidth: 3,
   },
   numberText: {
+    fontFamily: 'Avenir',
     fontSize: 11,
     fontWeight: '900',
     color: WHITE,
@@ -260,27 +251,28 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   cardTitle: {
-    fontFamily: 'Georgia',
-    fontSize: 13,
-    fontWeight: '700',
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontWeight: '800',
     color: INK,
-    lineHeight: 19,
+    lineHeight: 20,
   },
   cardTagline: {
+    fontFamily: 'Avenir',
     fontSize: 11,
     fontWeight: '400',
     color: INK_SOFT,
   },
 
   pawChevron: {
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     flexShrink: 0,
   },
 
   bulletsArea: {
     gap: 10,
-    marginTop: 4,
+    marginTop: 6,
   },
   divider: {
     height: 1.5,
@@ -300,24 +292,10 @@ const styles = StyleSheet.create({
   },
   bulletText: {
     flex: 1,
-    fontSize: 12,
+    fontFamily: 'Avenir',
+    fontSize: 13,
     fontWeight: '400',
     color: INK_SOFT,
-    lineHeight: 18,
-  },
-
-  stickyCat: {
-    position: 'absolute',
-    bottom: 0,
-    alignSelf: 'center',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    pointerEvents: 'none',
-  },
-  bottomCat: {
-    width: 120,
-    height: 120,
-    opacity: 0.5,
+    lineHeight: 19,
   },
 });

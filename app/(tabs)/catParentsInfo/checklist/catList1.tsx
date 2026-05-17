@@ -1,34 +1,35 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, Image, SafeAreaView } from "react-native";
 import food, { plants, householdItems, others } from '../../../data/catParents/catList1';
 import { useState, useRef, useEffect } from "react";
 
-const INK = '#2C1A0E';
-const INK_SOFT = '#6B4C35';
-const WARM = '#D4956A';
-const WHITE = '#FFFAF5';
-const GREEN = '#6B8F5E';
-const RED = '#C47A45';
-const screenWidth = Dimensions.get('window').width;
+const INK        = '#2C1A0E';
+const INK_SOFT   = '#6B4C35';
+const WHITE      = '#FFFAF5';
+const GREEN      = '#7BAE6E';
+const GREEN_DARK = '#5A8F50';
+const RED        = '#C47A45';
+const RED_DARK   = '#9E5C2E';
+const screenWidth  = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-const LISTS = [food, plants, householdItems, others];
+const LISTS       = [food, plants, householdItems, others];
 const LIST_LABELS = ['Foods', 'Plants', 'Household', 'Others'];
-const CONFETTI_COLORS = ['#D4956A', '#E8C9A0', '#6B8F5E', '#C8D8E8', '#E8C8B8', '#2C1A0E', '#FFFAF5'];
+const CONFETTI_COLORS = ['#D4956A', '#E8C9A0', '#7BAE6E', '#C8D8E8', '#E8C8B8', '#2C1A0E', '#FFFAF5'];
 
 const CAT = require('../../../../assets/images/walkingCat.png');
 
-function ConfettiPiece({ color, delay }: { color: string, delay: number }) {
-  const y = useRef(new Animated.Value(-20)).current;
-  const x = useRef(new Animated.Value(Math.random() * screenWidth)).current;
+function ConfettiPiece({ color, delay }: { color: string; delay: number }) {
+  const y       = useRef(new Animated.Value(-20)).current;
+  const x       = useRef(new Animated.Value(Math.random() * screenWidth)).current;
   const opacity = useRef(new Animated.Value(1)).current;
-  const rotate = useRef(new Animated.Value(0)).current;
+  const rotate  = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
       Animated.delay(delay),
       Animated.parallel([
-        Animated.timing(y, { toValue: screenHeight, duration: 2000 + Math.random() * 1000, useNativeDriver: true }),
-        Animated.timing(x, { toValue: (Math.random() - 0.5) * 200 + Math.random() * screenWidth, duration: 2000 + Math.random() * 1000, useNativeDriver: true }),
+        Animated.timing(y,      { toValue: screenHeight, duration: 2000 + Math.random() * 1000, useNativeDriver: true }),
+        Animated.timing(x,      { toValue: (Math.random() - 0.5) * 200 + Math.random() * screenWidth, duration: 2000 + Math.random() * 1000, useNativeDriver: true }),
         Animated.timing(rotate, { toValue: Math.random() > 0.5 ? 10 : -10, duration: 2000, useNativeDriver: true }),
         Animated.sequence([
           Animated.delay(1200),
@@ -48,8 +49,7 @@ function ConfettiPiece({ color, delay }: { color: string, delay: number }) {
       borderRadius: Math.random() > 0.5 ? 5 : 0,
       backgroundColor: color,
       transform: [{ translateY: y }, { translateX: x }, { rotate: spin }],
-      opacity,
-      zIndex: 999,
+      opacity, zIndex: 999,
     }} />
   );
 }
@@ -67,30 +67,31 @@ function Confetti({ show }: { show: boolean }) {
 
 export default function CatList1({ navigation }: { navigation: any }) {
 
-  const [listIndex, setListIndex] = useState(0);
+  const [listIndex, setListIndex]               = useState(0);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
-  const [answered, setAnswered] = useState<string | null>(null);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [completed, setCompleted] = useState(false);
-  const [score, setScore] = useState(0);
+  const [answered, setAnswered]                 = useState<string | null>(null);
+  const [showConfetti, setShowConfetti]         = useState(false);
+  const [completed, setCompleted]               = useState(false);
+  const [score, setScore]                       = useState(0);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim   = useRef(new Animated.Value(0)).current;
   const catProgress = useRef(new Animated.Value(0)).current;
+
   const currentList = LISTS[listIndex];
   const currentItem = currentList[currentItemIndex];
 
-  const CAT_SIZE = 36;
-  const TRACK_WIDTH = screenWidth - 40;
+  const CAT_SIZE    = 36;
+  const TRACK_WIDTH = screenWidth - 44;
   const catX = catProgress.interpolate({
     inputRange: [0, 1],
     outputRange: [0, TRACK_WIDTH - CAT_SIZE],
+    extrapolate: 'clamp',
   });
 
   useEffect(() => {
     Animated.spring(catProgress, {
       toValue: currentItemIndex / currentList.length,
-      friction: 6,
-      tension: 80,
+      friction: 6, tension: 80,
       useNativeDriver: false,
     }).start();
   }, [currentItemIndex]);
@@ -105,20 +106,13 @@ export default function CatList1({ navigation }: { navigation: any }) {
 
   const animateToList = (newIndex: number) => {
     const direction = newIndex > listIndex ? -1 : 1;
-    Animated.timing(slideAnim, {
-      toValue: direction * screenWidth,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      resetList();
-      setListIndex(newIndex);
-      slideAnim.setValue(-direction * screenWidth);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-    });
+    Animated.timing(slideAnim, { toValue: direction * screenWidth, duration: 200, useNativeDriver: true })
+      .start(() => {
+        resetList();
+        setListIndex(newIndex);
+        slideAnim.setValue(-direction * screenWidth);
+        Animated.timing(slideAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start();
+      });
   };
 
   const handleAnswer = (answer: 'yes' | 'no') => {
@@ -126,7 +120,6 @@ export default function CatList1({ navigation }: { navigation: any }) {
     const correct = answer === currentItem.answer;
     setAnswered(correct ? 'correct' : 'incorrect');
     if (correct) {
-      setScore(prev => prev + 1);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 2500);
     }
@@ -143,319 +136,447 @@ export default function CatList1({ navigation }: { navigation: any }) {
       }
       Animated.spring(catProgress, { toValue: 1, friction: 6, tension: 80, useNativeDriver: false }).start();
     } else {
-      Animated.timing(slideAnim, {
-        toValue: -screenWidth,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => {
-        setCurrentItemIndex(prev => prev + 1);
-        setAnswered(null);
-        slideAnim.setValue(screenWidth);
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }).start();
-      });
+      Animated.timing(slideAnim, { toValue: -screenWidth, duration: 200, useNativeDriver: true })
+        .start(() => {
+          setCurrentItemIndex(prev => prev + 1);
+          setAnswered(null);
+          slideAnim.setValue(screenWidth);
+          Animated.timing(slideAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start();
+        });
     }
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
 
       <Confetti show={showConfetti} />
 
-      {/* Back button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-        <Text style={styles.backText}>{"< Back"}</Text>
-      </TouchableOpacity>
+      <View style={styles.container}>
 
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>Are These Toxic?</Text>
-        <View style={styles.counterBadge}>
-          <Text style={styles.counterText}>{currentItemIndex + 1}/{currentList.length}</Text>
-        </View>
-      </View>
-
-      {/* Tabs */}
-      <View style={styles.tabRow}>
-        {LIST_LABELS.map((label, i) => (
-          <TouchableOpacity
-            key={i}
-            style={[styles.tabPill, listIndex === i && styles.tabPillActive]}
-            onPress={() => i !== listIndex && animateToList(i)}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.tabPillText, listIndex === i && styles.tabPillTextActive]}>{label}</Text>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
+            <Text style={styles.backBtnText}>{"<"}</Text>
           </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Progress bar */}
-      <View style={styles.progressArea}>
-        <View style={styles.progressTrack}>
-          <Animated.View style={[styles.progressFill, {
-            width: catProgress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
-          }]} />
-        </View>
-        <Animated.Image source={CAT} style={[styles.progressCat, { transform: [{ translateX: catX }] }]} resizeMode="contain" />
-      </View>
-
-      {completed ? (
-
-        <View style={styles.completedArea}>
-          <Image source={CAT} style={styles.completedCat} resizeMode="contain" />
-          <Text style={styles.completedTitle}>{score === currentList.length ? 'Perfect!' : 'Done!'}</Text>
-          <Text style={styles.completedScore}>{score} out of {currentList.length} correct</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={resetList} activeOpacity={0.85}>
-            <Text style={styles.retryText}>Try Again</Text>
-          </TouchableOpacity>
+          <View style={styles.headerCenter}>
+            <Text style={styles.eyebrow}>CAT PARENTS</Text>
+            <Text style={styles.pageTitle}>Are These Toxic?</Text>
+          </View>
         </View>
 
-      ) : (
-
-        <View style={styles.questionArea}>
-
-          {/* Item card */}
-          <Animated.View style={[styles.itemCard, { transform: [{ translateX: slideAnim }] }]}>
-            <Text style={styles.itemQuestion}>Is this toxic to cats?</Text>
-            <Text style={styles.itemName}>{currentItem.item}</Text>
-
-            {answered && (
-              <View style={[styles.resultBanner, answered === 'correct' ? styles.resultCorrect : styles.resultWrong]}>
-                <Text style={styles.resultText}>
-                  {answered === 'correct'
-                    ? currentItem.answer === 'yes' ? '☠️ Yes, toxic!' : '✓ Correct, it\'s safe!'
-                    : currentItem.answer === 'yes' ? '☠️ Actually toxic!' : '✓ Actually safe!'}
-                </Text>
-              </View>
-            )}
-          </Animated.View>
-
-          {/* Yes / No buttons */}
-          <View style={styles.choiceRow}>
+        {/* Tabs */}
+        <View style={styles.tabRow}>
+          {LIST_LABELS.map((label, i) => (
             <TouchableOpacity
-              style={[
-                styles.choiceButton,
-                styles.choiceYes,
-                answered === 'correct' && currentItem.answer === 'yes' && styles.choiceCorrectHighlight,
-                answered === 'incorrect' && currentItem.answer !== 'yes' && styles.choiceWrongHighlight,
-              ]}
-              onPress={() => handleAnswer('yes')}
-              disabled={answered !== null}
-              activeOpacity={0.85}
+              key={i}
+              style={[styles.tabPill, listIndex === i && styles.tabPillActive]}
+              onPress={() => i !== listIndex && animateToList(i)}
+              activeOpacity={0.8}
             >
-              <Text style={styles.choiceEmoji}>☠️</Text>
-              <Text style={styles.choiceLabel}>Toxic!</Text>
+              <Text style={[styles.tabPillText, listIndex === i && styles.tabPillTextActive]}>{label}</Text>
             </TouchableOpacity>
+          ))}
+        </View>
 
-            <TouchableOpacity
-              style={[
-                styles.choiceButton,
-                styles.choiceNo,
-                answered === 'correct' && currentItem.answer === 'no' && styles.choiceCorrectHighlight,
-                answered === 'incorrect' && currentItem.answer !== 'no' && styles.choiceWrongHighlight,
-              ]}
-              onPress={() => handleAnswer('no')}
-              disabled={answered !== null}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.choiceEmoji}>✓</Text>
-              <Text style={styles.choiceLabel}>Safe!</Text>
+        {/* Progress bar */}
+        <View style={styles.progressArea}>
+          <Animated.Image
+            source={CAT}
+            style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
+            resizeMode="contain"
+          />
+          <View style={styles.progressTrack}>
+            <Animated.View style={[styles.progressFill, {
+              width: catProgress.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+                extrapolate: 'clamp',
+              }),
+            }]} />
+          </View>
+        </View>
+
+        {completed ? (
+
+          <View style={styles.completedArea}>
+            <Image source={CAT} style={styles.completedCat} resizeMode="contain" />
+            <View style={styles.completedCard}>
+              <Text style={styles.completedEyebrow}>RESULT</Text>
+              <Text style={styles.completedTitle}>{score === currentList.length ? 'Perfect!' : 'Done!'}</Text>
+              <Text style={styles.completedScore}>{score} / {currentList.length} correct</Text>
+            </View>
+            <TouchableOpacity style={styles.retryBtn} onPress={resetList} activeOpacity={0.85}>
+              <Text style={styles.retryBtnText}>Try Again</Text>
             </TouchableOpacity>
           </View>
 
-          {answered && (
-            <TouchableOpacity
-              style={[styles.nextButton, answered === 'correct' ? styles.nextButtonCorrect : styles.nextButtonWrong]}
-              onPress={handleNext}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.nextButtonText}>
-                {currentItemIndex === currentList.length - 1 ? 'See Results' : 'Next >'}
-              </Text>
-            </TouchableOpacity>
-          )}
+        ) : (
 
-        </View>
-      )}
+          <View style={styles.questionArea}>
 
-    </View>
+            {/* Item card */}
+            <Animated.View style={[styles.itemCard, { transform: [{ translateX: slideAnim }] }]}>
+              <Text style={styles.itemQuestion}>Is this toxic to cats?</Text>
+              <Text style={styles.itemName}>{currentItem.item}</Text>
+            </Animated.View>
+
+            {/* Result banner — fixed height so buttons don't shift */}
+            <View style={styles.resultBannerContainer}>
+              {answered && (
+                <View style={[styles.resultBanner, answered === 'correct' ? styles.resultCorrect : styles.resultWrong]}>
+                  <Text style={[styles.resultText, { color: answered === 'correct' ? GREEN : RED }]}>
+                    {answered === 'correct'
+                      ? currentItem.answer === 'yes' ? 'Yes, toxic!' : 'Correct, safe!'
+                      : currentItem.answer === 'yes' ? 'Actually toxic!' : 'Actually safe!'}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Toxic / Safe buttons */}
+            <View style={styles.choiceRow}>
+              <TouchableOpacity
+                style={[
+                  styles.choiceBtn,
+                  styles.choiceToxic,
+                  answered && currentItem.answer === 'yes' && styles.choiceBtnCorrect,
+                  answered && answered === 'incorrect' && currentItem.answer !== 'yes' && styles.choiceBtnWrong,
+                ]}
+                onPress={() => handleAnswer('yes')}
+                disabled={answered !== null}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.choiceLabel}>Toxic!</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.choiceBtn,
+                  styles.choiceSafe,
+                  answered && currentItem.answer === 'no' && styles.choiceBtnCorrect,
+                  answered && answered === 'incorrect' && currentItem.answer !== 'no' && styles.choiceBtnWrong,
+                ]}
+                onPress={() => handleAnswer('no')}
+                disabled={answered !== null}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.choiceLabel}>Safe!</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Next button — always reserves space so choice buttons don't move */}
+            <View style={styles.nextBtnContainer}>
+              {answered && (
+                <TouchableOpacity
+                  style={[styles.nextBtn, answered === 'correct' ? styles.nextBtnCorrect : styles.nextBtnWrong]}
+                  onPress={handleNext}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.nextBtnText}>
+                    {currentItemIndex === currentList.length - 1 ? 'SEE RESULTS' : 'NEXT'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+          </View>
+        )}
+
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
 
+  safeArea: {
+    flex: 1,
+    backgroundColor: WHITE,
+  },
+
   container: {
     flex: 1,
-    backgroundColor: '#F5EAD8',
-    paddingHorizontal: 20,
-    paddingTop: 90,
-    paddingBottom: 24,
-    gap: 12,
+    paddingHorizontal: 22,
+    paddingTop: 12,
+    paddingBottom: 28,
+    gap: 14,
   },
 
-  backButton: { alignSelf: 'flex-start' },
-  backText: { fontSize: 14, fontWeight: '700', color: INK_SOFT },
-
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontFamily: 'Georgia',
-    fontSize: 24,
-    fontWeight: '900',
-    color: INK,
-    letterSpacing: -0.5,
-  },
-  counterBadge: {
+  header: { gap: 8 },
+  backBtn: {
+    width: 38, height: 38,
+    borderRadius: 19,
     backgroundColor: 'rgba(44,26,14,0.08)',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
   },
-  counterText: { fontSize: 13, fontWeight: '700', color: INK_SOFT },
+  backBtnText: {
+    fontSize: 18, fontWeight: '700',
+    color: INK, lineHeight: 22,
+  },
+  headerCenter: { gap: 2 },
+  eyebrow: {
+    fontFamily: 'Avenir',
+    fontSize: 10, fontWeight: '800',
+    color: 'rgba(44,26,14,0.4)',
+    letterSpacing: 2,
+  },
+  pageTitle: {
+    fontFamily: 'Avenir',
+    fontSize: 26, fontWeight: '900',
+    color: INK, letterSpacing: -0.5,
+  },
 
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,250,245,0.4)',
+    backgroundColor: 'rgba(44,26,14,0.06)',
     borderRadius: 50,
-    padding: 3,
-    gap: 3,
+    padding: 4, gap: 4,
   },
-  tabPill: { flex: 1, paddingVertical: 6, borderRadius: 50, alignItems: 'center' },
-  tabPillActive: { backgroundColor: INK },
-  tabPillText: { fontSize: 11, fontWeight: '600', color: INK_SOFT },
-  tabPillTextActive: { color: WHITE },
+  tabPill: {
+    flex: 1, paddingVertical: 9,
+    borderRadius: 50,
+    alignItems: 'center',
+  },
+  tabPillActive: {
+    backgroundColor: INK,
+    shadowColor: INK,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  tabPillText: {
+    fontFamily: 'Avenir',
+    fontSize: 12, fontWeight: '600',
+    color: INK_SOFT,
+  },
+  tabPillTextActive: {
+    color: WHITE, fontWeight: '800',
+  },
 
-  progressArea: { marginTop: 8, marginBottom: 4 },
+  progressArea: {
+    marginTop: 16,
+    marginBottom: 4,
+  },
   progressTrack: {
-    height: 8,
-    backgroundColor: 'rgba(44,26,14,0.12)',
-    borderRadius: 4,
+    height: 10,
+    backgroundColor: 'rgba(44,26,14,0.1)',
+    borderRadius: 5,
     overflow: 'hidden',
   },
-  progressFill: { height: '100%', backgroundColor: GREEN, borderRadius: 4 },
-  progressCat: { position: 'absolute', width: 36, height: 36, top: -28 },
+  progressFill: {
+    height: '100%',
+    backgroundColor: GREEN,
+    borderRadius: 5,
+  },
+  progressCat: {
+    position: 'absolute',
+    width: 36, height: 36,
+    top: -20,
+  },
 
   questionArea: {
     flex: 1,
-    gap: 16,
+    gap: 14,
     justifyContent: 'center',
   },
 
   itemCard: {
     backgroundColor: WHITE,
-    borderRadius: 28,
-    padding: 28,
+    borderRadius: 24,
+    padding: 32,
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(44,26,14,0.06)',
+    borderBottomWidth: 5,
+    borderBottomColor: 'rgba(44,26,14,0.1)',
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.07,
     shadowRadius: 12,
     elevation: 4,
-    minHeight: 180,
+    minHeight: 160,
     justifyContent: 'center',
   },
   itemQuestion: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontFamily: 'Avenir',
+    fontSize: 12, fontWeight: '700',
     color: INK_SOFT,
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
+    letterSpacing: 1.5,
   },
   itemName: {
-    fontFamily: 'Georgia',
-    fontSize: 32,
-    fontWeight: '900',
+    fontFamily: 'Avenir',
+    fontSize: 34, fontWeight: '900',
     color: INK,
     textAlign: 'center',
     letterSpacing: -0.8,
-    lineHeight: 38,
+    lineHeight: 40,
   },
 
-  resultBanner: {
-    borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginTop: 4,
+  resultBannerContainer: {
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  resultCorrect: { backgroundColor: 'rgba(107,143,94,0.15)' },
-  resultWrong: { backgroundColor: 'rgba(196,122,69,0.15)' },
+  resultBanner: {
+    width: '70%',
+    borderRadius: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderBottomWidth: 4,
+  },
+  resultCorrect: {
+    backgroundColor: 'rgba(123,174,110,0.1)',
+    borderColor: GREEN,
+    borderBottomColor: GREEN_DARK,
+  },
+  resultWrong: {
+    backgroundColor: 'rgba(196,122,69,0.1)',
+    borderColor: RED,
+    borderBottomColor: RED_DARK,
+  },
   resultText: {
-    fontFamily: 'Georgia',
-    fontSize: 15,
-    fontWeight: '700',
-    color: INK,
-    textAlign: 'center',
+    fontFamily: 'Avenir',
+    fontSize: 14, fontWeight: '900',
+    letterSpacing: 0.3,
   },
 
   choiceRow: {
     flexDirection: 'row',
     gap: 12,
   },
-  choiceButton: {
+  choiceBtn: {
     flex: 1,
-    borderRadius: 24,
-    paddingVertical: 22,
+    borderRadius: 20,
+    paddingVertical: 28,
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'center',
+    borderWidth: 2.5,
+    borderBottomWidth: 5,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 4,
   },
-  choiceYes: { backgroundColor: '#E8C8B8' },
-  choiceNo: { backgroundColor: '#C4DDB0' },
-  choiceCorrectHighlight: {
-    backgroundColor: 'rgba(107,143,94,0.3)',
-    borderWidth: 2.5,
-    borderColor: GREEN,
+  choiceToxic: {
+    backgroundColor: '#F2C9A0',
+    borderColor: '#D4956A',
+    borderBottomColor: '#A86E45',
   },
-  choiceWrongHighlight: { opacity: 0.4 },
-  choiceEmoji: { fontSize: 28 },
+  choiceSafe: {
+    backgroundColor: '#C4DDB0',
+    borderColor: '#7BAE6E',
+    borderBottomColor: GREEN_DARK,
+  },
+  choiceBtnCorrect: {
+    borderColor: GREEN,
+    borderBottomColor: GREEN_DARK,
+    backgroundColor: 'rgba(123,174,110,0.2)',
+  },
+  choiceBtnWrong: {
+    opacity: 0.4,
+  },
   choiceLabel: {
-    fontFamily: 'Georgia',
-    fontSize: 18,
-    fontWeight: '900',
+    fontFamily: 'Avenir',
+    fontSize: 18, fontWeight: '900',
     color: INK,
   },
 
-  nextButton: {
-    borderRadius: 20,
-    paddingVertical: 16,
-    alignItems: 'center',
+  // Fixed height container — next button appears inside without shifting layout
+  nextBtnContainer: {
+    height: 62,
+    justifyContent: 'center',
   },
-  nextButtonCorrect: { backgroundColor: GREEN },
-  nextButtonWrong: { backgroundColor: RED },
-  nextButtonText: { color: WHITE, fontSize: 16, fontWeight: '700' },
+  nextBtn: {
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+    borderBottomWidth: 4,
+    shadowColor: INK,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  nextBtnCorrect: {
+    backgroundColor: GREEN,
+    borderBottomColor: GREEN_DARK,
+  },
+  nextBtnWrong: {
+    backgroundColor: RED,
+    borderBottomColor: RED_DARK,
+  },
+  nextBtnText: {
+    fontFamily: 'Avenir',
+    color: WHITE,
+    fontSize: 16, fontWeight: '900',
+    letterSpacing: 1,
+  },
 
   completedArea: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
+    gap: 20,
   },
-  completedCat: { width: 120, height: 120 },
+  completedCat: { width: 130, height: 130 },
+  completedCard: {
+    backgroundColor: WHITE,
+    borderRadius: 24,
+    padding: 24,
+    width: '80%',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 2,
+    borderColor: 'rgba(44,26,14,0.06)',
+    borderBottomWidth: 4,
+    borderBottomColor: 'rgba(44,26,14,0.1)',
+    shadowColor: INK,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  completedEyebrow: {
+    fontFamily: 'Avenir',
+    fontSize: 10, fontWeight: '800',
+    color: 'rgba(44,26,14,0.4)',
+    letterSpacing: 2,
+  },
   completedTitle: {
-    fontFamily: 'Georgia',
-    fontSize: 42,
-    fontWeight: '900',
-    color: INK,
-    letterSpacing: -1,
+    fontFamily: 'Avenir',
+    fontSize: 32, fontWeight: '900',
+    color: INK, letterSpacing: -0.5,
   },
-  completedScore: { fontSize: 16, fontWeight: '500', color: INK_SOFT },
-  retryButton: {
-    marginTop: 8,
-    backgroundColor: INK,
+  completedScore: {
+    fontFamily: 'Avenir',
+    fontSize: 15, fontWeight: '400',
+    color: INK_SOFT,
+  },
+  retryBtn: {
+    width: '60%',
+    backgroundColor: GREEN,
     borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 40,
+    paddingVertical: 18,
+    alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: GREEN_DARK,
+    shadowColor: GREEN,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  retryText: { color: WHITE, fontSize: 15, fontWeight: '600' },
+  retryBtnText: {
+    fontFamily: 'Avenir',
+    color: WHITE,
+    fontSize: 16, fontWeight: '900',
+    letterSpacing: 0.5,
+  },
 });
