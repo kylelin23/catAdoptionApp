@@ -8,7 +8,6 @@ This app was made using React Native, and the goal of this app is to let new cat
 - [How To Start](#How-to-Start)
 - [Features](#Features)
 - [Tech Stack](#Tech-Stack)
-- [Contributing](#contributing)
 
 ## Demo
 **Youtube Link:** https://www.youtube.com/shorts/lzamWX11MFQ
@@ -71,5 +70,3 @@ This app was made using React Native, and the goal of this app is to let new cat
 - Scan the QR code shown in your terminal or browser
 - The app should open directly on your device
 
-## Contributing
-All pull requests and issues are welcome! 
