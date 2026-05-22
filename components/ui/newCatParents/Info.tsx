@@ -19,6 +19,7 @@ const ITEMS = [
     border:     BLUE,
     borderDark: BLUE_DARK,
     pawColor:   BLUE,
+    bg:         '#EEF4F9',
   },
   {
     route:      'What to Expect in the First Week',
@@ -27,6 +28,7 @@ const ITEMS = [
     border:     GREEN,
     borderDark: GREEN_DARK,
     pawColor:   GREEN,
+    bg:         '#EEF5EC',
   },
 ];
 
@@ -54,20 +56,30 @@ function InfoCard({ item, index, onPress }: { item: typeof ITEMS[0]; index: numb
       { opacity, transform: [{ translateY }, { scale: scaleAnim }] },
     ]}>
       <TouchableOpacity
-        style={[styles.card, { borderColor: item.border, borderBottomColor: item.borderDark }]}
+        style={[styles.card, {
+          borderColor: item.border,
+          borderBottomColor: item.borderDark,
+          backgroundColor: item.bg,
+        }]}
         onPress={onPress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         activeOpacity={1}
       >
-        <Image source={PAW} style={[styles.paw, { tintColor: item.pawColor }]} resizeMode="contain" />
+        {/* Top row — paw + arrow */}
+        <View style={styles.cardTop}>
+          <View style={[styles.pawCircle, { backgroundColor: item.border }]}>
+            <Image source={PAW} style={styles.paw} resizeMode="contain" />
+          </View>
+          <Text style={[styles.arrow, { color: item.border }]}>›</Text>
+        </View>
 
-        <View style={styles.cardText}>
+        {/* Bottom — text */}
+        <View style={styles.cardBottom}>
           <Text style={styles.cardTitle}>{item.title}</Text>
           <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
         </View>
 
-        <Text style={[styles.arrow, { color: item.border }]}>›</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -94,11 +106,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    gap: 50,
+    paddingVertical: 32,
+    gap: 20,
     justifyContent: 'center',
   },
 
   cardWrapper: {
+    flex: 1,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.07,
@@ -107,45 +121,53 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: WHITE,
-    borderRadius: 20,
+    flex: 1,
+    borderRadius: 24,
     borderWidth: 2.5,
     borderBottomWidth: 5,
+    paddingVertical: 28,
+    paddingHorizontal: 22,
+    justifyContent: 'space-between',
+  },
+
+  cardTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 18,
-    gap: 14,
+    justifyContent: 'space-between',
   },
 
+  pawCircle: {
+    width: 44, height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   paw: {
-    width: 32,
-    height: 32,
-    flexShrink: 0,
-  },
-
-  cardText: {
-    flex: 1,
-    gap: 4,
-  },
-  cardTitle: {
-    fontFamily: 'Avenir',
-    fontSize: 16,
-    fontWeight: '900',
-    color: INK,
-    letterSpacing: -0.2,
-    lineHeight: 22,
-  },
-  cardSubtitle: {
-    fontFamily: 'Avenir',
-    fontSize: 12,
-    fontWeight: '400',
-    color: INK_SOFT,
+    width: 24, height: 24,
+    tintColor: WHITE,
   },
 
   arrow: {
-    fontSize: 26,
+    fontSize: 32,
     fontWeight: '800',
-    flexShrink: 0,
+  },
+
+  cardBottom: {
+    gap: 6,
+    marginTop: 24,
+  },
+  cardTitle: {
+    fontFamily: 'Avenir',
+    fontSize: 20,
+    fontWeight: '900',
+    color: INK,
+    letterSpacing: -0.3,
+    lineHeight: 26,
+  },
+  cardSubtitle: {
+    fontFamily: 'Avenir',
+    fontSize: 13,
+    fontWeight: '400',
+    color: INK_SOFT,
   },
 });

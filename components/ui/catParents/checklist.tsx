@@ -9,28 +9,31 @@ const PAW = require('../../../assets/images/paw.png');
 
 const ITEMS = [
   {
-    route:   'Toxic Foods, Plants and Items',
-    title:   'Toxic Foods, Plants and Items',
+    route:    'Toxic Foods, Plants and Items',
+    title:    'Toxic Foods, Plants and Items',
     subtitle: 'Keep your cat safe',
-    border:  '#C47A45',
-    dark:    '#9E5C2E',
-    paw:     '#C47A45',
+    border:   '#C47A45',
+    dark:     '#9E5C2E',
+    paw:      '#C47A45',
+    bg:       '#FAF0E8',
   },
   {
-    route:   'Cat Language',
-    title:   'Cat Language',
+    route:    'Cat Language',
+    title:    'Cat Language',
     subtitle: 'Understand what they are saying',
-    border:  '#7A9BBE',
-    dark:    '#5C7A9A',
-    paw:     '#7A9BBE',
+    border:   '#7A9BBE',
+    dark:     '#5C7A9A',
+    paw:      '#7A9BBE',
+    bg:       '#EEF4F9',
   },
   {
-    route:   'Poop Monitoring Scores',
-    title:   'Poop Monitoring Scores',
+    route:    'Poop Monitoring Scores',
+    title:    'Poop Monitoring Scores',
     subtitle: "Track your cat's health",
-    border:  '#7BAE6E',
-    dark:    '#5A8F50',
-    paw:     '#7BAE6E',
+    border:   '#7BAE6E',
+    dark:     '#5A8F50',
+    paw:      '#7BAE6E',
+    bg:       '#EEF5EC',
   },
 ];
 
@@ -58,20 +61,30 @@ function InfoCard({ item, index, onPress }: { item: typeof ITEMS[0]; index: numb
       { opacity, transform: [{ translateY }, { scale: scaleAnim }] },
     ]}>
       <TouchableOpacity
-        style={[styles.card, { borderColor: item.border, borderBottomColor: item.dark }]}
+        style={[styles.card, {
+          borderColor: item.border,
+          borderBottomColor: item.dark,
+          backgroundColor: item.bg,
+        }]}
         onPress={onPress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         activeOpacity={1}
       >
-        <Image source={PAW} style={[styles.paw, { tintColor: item.paw }]} resizeMode="contain" />
+        {/* Top row */}
+        <View style={styles.cardTop}>
+          <View style={[styles.pawCircle, { backgroundColor: item.border }]}>
+            <Image source={PAW} style={styles.paw} resizeMode="contain" />
+          </View>
+          <Text style={[styles.arrow, { color: item.border }]}>›</Text>
+        </View>
 
-        <View style={styles.cardText}>
+        {/* Bottom text */}
+        <View style={styles.cardBottom}>
           <Text style={styles.cardTitle}>{item.title}</Text>
           <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
         </View>
 
-        <Text style={[styles.arrow, { color: item.border }]}>›</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -96,13 +109,14 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: WHITE,
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    gap: 14,
-    justifyContent: 'center',
+    paddingVertical: 28,
+    gap: 16,
   },
 
   cardWrapper: {
+    flex: 1,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.07,
@@ -111,45 +125,53 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: WHITE,
-    borderRadius: 20,
+    flex: 1,
+    borderRadius: 24,
     borderWidth: 2.5,
     borderBottomWidth: 5,
+    paddingVertical: 17,
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+  },
+
+  cardTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 18,
-    gap: 14,
+    justifyContent: 'space-between',
   },
 
+  pawCircle: {
+    width: 40, height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   paw: {
-    width: 30,
-    height: 30,
-    flexShrink: 0,
+    width: 22, height: 22,
+    tintColor: WHITE,
   },
 
-  cardText: {
-    flex: 1,
-    gap: 4,
+  arrow: {
+    fontSize: 30,
+    fontWeight: '800',
+  },
+
+  cardBottom: {
+    gap: 5,
+    marginTop: 20,
   },
   cardTitle: {
     fontFamily: 'Avenir',
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '900',
     color: INK,
-    letterSpacing: -0.2,
-    lineHeight: 21,
+    letterSpacing: -0.3,
+    lineHeight: 24,
   },
   cardSubtitle: {
     fontFamily: 'Avenir',
     fontSize: 12,
     fontWeight: '400',
     color: INK_SOFT,
-  },
-
-  arrow: {
-    fontSize: 26,
-    fontWeight: '800',
-    flexShrink: 0,
   },
 });

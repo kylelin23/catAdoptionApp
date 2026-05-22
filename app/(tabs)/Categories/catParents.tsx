@@ -17,13 +17,9 @@ const GREEN    = '#7BAE6E';
 const CAT_IMG = require('../../../assets/images/catWave.png');
 
 const CatssentialLists = ({ navigation }: { navigation: any }) => (
-  <ScrollView
-    style={{ flex: 1, backgroundColor: WHITE }}
-    contentContainerStyle={{ flexGrow: 1, padding: 25, justifyContent: 'center' }}
-    showsVerticalScrollIndicator={false}
-  >
+  <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
     <Checklist navigation={navigation} />
-  </ScrollView>
+  </View>
 );
 
 export default function CatParents({ navigation }: { navigation: any }) {
@@ -126,7 +122,7 @@ const styles = StyleSheet.create({
 
   safeArea: {
     flex: 1,
-    backgroundColor: WHITE,
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
   },
 
@@ -142,7 +138,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0, left: 0, right: 0,
     height: H * 0.55,
-    backgroundColor: WHITE,
+    backgroundColor: '#FFFFFF',
   },
 
   tabBarWrapper: {

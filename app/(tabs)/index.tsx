@@ -319,6 +319,7 @@ const styles = StyleSheet.create({
 
   btnStack: {
     width: '100%',
+    marginTop: 35,
   },
   ctaPrimary: {
     width: '100%', paddingVertical: 18,

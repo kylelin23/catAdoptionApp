@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: WHITE,
+    backgroundColor: '#FFFFFF',
   },
 
   scroll: { flex: 1 },

@@ -6,20 +6,19 @@ import {
 
 const { width: W, height: H } = Dimensions.get('window');
 
-const INK           = '#2C1A0E';
-const INK_SOFT      = '#6B4C35';
-const SAND          = '#E8C9A0';
-const WHITE         = '#FFFAF5';
-const GREEN         = '#7BAE6E';
+const INK      = '#2C1A0E';
+const INK_SOFT = '#6B4C35';
+const SAND     = '#E8C9A0';
+const WHITE    = '#FFFAF5';
+const GREEN    = '#7BAE6E';
 
 const PAW     = require('../../assets/images/paw.png');
 const CAT_IMG = require('../../assets/images/catWave.png');
 
 const CATEGORIES = [
-  { key: 'thinking', route: 'Thinking of Adopting', title: 'Thinking of Adopting', subtitle: 'Considering getting a cat', color: '#C4DDB0', border: '#7BAE6E' },
-  { key: 'new',      route: 'New Cat Parents',       title: 'New Cat Parents',       subtitle: 'Just brought a cat home',    color: '#C8D8E8', border: '#7A9BBE' },
-  { key: 'parents',  route: 'Cat Parents',            title: 'Cat Parents',            subtitle: 'Already a cat parent',       color: '#F2C9A0', border: '#D4956A' },
-  { key: 'lovers',   route: 'Cat Lovers',             title: 'Cat Lovers',             subtitle: 'Just love cats',             color: '#E8C8B8', border: '#C47A45' },
+  { key: 'thinking', route: 'Thinking of Adopting', title: 'Thinking of Adopting', subtitle: 'Considering getting a cat', color: '#C4DDB0', border: '#7BAE6E', dark: '#5A8F50' },
+  { key: 'new',      route: 'New Cat Parents',       title: 'New Cat Parents',       subtitle: 'Just brought a cat home',    color: '#C8D8E8', border: '#7A9BBE', dark: '#5C7A9A' },
+  { key: 'parents',  route: 'Cat Parents',            title: 'Cat Parents',            subtitle: 'Already a cat parent',       color: '#F2C9A0', border: '#D4956A', dark: '#A86E45' },
 ];
 
 function CategoryCard({ cat, index, onPress }: { cat: typeof CATEGORIES[0]; index: number; onPress: () => void }) {
@@ -41,23 +40,27 @@ function CategoryCard({ cat, index, onPress }: { cat: typeof CATEGORIES[0]; inde
   const onPressOut = () => Animated.spring(pressAnim, { toValue: 1,    useNativeDriver: true, friction: 5 }).start();
 
   return (
-    <Animated.View style={{ opacity, transform: [{ scale: Animated.multiply(scale, pressAnim) }] }}>
+    <Animated.View style={[styles.cardWrapper, { opacity, transform: [{ scale: Animated.multiply(scale, pressAnim) }] }]}>
       <TouchableOpacity
-        style={[styles.card, { borderColor: cat.border }]}
+        style={[styles.card, {
+          backgroundColor: cat.color,
+          borderColor: cat.border,
+          borderBottomColor: cat.dark,
+        }]}
         onPress={onPress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         activeOpacity={1}
       >
-        <View style={[styles.cardSwatch, { backgroundColor: cat.color }]}>
-          <Image source={PAW} style={[styles.cardPaw, { tintColor: cat.border }]} resizeMode="contain" />
+        <View style={[styles.cardSwatch, { backgroundColor: cat.border, borderBottomColor: cat.dark }]}>
+          <Image source={PAW} style={styles.cardPaw} resizeMode="contain" />
         </View>
         <View style={styles.cardText}>
           <Text style={styles.cardTitle}>{cat.title}</Text>
           <Text style={styles.cardSub}>{cat.subtitle}</Text>
         </View>
-        <View style={[styles.chevron, { backgroundColor: cat.color, borderBottomColor: cat.border }]}>
-          <Text style={[styles.chevronText, { color: cat.border }]}>›</Text>
+        <View style={[styles.chevron, { backgroundColor: cat.border, borderBottomColor: cat.dark }]}>
+          <Text style={styles.chevronText}>›</Text>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -89,10 +92,9 @@ export default function AreYou({ navigation }: { navigation: any }) {
         <Text style={styles.backText}>{"<"}</Text>
       </TouchableOpacity>
 
+      {/* Speech bubble header — unchanged */}
       <Animated.View style={[styles.mascotArea, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
-
         <Image source={CAT_IMG} style={styles.catImg} resizeMode="contain" />
-
         <Animated.View style={[styles.bubbleWrapper, { transform: [{ scale: bubbleScale }] }]}>
           <View style={styles.bubbleRow}>
             <View style={styles.tail} />
@@ -101,9 +103,9 @@ export default function AreYou({ navigation }: { navigation: any }) {
             </View>
           </View>
         </Animated.View>
-
       </Animated.View>
 
+      {/* Cards fill the white area */}
       <View style={styles.cardsArea}>
         {CATEGORIES.map((cat, i) => (
           <CategoryCard
@@ -138,7 +140,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0, left: 0, right: 0,
     height: H * 0.65,
-    backgroundColor: WHITE,
+    backgroundColor: '#FFFFFF',
   },
 
   backBtn: {
@@ -156,21 +158,18 @@ const styles = StyleSheet.create({
     color: INK, lineHeight: 22,
   },
 
+  // Mascot — unchanged
   mascotArea: {
-    paddingHorizontal: 12,  // was 24
+    paddingHorizontal: 12,
     paddingTop: 40,
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   catImg: {
-    width: 200,
-    height: 200,
+    width: 200, height: 200,
     flexShrink: 0,
-    marginRight: -40,  // pulls bubble closer to cat
+    marginRight: -32,
   },
-
-  // Shadow on wrapper so it wraps the whole shape including tail
   bubbleWrapper: {
     flex: 1,
     shadowColor: INK,
@@ -179,16 +178,12 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
-
   bubbleRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-
-  // Single triangle — same WHITE as bubble, no border
   tail: {
-    width: 0,
-    height: 0,
+    width: 0, height: 0,
     borderTopWidth: 12,
     borderBottomWidth: 12,
     borderRightWidth: 14,
@@ -196,57 +191,61 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
     borderRightColor: WHITE,
   },
-
-  // No border on bubble — shadow only so no seam
   bubble: {
     backgroundColor: WHITE,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
-
   bubbleText: {
     fontFamily: 'Avenir',
-    fontSize: 18,
-    fontWeight: '900',
-    color: INK,
-    letterSpacing: -0.3,
+    fontSize: 18, fontWeight: '900',
+    color: INK, letterSpacing: -0.3,
   },
 
   cardsArea: {
     flex: 1,
     paddingHorizontal: 20,
-    gap: 10,
+    paddingTop: 8,
+    paddingBottom: 20,
+    gap: 20,
     justifyContent: 'center',
-    paddingBottom: 24,
+    marginTop: 40,   // pushes cards below the sandy boundary
   },
 
-  card: {
-    backgroundColor: WHITE,
-    borderRadius: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingLeft: 14,
-    paddingRight: 16,
-    borderWidth: 2.5,
+  cardWrapper: {
+    flex: 1,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 4,
+  },
+
+  card: {
+    flex: 1,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 14,
+    paddingRight: 16,
+    borderWidth: 2.5,
     borderBottomWidth: 4,
   },
 
   cardSwatch: {
-    width: 48, height: 48,
-    borderRadius: 14,
+    width: 44, height: 44,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
     flexShrink: 0,
+    borderBottomWidth: 3,
   },
-  cardPaw: { width: 26, height: 26 },
+  cardPaw: {
+    width: 22, height: 22,
+    tintColor: WHITE,
+  },
 
   cardText: { flex: 1, gap: 3 },
   cardTitle: {
@@ -270,6 +269,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
   },
   chevronText: {
-    fontSize: 22, fontWeight: '800', lineHeight: 26,
+    fontSize: 22, fontWeight: '800',
+    lineHeight: 26,
+    color: WHITE,
   },
 });
