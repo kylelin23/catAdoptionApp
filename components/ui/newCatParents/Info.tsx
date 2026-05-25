@@ -23,7 +23,7 @@ const ITEMS = [
   },
   {
     route:      'What to Expect in the First Week',
-    title:      'What to Expect in the First Week',
+    title:      'What to Expect in First Week',
     subtitle:   'Know what to expect!',
     border:     GREEN,
     borderDark: GREEN_DARK,

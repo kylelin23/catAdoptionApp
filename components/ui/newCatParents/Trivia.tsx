@@ -70,6 +70,7 @@ export default function Trivia() {
   const [isCorrect, setIsCorrect]       = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [finished, setFinished]         = useState(false);
+  const [score, setScore]               = useState(0);
 
   const slideAnim   = useRef(new Animated.Value(0)).current;
   const catProgress = useRef(new Animated.Value(0)).current;
@@ -108,6 +109,7 @@ export default function Trivia() {
     setIsCorrect(correct);
     setChecked(true);
     if (correct) {
+      setScore(s => s + 1);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
     }
@@ -135,6 +137,7 @@ export default function Trivia() {
     setChecked(false);
     setIsCorrect(false);
     setFinished(false);
+    setScore(0);
     catProgress.setValue(0);
     isAnimating.current = false;
   };
@@ -150,10 +153,10 @@ export default function Trivia() {
   if (finished) {
     return (
       <SafeAreaView style={styles.resultScreen}>
-        <Image source={CAT} style={styles.resultCat} resizeMode="contain" />
         <View style={styles.resultCard}>
           <Text style={styles.resultEyebrow}>YOU DID IT!</Text>
           <Text style={styles.resultText}>Congrats on finishing the quiz!</Text>
+          <Text style={styles.scoreText}>{score} / {quiz.length} correct</Text>
         </View>
         <TouchableOpacity style={styles.tryAgainBtn} onPress={reset} activeOpacity={0.85}>
           <Text style={styles.tryAgainText}>Try Again</Text>
@@ -216,53 +219,49 @@ export default function Trivia() {
         </Animated.View>
       </View>
 
-      {/* Answers */}
+      {/* Answers + result banner grouped together */}
       <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
         {ANSWERS.map((answer) => (
           <TouchableOpacity
             key={answer.key}
-            style={getAnswerStyle(answer.key)}
+            style={[getAnswerStyle(answer.key), styles.answerRow]}
             onPress={() => handleSelect(answer.key)}
             activeOpacity={0.85}
             disabled={checked}
           >
-            <Text style={getAnswerTextStyle(answer.key)}>{answer.label}</Text>
+            <Text style={[...getAnswerTextStyle(answer.key), { flex: 1 }]}>{answer.label}</Text>
+            {!checked && selected === answer.key && (
+              <TouchableOpacity
+                style={styles.arrowBadge}
+                onPress={handleCheck}
+                activeOpacity={0.8}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={styles.arrowBadgeText}>→</Text>
+              </TouchableOpacity>
+            )}
           </TouchableOpacity>
         ))}
-      </Animated.View>
 
-      {/* Result banner — always reserves space so answers don't move */}
-      <View style={styles.resultBannerContainer}>
         {checked && (
           <View style={[styles.resultBanner, isCorrect ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
-            <Text style={[styles.resultBannerText, { color: isCorrect ? GREEN : RED }]}>
+            <View style={{ width: 32 }} />
+            <Text style={[styles.resultBannerText, { color: isCorrect ? GREEN : RED, flex: 1, textAlign: 'center' }]}>
               {isCorrect ? 'Correct!' : 'Not quite!'}
             </Text>
+            <TouchableOpacity
+              style={[styles.arrowBadge, { backgroundColor: isCorrect ? GREEN : RED, borderBottomColor: isCorrect ? GREEN_DARK : RED_DARK, marginLeft: 0 }]}
+              onPress={handleNext}
+              activeOpacity={0.8}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.arrowBadgeText}>{isLast ? '✓' : '→'}</Text>
+            </TouchableOpacity>
           </View>
         )}
-      </View>
+      </Animated.View>
 
-      {/* Bottom button */}
-      <View style={styles.bottomSection}>
-        {!checked ? (
-          <TouchableOpacity
-            style={[styles.checkBtn, !selected && styles.checkBtnDisabled]}
-            onPress={handleCheck}
-            disabled={!selected}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.checkBtnText}>CHECK</Text>
-          </TouchableOpacity>
-        ) : isCorrect ? (
-          <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.85}>
-            <Text style={styles.nextBtnText}>{isLast ? 'FINISH' : 'NEXT'}</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.retryBtn} onPress={handleRetry} activeOpacity={0.85}>
-            <Text style={styles.retryBtnText}>TRY AGAIN</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      <View style={styles.bottomSection} />
 
     </SafeAreaView>
   );
@@ -310,9 +309,14 @@ const styles = StyleSheet.create({
   answersArea: {
     flex: 1,
     paddingHorizontal: 22,
-    marginTop: 25,
+    marginTop: 5,
     gap: 10,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 8,
+  },
+  answerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   answerBtn: {
     backgroundColor: WHITE,
@@ -355,21 +359,48 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  // Always reserves space — banner appears inside without shifting layout
+  arrowBadge: {
+    width: 32, height: 32,
+    borderRadius: 10,
+    backgroundColor: GREEN,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+    flexShrink: 0,
+    borderBottomWidth: 3,
+    borderBottomColor: GREEN_DARK,
+  },
+  arrowBadgeText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: WHITE,
+    lineHeight: 20,
+  },
+
   resultBannerContainer: {
-    height: 56,
+    height: 64,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 8,
+    paddingHorizontal: 22,
   },
   resultBanner: {
-    width: '65%',
+    width: '100%',
     borderRadius: 16,
     paddingVertical: 12,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
     borderBottomWidth: 4,
+    marginTop: 10,
+  },
+  arrowBadgeAbsolute: {
+    position: 'absolute',
+    right: 12,
+    top: '50%',
+    marginTop: -16,
   },
   resultBannerCorrect: {
     backgroundColor: 'rgba(123,174,110,0.1)',
@@ -392,29 +423,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     paddingBottom: 28,
     alignItems: 'center',
-  },
-  checkBtn: {
-    width: '70%',
-    paddingVertical: 16,
-    backgroundColor: GREEN,
-    borderRadius: 16,
-    alignItems: 'center',
+    minHeight: 70,
     justifyContent: 'center',
-    borderBottomWidth: 4,
-    borderBottomColor: GREEN_DARK,
-    shadowColor: GREEN,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  checkBtnDisabled: { opacity: 0.35 },
-  checkBtnText: {
-    fontFamily: 'Avenir',
-    color: WHITE,
-    fontSize: 16,
-    fontWeight: '900',
-    letterSpacing: 1,
   },
   nextBtn: {
     width: '70%',
@@ -483,6 +493,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 4,
+  },
+  scoreText: {
+    fontFamily: 'Avenir',
+    fontSize: 28,
+    fontWeight: '900',
+    color: GREEN,
+    letterSpacing: -0.5,
   },
   resultEyebrow: {
     fontFamily: 'Avenir',

@@ -66,7 +66,6 @@ export default function Trivia() {
         return;
       }
 
-      // Compute total directly from questions array — don't rely on stale state
       const finalTotal = questions.reduce((a, b) => a + b, 0);
 
       let resultText = '';
@@ -90,6 +89,7 @@ export default function Trivia() {
     const finalTotal = questions.reduce((a, b) => a + b, 0);
     return finalTotal < 16 ? '#C47A45' : finalTotal < 22 ? WARM : GREEN;
   };
+
   const currentAnswer = questions[currentQ];
   const question      = quiz[currentQ];
   const isLast        = currentQ === quiz.length - 1;
@@ -101,13 +101,12 @@ export default function Trivia() {
   const catX = catProgress.interpolate({
     inputRange: [0, 1],
     outputRange: [0, TRACK_WIDTH - CAT_SIZE],
-    extrapolate: 'clamp',  // add this
+    extrapolate: 'clamp',
   });
 
   if (showResult) {
     return (
       <SafeAreaView style={styles.resultScreen}>
-        <Image source={CAT} style={styles.resultCat} resizeMode="contain" />
         <View style={styles.resultCard}>
           <Text style={styles.resultEyebrow}>YOUR RESULT</Text>
           <Text style={[styles.resultText, { color: getResultColor() }]}>{result}</Text>
@@ -122,9 +121,7 @@ export default function Trivia() {
   return (
     <SafeAreaView style={styles.safeArea}>
 
-      {/* Progress bar + question together at top */}
       <View style={styles.topSection}>
-
         <View style={styles.progressArea}>
           <Animated.Image
             source={CAT}
@@ -136,19 +133,17 @@ export default function Trivia() {
               width: catProgress.interpolate({
                 inputRange: [0, 1],
                 outputRange: ['0%', '100%'],
-                extrapolate: 'clamp',  // add this
+                extrapolate: 'clamp',
               }),
             }]} />
-        </View>
+          </View>
         </View>
 
         <Animated.View style={{ transform: [{ translateX: slideAnim }] }}>
           <Text style={styles.questionText}>{question.question}</Text>
         </Animated.View>
-
       </View>
 
-      {/* Answers in the middle */}
       <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
         {[
           { label: question.answer1, points: 3 },
@@ -163,31 +158,26 @@ export default function Trivia() {
               onPress={() => selectAnswer(answer.points)}
               activeOpacity={0.85}
             >
-              <Text style={[styles.answerText, isSelected && styles.answerTextSelected]}>
+              <Text style={[styles.answerText, isSelected && styles.answerTextSelected, { flex: 1 }]}>
                 {answer.label}
               </Text>
+              {isSelected && (
+                <TouchableOpacity
+                  style={styles.arrowBadge}
+                  onPress={handleCheck}
+                  activeOpacity={0.8}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={styles.arrowBadgeText}>{isLast ? '✓' : '→'}</Text>
+                </TouchableOpacity>
+              )}
             </TouchableOpacity>
           );
         })}
       </Animated.View>
 
-      {/* CHECK button — centered */}
-      <View style={styles.bottomSection}>
-        <TouchableOpacity
-          style={[
-            styles.checkBtn,
-            currentAnswer === 0 && styles.checkBtnDisabled,
-            isLast && currentAnswer !== 0 && { backgroundColor: GREEN, borderBottomColor: GREEN_DARK },
-          ]}
-          onPress={handleCheck}
-          disabled={currentAnswer === 0}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.checkBtnText}>
-            {isLast ? 'SEE RESULT' : 'NEXT'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {/* Spacer to keep layout stable */}
+      <View style={styles.bottomSection} />
 
     </SafeAreaView>
   );
@@ -200,7 +190,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 
-  // Progress bar + question grouped together at the top
   topSection: {
     paddingHorizontal: 22,
     paddingTop: 50,
@@ -235,7 +224,6 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
 
-  // Answers take remaining space, centered vertically
   answersArea: {
     flex: 1,
     paddingHorizontal: 22,
@@ -256,6 +244,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   answerBtnSelected: {
     borderColor: GREEN,
@@ -274,36 +264,27 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  // Bottom — CHECK centered
-  bottomSection: {
-    paddingHorizontal: 22,
-    paddingBottom: 28,
-    alignItems: 'center',
-  },
-  checkBtn: {
-    width: '70%',
-    paddingVertical: 10,
+  arrowBadge: {
+    width: 32, height: 32,
+    borderRadius: 10,
     backgroundColor: GREEN,
-    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.3)',
-    shadowColor: INK,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    marginLeft: 10,
+    flexShrink: 0,
+    borderBottomWidth: 3,
+    borderBottomColor: GREEN_DARK,
   },
-  checkBtnDisabled: {
-    opacity: 0.35,
-  },
-  checkBtnText: {
-    fontFamily: 'Avenir',
-    color: WHITE,
+  arrowBadgeText: {
     fontSize: 16,
-    fontWeight: '900',
-    letterSpacing: 1,
+    fontWeight: '800',
+    color: WHITE,
+    lineHeight: 20,
+  },
+
+  bottomSection: {
+    paddingBottom: 28,
+    minHeight: 28,
   },
 
   resultScreen: {
@@ -313,9 +294,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 28,
     gap: 24,
-  },
-  resultCat: {
-    width: 140, height: 140,
   },
   resultCard: {
     backgroundColor: WHITE,

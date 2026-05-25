@@ -1,90 +1,127 @@
 import React, { useRef, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 
-const INK      = '#2C1A0E';
+const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
-const WHITE    = '#FFFAF5';
+const WHITE = '#FFFAF5';
 
 const PAW = require('../../../assets/images/paw.png');
 
 const ITEMS = [
   {
-    route:    'Toxic Foods, Plants and Items',
-    title:    'Toxic Foods, Plants and Items',
+    route: 'Toxic Foods, Plants and Items',
+    title: 'Toxic Foods, Plants, Items',
     subtitle: 'Keep your cat safe',
-    border:   '#C47A45',
-    dark:     '#9E5C2E',
-    paw:      '#C47A45',
-    bg:       '#FAF0E8',
+    border: '#C47A45',
+    dark: '#9E5C2E',
+    paw: '#C47A45',
+    bg: '#FAF0E8',
   },
   {
-    route:    'Cat Language',
-    title:    'Cat Language',
+    route: 'Cat Language',
+    title: 'Cat Language',
     subtitle: 'Understand what they are saying',
-    border:   '#7A9BBE',
-    dark:     '#5C7A9A',
-    paw:      '#7A9BBE',
-    bg:       '#EEF4F9',
+    border: '#7A9BBE',
+    dark: '#5C7A9A',
+    paw: '#7A9BBE',
+    bg: '#EEF4F9',
   },
   {
-    route:    'Poop Monitoring Scores',
-    title:    'Poop Monitoring Scores',
+    route: 'Poop Monitoring Scores',
+    title: 'Poop Monitoring Scores',
     subtitle: "Track your cat's health",
-    border:   '#7BAE6E',
-    dark:     '#5A8F50',
-    paw:      '#7BAE6E',
-    bg:       '#EEF5EC',
+    border: '#7BAE6E',
+    dark: '#5A8F50',
+    paw: '#7BAE6E',
+    bg: '#EEF5EC',
   },
 ];
 
-function InfoCard({ item, index, onPress }: { item: typeof ITEMS[0]; index: number; onPress: () => void }) {
-  const scaleAnim  = useRef(new Animated.Value(1)).current;
+function InfoCard({
+  item,
+  index,
+  onPress,
+}: {
+  item: typeof ITEMS[0];
+  index: number;
+  onPress: () => void;
+}) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
   const translateY = useRef(new Animated.Value(40)).current;
-  const opacity    = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
       Animated.delay(index * 100),
       Animated.parallel([
-        Animated.spring(translateY, { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
-        Animated.timing(opacity,    { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.spring(translateY, {
+          toValue: 0,
+          friction: 7,
+          tension: 80,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: true,
+        }),
       ]),
     ]).start();
   }, []);
 
-  const onPressIn  = () => Animated.spring(scaleAnim, { toValue: 0.97, useNativeDriver: true, friction: 5 }).start();
-  const onPressOut = () => Animated.spring(scaleAnim, { toValue: 1,    useNativeDriver: true, friction: 5 }).start();
+  const onPressIn = () =>
+    Animated.spring(scaleAnim, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      friction: 5,
+    }).start();
+
+  const onPressOut = () =>
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      friction: 5,
+    }).start();
 
   return (
-    <Animated.View style={[
-      styles.cardWrapper,
-      { opacity, transform: [{ translateY }, { scale: scaleAnim }] },
-    ]}>
+    <Animated.View
+      style={[
+        styles.cardWrapper,
+        {
+          opacity,
+          transform: [{ translateY }, { scale: scaleAnim }],
+        },
+      ]}
+    >
       <TouchableOpacity
-        style={[styles.card, {
-          borderColor: item.border,
-          borderBottomColor: item.dark,
-          backgroundColor: item.bg,
-        }]}
+        style={[
+          styles.card,
+          {
+            borderColor: item.border,
+            borderBottomColor: item.dark,
+            backgroundColor: item.bg,
+          },
+        ]}
         onPress={onPress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         activeOpacity={1}
       >
-        {/* Top row */}
         <View style={styles.cardTop}>
-          <View style={[styles.pawCircle, { backgroundColor: item.border }]}>
-            <Image source={PAW} style={styles.paw} resizeMode="contain" />
+          <View style={styles.leftRow}>
+            <View style={[styles.pawCircle, { backgroundColor: item.border }]}>
+              <Image source={PAW} style={styles.paw} resizeMode="contain" />
+            </View>
+
+            <Text style={styles.cardTitle}>{item.title}</Text>
           </View>
+
           <Text style={[styles.arrow, { color: item.border }]}>›</Text>
         </View>
 
-        {/* Bottom text */}
         <View style={styles.cardBottom}>
-          <Text style={styles.cardTitle}>{item.title}</Text>
           <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
         </View>
-
       </TouchableOpacity>
     </Animated.View>
   );
@@ -106,7 +143,6 @@ export default function CheckList({ navigation }: { navigation: any }) {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -140,27 +176,39 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
+  leftRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+
   pawCircle: {
-    width: 40, height: 40,
+    width: 40,
+    height: 40,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   paw: {
-    width: 22, height: 22,
+    width: 22,
+    height: 22,
     tintColor: WHITE,
   },
 
   arrow: {
     fontSize: 30,
     fontWeight: '800',
+    marginLeft: 8,
   },
 
   cardBottom: {
-    gap: 5,
     marginTop: 20,
   },
+
   cardTitle: {
+    flex: 1,
     fontFamily: 'Avenir',
     fontSize: 18,
     fontWeight: '900',
@@ -168,6 +216,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     lineHeight: 24,
   },
+
   cardSubtitle: {
     fontFamily: 'Avenir',
     fontSize: 12,

@@ -71,6 +71,7 @@ export default function AreYou({ navigation }: { navigation: any }) {
   const headerY     = useRef(new Animated.Value(-20)).current;
   const headerOp    = useRef(new Animated.Value(0)).current;
   const bubbleScale = useRef(new Animated.Value(0)).current;
+  const slideOut    = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
@@ -82,13 +83,17 @@ export default function AreYou({ navigation }: { navigation: any }) {
     ]).start();
   }, []);
 
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
 
       <View style={styles.bgTop} />
       <View style={styles.bgBottom} />
 
-      <TouchableOpacity style={styles.backBtn} onPress={() => navigation.navigate('Start')} activeOpacity={0.7}>
+      <TouchableOpacity style={styles.backBtn} onPress={handleBack} activeOpacity={0.7}>
         <Text style={styles.backText}>{"<"}</Text>
       </TouchableOpacity>
 
@@ -131,7 +136,7 @@ const styles = StyleSheet.create({
   bgTop: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
-    height: H * 0.44,
+    height: H * 0.4,
     backgroundColor: SAND,
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
@@ -144,14 +149,15 @@ const styles = StyleSheet.create({
   },
 
   backBtn: {
-    position: 'absolute',
-    top: 56, left: 20,
-    zIndex: 10,
-    width: 38, height: 38,
-    borderRadius: 19,
+    width: 34, height: 34,
+    borderRadius: 17,
     backgroundColor: 'rgba(44,26,14,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'flex-start',
+    marginLeft: 20,
+    marginTop: 10,
+    marginBottom: 4,
   },
   backText: {
     fontSize: 18, fontWeight: '700',
@@ -161,14 +167,14 @@ const styles = StyleSheet.create({
   // Mascot — unchanged
   mascotArea: {
     paddingHorizontal: 12,
-    paddingTop: 40,
+    paddingTop: H * 0.035,
     flexDirection: 'row',
     alignItems: 'center',
   },
   catImg: {
-    width: 200, height: 200,
+    width: H * 0.24, height: H * 0.24,
     flexShrink: 0,
-    marginRight: -32,
+    marginRight: -(W * 0.1),
   },
   bubbleWrapper: {
     flex: 1,
@@ -206,11 +212,9 @@ const styles = StyleSheet.create({
   cardsArea: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 8,
     paddingBottom: 20,
     gap: 20,
     justifyContent: 'center',
-    marginTop: 40,   // pushes cards below the sandy boundary
   },
 
   cardWrapper: {

@@ -8,7 +8,11 @@ const WHITE = '#FFFAF5';
 const ORANGE = '#D4956A';
 const ORANGE_DARK = '#B9784F';
 const ORANGE_LIGHT = '#F2C9A0';
-const screenWidth = Dimensions.get('window').width;
+const screenWidth  = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
+const CARD_WIDTH  = screenWidth * 0.88;
+const CARD_HEIGHT = screenHeight * 0.5;
 
 const PAW = require('../../../assets/images/paw.png');
 
@@ -24,9 +28,9 @@ function FlipCard({ con, index }: { con: any; index: number }) {
   const [flipped, setFlipped] = useState(false);
 
   const frontInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] });
-  const backInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
-  const frontOpacity = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [1, 0] });
-  const backOpacity = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [0, 1] });
+  const backInterpolate  = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
+  const frontOpacity     = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [1, 0] });
+  const backOpacity      = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [0, 1] });
 
   const flip = () => {
     Animated.spring(flipAnim, {
@@ -216,15 +220,13 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'white',
-    paddingHorizontal: 22,
-    paddingTop: 24,
-    paddingBottom: 28,
   },
 
   container: {
     flex: 1,
     width: '100%',
     maxWidth: 380,
+    padding: 22,
     alignSelf: 'center',
     gap: 16,
   },
@@ -282,14 +284,14 @@ const styles = StyleSheet.create({
   },
 
   flipContainer: {
-    width: '92%',
-    height: 340,
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     alignSelf: 'center',
   },
 
   card: {
-    width: '100%',
-    height: 340,
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     borderRadius: 24,
     padding: 26,
     shadowColor: INK,
@@ -329,8 +331,8 @@ const styles = StyleSheet.create({
   },
 
   catSticker: {
-    width: 130,
-    height: 130,
+    width: CARD_HEIGHT * 0.35,
+    height: CARD_HEIGHT * 0.35,
   },
 
   tapHint: {
@@ -350,7 +352,7 @@ const styles = StyleSheet.create({
 
   backHeading: {
     fontFamily: 'Avenir',
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '900',
     color: INK,
     letterSpacing: -0.2,
@@ -388,7 +390,7 @@ const styles = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '400',
     color: INK_SOFT,
     lineHeight: 19,

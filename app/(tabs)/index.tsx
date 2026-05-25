@@ -118,19 +118,19 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
 
     Animated.sequence([
       Animated.parallel([
-        Animated.spring(logoY, { toValue: 0, friction: 7, tension: 100, useNativeDriver: true }),
-        Animated.timing(logoOp, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.spring(logoY, { toValue: 0, friction: 10, tension: 200, useNativeDriver: true }),
+        Animated.timing(logoOp, { toValue: 1, duration: 100, useNativeDriver: true }),
       ]),
-      Animated.delay(50),
+      Animated.delay(15),
       Animated.parallel([
-        Animated.spring(tagY, { toValue: 0, friction: 7, tension: 100, useNativeDriver: true }),
-        Animated.timing(tagOp, { toValue: 1, duration: 250, useNativeDriver: true }),
-        Animated.timing(pillsOp, { toValue: 1, duration: 280, useNativeDriver: true }),
+        Animated.spring(tagY, { toValue: 0, friction: 10, tension: 200, useNativeDriver: true }),
+        Animated.timing(tagOp, { toValue: 1, duration: 100, useNativeDriver: true }),
+        Animated.timing(pillsOp, { toValue: 1, duration: 120, useNativeDriver: true }),
       ]),
-      Animated.delay(60),
+      Animated.delay(15),
       Animated.parallel([
-        Animated.spring(btnY, { toValue: 0, friction: 6, tension: 90, useNativeDriver: true }),
-        Animated.timing(btnOp, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.spring(btnY, { toValue: 0, friction: 10, tension: 180, useNativeDriver: true }),
+        Animated.timing(btnOp, { toValue: 1, duration: 100, useNativeDriver: true }),
       ]),
     ]).start(() => {
       startIdleAnimations();
@@ -145,16 +145,16 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
     }
 
     Animated.sequence([
-      Animated.delay(150),
+      Animated.delay(10),
       Animated.parallel([
-        Animated.spring(catScale, { toValue: 1, friction: 4, tension: 70, useNativeDriver: true }),
-        Animated.timing(catOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.spring(catScale, { toValue: 1, friction: 6, tension: 180, useNativeDriver: true }),
+        Animated.timing(catOpacity, { toValue: 1, duration: 100, useNativeDriver: true }),
       ]),
-      Animated.spring(catBounce, { toValue: -12, friction: 3, tension: 120, useNativeDriver: true }),
-      Animated.spring(catBounce, { toValue: 0,   friction: 4, tension: 80,  useNativeDriver: true }),
+      Animated.spring(catBounce, { toValue: -12, friction: 5, tension: 250, useNativeDriver: true }),
+      Animated.spring(catBounce, { toValue: 0,   friction: 6, tension: 180,  useNativeDriver: true }),
     ]).start(() => {
       hasVisited = true;
-      timeoutRef.current = setTimeout(loadContent, 600);
+      timeoutRef.current = setTimeout(loadContent, 100);
     });
 
     return () => {

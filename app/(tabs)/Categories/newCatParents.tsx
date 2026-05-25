@@ -60,7 +60,7 @@ export default function NewCatParents({ navigation }: { navigation: any }) {
       {/* Back button */}
       <TouchableOpacity
         style={styles.backBtn}
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.goBack()}
         activeOpacity={0.7}
       >
         <Text style={styles.backText}>{"<"}</Text>
@@ -140,23 +140,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0, left: 0, right: 0,
     height: H * 0.55,
-    backgroundColor: '#FFFFFF',  // was WHITE but defined as same — change to match trivia
+    backgroundColor: '#FFFFFF',
   },
 
   tabBarWrapper: {
-    paddingTop: 16,
+    paddingTop: 10,
     paddingHorizontal: 12,
-    paddingBottom: 16,
+    paddingBottom: 10,
   },
 
   backBtn: {
-    width: 38, height: 38,
-    borderRadius: 19,
+    width: 34, height: 34,
+    borderRadius: 17,
     backgroundColor: 'rgba(44,26,14,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 4,
     marginLeft: 8,
   },
   backText: {
@@ -172,10 +172,10 @@ const styles = StyleSheet.create({
   },
 
   catImg: {
-    width: 130,
-    height: 130,
+    width: 110,
+    height: 110,
     flexShrink: 0,
-    marginRight: -28,
+    marginRight: -24,
   },
 
   bubbleWrapper: {

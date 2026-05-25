@@ -8,7 +8,11 @@ const WHITE      = '#FFFAF5';
 const GREEN      = '#7BAE6E';
 const GREEN_DARK = '#5A8F50';
 const GREEN_LIGHT = '#C4DDB0';
-const screenWidth = Dimensions.get('window').width;
+const screenWidth  = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
+const CARD_WIDTH  = screenWidth * 0.88;
+const CARD_HEIGHT = screenHeight * 0.5;
 
 const PAW = require('../../../assets/images/paw.png');
 
@@ -216,15 +220,13 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'white',
-    paddingHorizontal: 22,
-    paddingTop: 24,
-    paddingBottom: 28,
   },
 
   container: {
     flex: 1,
     width: '100%',
     maxWidth: 380,
+    padding: 22,
     alignSelf: 'center',
     gap: 16,
   },
@@ -282,14 +284,14 @@ const styles = StyleSheet.create({
   },
 
   flipContainer: {
-    width: '92%',
-    height: 340,
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     alignSelf: 'center',
   },
 
   card: {
-    width: '100%',
-    height: 340,
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     borderRadius: 24,
     padding: 26,
     shadowColor: INK,
@@ -329,8 +331,8 @@ const styles = StyleSheet.create({
   },
 
   catSticker: {
-    width: 130,
-    height: 130,
+    width: CARD_HEIGHT * 0.35,
+    height: CARD_HEIGHT * 0.35,
   },
 
   tapHint: {
@@ -350,7 +352,7 @@ const styles = StyleSheet.create({
 
   backHeading: {
     fontFamily: 'Avenir',
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '900',
     color: INK,
     letterSpacing: -0.2,
@@ -388,7 +390,7 @@ const styles = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '400',
     color: INK_SOFT,
     lineHeight: 19,

@@ -7,7 +7,7 @@ type Trivia = {
 
 const quiz: Trivia[] = [
     {
-        question: '1. Can you comfortably afford recurring expenses like food, litter, toys, and vet care (~$50 to $100/month)?',
+        question: '1. Can you comfortably afford recurring expenses like food, litter, and toys (~$50 to $100/month)?',
         answer1: "A. Yes I've budgeted for it",
         answer2: 'B. I could make it work',
         answer3: 'C. Not really sure'
@@ -42,8 +42,8 @@ const quiz: Trivia[] = [
     },
 
     {
-        question: '6. Cats are independent but need loving care and attention daily. Are you ready to provide love and attention?',
-        answer1: "A. Can't wait to pour my love onto a cat and open my heart",
+        question: '6. Cats are independent but need loving care daily. Are you ready to provide love and attention?',
+        answer1: "A. Can't wait to pour my love onto a cat",
         answer2: 'B. I see myself just as a caregiver',
         answer3: "C. Adopting a cat isn't for me, it's for someone else in the family!"
     },

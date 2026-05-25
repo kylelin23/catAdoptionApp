@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView } from 'react-native';
+import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView, ScrollView } from 'react-native';
 import prepCards from '../../data/newCatParents/preperation';
 
 const INK        = '#2C1A0E';
@@ -8,7 +8,11 @@ const WHITE      = '#FFFAF5';
 const BLUE       = '#7A9BBE';
 const BLUE_DARK  = '#5C7A9A';
 const BLUE_LIGHT = '#C8D8E8';
-const screenWidth = Dimensions.get('window').width;
+const screenWidth  = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
+const CARD_WIDTH  = screenWidth * 0.88;
+const CARD_HEIGHT = screenHeight * 0.5;
 
 const PAW = require('../../../assets/images/paw.png');
 
@@ -41,48 +45,62 @@ function FlipCard({ card, index }: { card: any; index: number }) {
     .filter(b => b && b !== '');
 
   return (
-    <TouchableOpacity onPress={flip} activeOpacity={1} style={styles.flipContainer}>
+    <View style={styles.flipContainer}>
 
-      {/* Front */}
-      <Animated.View style={[
-        styles.card,
-        { backgroundColor: BLUE_LIGHT },
-        { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
-      ]}>
-        <Text style={styles.frontTitle}>{card.category}</Text>
-        <Image
-          source={CAT_IMAGES[index % CAT_IMAGES.length]}
-          style={styles.catSticker}
-          resizeMode="contain"
-        />
-        <View style={styles.tapHint}>
-          <Text style={styles.tapHintText}>Tap to see more</Text>
-        </View>
-      </Animated.View>
+      {/* Front — fully tappable */}
+      <TouchableOpacity
+        onPress={flip}
+        activeOpacity={0.95}
+        style={[
+          styles.card,
+          { position: flipped ? 'absolute' : 'relative' },
+        ]}
+      >
+        <Animated.View style={[
+          StyleSheet.absoluteFill,
+          { padding: 26, alignItems: 'center', justifyContent: 'space-between', backgroundColor: BLUE_LIGHT, borderRadius: 24 },
+          { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
+        ]}>
+          <Text style={styles.frontTitle}>{card.category}</Text>
+          <Image
+            source={CAT_IMAGES[index % CAT_IMAGES.length]}
+            style={styles.catSticker}
+            resizeMode="contain"
+          />
+          <View style={styles.tapHint}>
+            <Text style={styles.tapHintText}>Tap to see more</Text>
+          </View>
+        </Animated.View>
+      </TouchableOpacity>
 
-      {/* Back */}
+      {/* Back — scrollable, flip via button */}
       <Animated.View style={[
         styles.card,
         styles.cardBack,
-        { backgroundColor: WHITE },
+        { backgroundColor: 'transparent' },
         { transform: [{ rotateY: backInterpolate }], opacity: backOpacity },
       ]}>
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: WHITE, borderRadius: 24 }]} />
         <Text style={styles.backHeading}>{card.category}</Text>
         <View style={styles.divider} />
-        <View style={styles.bulletsArea}>
+
+        <ScrollView
+          style={styles.bulletsScroll}
+          contentContainerStyle={styles.bulletsContent}
+          showsVerticalScrollIndicator={false}
+          bounces={true}
+        >
           {bullets.map((bullet, i) => (
             <View key={i} style={styles.bulletRow}>
               <Image source={PAW} style={styles.bulletPaw} resizeMode="contain" />
               <Text style={styles.bulletText}>{bullet}</Text>
             </View>
           ))}
-        </View>
-        <View style={[styles.tapHint, { backgroundColor: 'rgba(44,26,14,0.06)' }]}>
-          <Text style={[styles.tapHintText, { color: INK_SOFT }]}>Tap to flip back</Text>
-        </View>
+        </ScrollView>
+
       </Animated.View>
 
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -178,15 +196,13 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: WHITE,
-    paddingHorizontal: 22,
-    paddingTop: 24,
-    paddingBottom: 28,
   },
 
   container: {
     flex: 1,
     width: '100%',
     maxWidth: 380,
+    padding: 22,
     alignSelf: 'center',
     gap: 16,
   },
@@ -231,14 +247,14 @@ const styles = StyleSheet.create({
   },
 
   flipContainer: {
-    width: '92%',
-    height: 400,
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     alignSelf: 'center',
   },
 
   card: {
-    width: '100%',
-    height: 400,
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     borderRadius: 24,
     padding: 26,
     shadowColor: INK,
@@ -275,7 +291,8 @@ const styles = StyleSheet.create({
   },
 
   catSticker: {
-    width: 130, height: 130,
+    width: CARD_HEIGHT * 0.35,
+    height: CARD_HEIGHT * 0.35,
   },
 
   tapHint: {
@@ -294,7 +311,7 @@ const styles = StyleSheet.create({
 
   backHeading: {
     fontFamily: 'Avenir',
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '900',
     color: INK,
     letterSpacing: -0.2,
@@ -307,13 +324,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(44,26,14,0.08)',
     borderRadius: 1,
     alignSelf: 'stretch',
+    marginBottom: 4,
   },
 
-  bulletsArea: {
-    gap: 10,
+  bulletsScroll: {
     flex: 1,
-    justifyContent: 'center',
     alignSelf: 'stretch',
+  },
+  bulletsContent: {
+    gap: 10,
+    paddingVertical: 20,
   },
   bulletRow: {
     flexDirection: 'row',
@@ -328,7 +348,7 @@ const styles = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '400',
     color: INK_SOFT,
     lineHeight: 19,
