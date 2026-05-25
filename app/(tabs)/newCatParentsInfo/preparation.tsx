@@ -108,7 +108,8 @@ export default function Preparation({ navigation }: { navigation: any }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentIndexRef = useRef(0);
   const translateX = useRef(new Animated.Value(0)).current;
-  const SWIPE_THRESHOLD = screenWidth * 0.3;
+  const SWIPE_THRESHOLD = screenWidth * 0.18;
+  const SWIPE_VELOCITY = 0.38;
 
   const goToIndex = (index: number) => {
     currentIndexRef.current = index;
@@ -117,18 +118,47 @@ export default function Preparation({ navigation }: { navigation: any }) {
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 10,
-      onPanResponderMove: (_, gesture) => { translateX.setValue(gesture.dx); },
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.abs(gesture.dx) > 4 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
+
+      onPanResponderMove: (_, gesture) => {
+        translateX.setValue(gesture.dx);
+      },
+
       onPanResponderRelease: (_, gesture) => {
         const idx = currentIndexRef.current;
-        if (gesture.dx < -SWIPE_THRESHOLD && idx < prepCards.length - 1) {
-          Animated.timing(translateX, { toValue: -screenWidth, duration: 250, useNativeDriver: true })
-            .start(() => { goToIndex(idx + 1); translateX.setValue(0); });
-        } else if (gesture.dx > SWIPE_THRESHOLD && idx > 0) {
-          Animated.timing(translateX, { toValue: screenWidth, duration: 250, useNativeDriver: true })
-            .start(() => { goToIndex(idx - 1); translateX.setValue(0); });
+
+        const swipedLeft =
+          gesture.dx < -SWIPE_THRESHOLD || gesture.vx < -SWIPE_VELOCITY;
+
+        const swipedRight =
+          gesture.dx > SWIPE_THRESHOLD || gesture.vx > SWIPE_VELOCITY;
+
+        if (swipedLeft && idx < prepCards.length - 1) {
+          Animated.timing(translateX, {
+            toValue: -screenWidth,
+            duration: 180,
+            useNativeDriver: true,
+          }).start(() => {
+            goToIndex(idx + 1);
+            translateX.setValue(0);
+          });
+        } else if (swipedRight && idx > 0) {
+          Animated.timing(translateX, {
+            toValue: screenWidth,
+            duration: 180,
+            useNativeDriver: true,
+          }).start(() => {
+            goToIndex(idx - 1);
+            translateX.setValue(0);
+          });
         } else {
-          Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 6 }).start();
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+            friction: 7,
+            tension: 80,
+          }).start();
         }
       },
     })

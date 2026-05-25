@@ -1,17 +1,28 @@
 import React, { useRef, useState } from 'react';
-import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView } from 'react-native';
+import {
+  Text,
+  Dimensions,
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Animated,
+  PanResponder,
+  SafeAreaView,
+} from 'react-native';
 import pros from '../../../app/data/thinkingOfAdopting/pros';
 
-const INK        = '#2C1A0E';
-const INK_SOFT   = '#6B4C35';
-const WHITE      = '#FFFAF5';
-const GREEN      = '#7BAE6E';
+const INK = '#2C1A0E';
+const INK_SOFT = '#6B4C35';
+const WHITE = '#FFFAF5';
+const GREEN = '#7BAE6E';
 const GREEN_DARK = '#5A8F50';
 const GREEN_LIGHT = '#C4DDB0';
-const screenWidth  = Dimensions.get('window').width;
+
+const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-const CARD_WIDTH  = screenWidth * 0.88;
+const CARD_WIDTH = screenWidth * 0.88;
 const CARD_HEIGHT = screenHeight * 0.5;
 
 const PAW = require('../../../assets/images/paw.png');
@@ -27,10 +38,25 @@ function FlipCard({ pro, index }: { pro: any; index: number }) {
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
 
-  const frontInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] });
-  const backInterpolate  = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
-  const frontOpacity     = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [1, 0] });
-  const backOpacity      = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [0, 1] });
+  const frontInterpolate = flipAnim.interpolate({
+    inputRange: [0, 180],
+    outputRange: ['0deg', '180deg'],
+  });
+
+  const backInterpolate = flipAnim.interpolate({
+    inputRange: [0, 180],
+    outputRange: ['180deg', '360deg'],
+  });
+
+  const frontOpacity = flipAnim.interpolate({
+    inputRange: [89, 90],
+    outputRange: [1, 0],
+  });
+
+  const backOpacity = flipAnim.interpolate({
+    inputRange: [89, 90],
+    outputRange: [0, 1],
+  });
 
   const flip = () => {
     Animated.spring(flipAnim, {
@@ -49,7 +75,10 @@ function FlipCard({ pro, index }: { pro: any; index: number }) {
         style={[
           styles.card,
           { backgroundColor: GREEN_LIGHT },
-          { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
+          {
+            transform: [{ rotateY: frontInterpolate }],
+            opacity: frontOpacity,
+          },
         ]}
       >
         <Text style={styles.frontTitle}>{pro.fact}</Text>
@@ -70,7 +99,10 @@ function FlipCard({ pro, index }: { pro: any; index: number }) {
           styles.card,
           styles.cardBack,
           { backgroundColor: WHITE },
-          { transform: [{ rotateY: backInterpolate }], opacity: backOpacity },
+          {
+            transform: [{ rotateY: backInterpolate }],
+            opacity: backOpacity,
+          },
         ]}
       >
         <Text style={styles.backHeading}>{pro.fact}</Text>
@@ -100,47 +132,68 @@ export default function Pros({ navigation }: { navigation: any }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentIndexRef = useRef(0);
   const translateX = useRef(new Animated.Value(0)).current;
-  const SWIPE_THRESHOLD = screenWidth * 0.3;
+
+  const SWIPE_THRESHOLD = screenWidth * 0.18;
+  const SWIPE_VELOCITY = 0.38;
 
   const goToIndex = (index: number) => {
     currentIndexRef.current = index;
     setCurrentIndex(index);
+    translateX.setValue(0);
+  };
+
+  const goNext = () => {
+    const idx = currentIndexRef.current;
+    if (idx >= pros.length - 1) return;
+
+    Animated.timing(translateX, {
+      toValue: -screenWidth,
+      duration: 180,
+      useNativeDriver: true,
+    }).start(() => {
+      goToIndex(idx + 1);
+    });
+  };
+
+  const goBack = () => {
+    const idx = currentIndexRef.current;
+    if (idx <= 0) return;
+
+    Animated.timing(translateX, {
+      toValue: screenWidth,
+      duration: 180,
+      useNativeDriver: true,
+    }).start(() => {
+      goToIndex(idx - 1);
+    });
   };
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 10,
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.abs(gesture.dx) > 4 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
 
       onPanResponderMove: (_, gesture) => {
         translateX.setValue(gesture.dx);
       },
 
       onPanResponderRelease: (_, gesture) => {
-        const idx = currentIndexRef.current;
+        const swipedLeft =
+          gesture.dx < -SWIPE_THRESHOLD || gesture.vx < -SWIPE_VELOCITY;
 
-        if (gesture.dx < -SWIPE_THRESHOLD && idx < pros.length - 1) {
-          Animated.timing(translateX, {
-            toValue: -screenWidth,
-            duration: 250,
-            useNativeDriver: true,
-          }).start(() => {
-            goToIndex(idx + 1);
-            translateX.setValue(0);
-          });
-        } else if (gesture.dx > SWIPE_THRESHOLD && idx > 0) {
-          Animated.timing(translateX, {
-            toValue: screenWidth,
-            duration: 250,
-            useNativeDriver: true,
-          }).start(() => {
-            goToIndex(idx - 1);
-            translateX.setValue(0);
-          });
+        const swipedRight =
+          gesture.dx > SWIPE_THRESHOLD || gesture.vx > SWIPE_VELOCITY;
+
+        if (swipedLeft) {
+          goNext();
+        } else if (swipedRight) {
+          goBack();
         } else {
           Animated.spring(translateX, {
             toValue: 0,
             useNativeDriver: true,
-            friction: 6,
+            friction: 7,
+            tension: 80,
           }).start();
         }
       },
@@ -156,7 +209,7 @@ export default function Pros({ navigation }: { navigation: any }) {
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
-            <Text style={styles.backBtnText}>{"<"}</Text>
+            <Text style={styles.backBtnText}>{'<'}</Text>
           </TouchableOpacity>
 
           <View style={styles.headerRow}>
@@ -182,12 +235,20 @@ export default function Pros({ navigation }: { navigation: any }) {
 
         <View style={styles.bottomNav}>
           <TouchableOpacity
-            style={[styles.circleNavBtn, currentIndex === 0 && styles.circleNavBtnDisabled]}
-            onPress={() => currentIndex > 0 && goToIndex(currentIndex - 1)}
+            style={[
+              styles.circleNavBtn,
+              currentIndex === 0 && styles.circleNavBtnDisabled,
+            ]}
+            onPress={goBack}
             disabled={currentIndex === 0}
             activeOpacity={0.8}
           >
-            <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowTextDisabled]}>
+            <Text
+              style={[
+                styles.arrowText,
+                currentIndex === 0 && styles.arrowTextDisabled,
+              ]}
+            >
               ←
             </Text>
           </TouchableOpacity>
@@ -202,13 +263,11 @@ export default function Pros({ navigation }: { navigation: any }) {
               styles.circleNavBtnNext,
               currentIndex === pros.length - 1 && styles.circleNavBtnDisabled,
             ]}
-            onPress={() => currentIndex < pros.length - 1 && goToIndex(currentIndex + 1)}
+            onPress={goNext}
             disabled={currentIndex === pros.length - 1}
             activeOpacity={0.8}
           >
-            <Text style={[styles.arrowText, styles.arrowTextNext]}>
-              →
-            </Text>
+            <Text style={[styles.arrowText, styles.arrowTextNext]}>→</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -352,7 +411,7 @@ const styles = StyleSheet.create({
 
   backHeading: {
     fontFamily: 'Avenir',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '900',
     color: INK,
     letterSpacing: -0.2,
@@ -390,7 +449,7 @@ const styles = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '400',
     color: INK_SOFT,
     lineHeight: 19,

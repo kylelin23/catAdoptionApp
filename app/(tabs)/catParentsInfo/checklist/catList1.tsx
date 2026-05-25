@@ -126,25 +126,44 @@ export default function CatList1({ navigation }: { navigation: any }) {
   };
 
   const handleNext = () => {
-    const newScore = score + (answered === 'correct' ? 1 : 0);
-    if (currentItemIndex === currentList.length - 1) {
-      setScore(newScore);
-      setCompleted(true);
-      if (newScore === currentList.length) {
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 3000);
-      }
-      Animated.spring(catProgress, { toValue: 1, friction: 6, tension: 80, useNativeDriver: false }).start();
-    } else {
-      Animated.timing(slideAnim, { toValue: -screenWidth, duration: 200, useNativeDriver: true })
-        .start(() => {
-          setCurrentItemIndex(prev => prev + 1);
-          setAnswered(null);
-          slideAnim.setValue(screenWidth);
-          Animated.timing(slideAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start();
-        });
+  const point = answered === 'correct' ? 1 : 0;
+  const newScore = score + point;
+
+  setScore(newScore);
+
+  if (currentItemIndex === currentList.length - 1) {
+    setCompleted(true);
+
+    if (newScore === currentList.length) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
     }
-  };
+
+    Animated.spring(catProgress, {
+      toValue: 1,
+      friction: 6,
+      tension: 80,
+      useNativeDriver: false,
+    }).start();
+
+  } else {
+    Animated.timing(slideAnim, {
+      toValue: -screenWidth,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      setCurrentItemIndex(prev => prev + 1);
+      setAnswered(null);
+      slideAnim.setValue(screenWidth);
+
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    });
+  }
+};
 
   return (
     <SafeAreaView style={styles.safeArea}>

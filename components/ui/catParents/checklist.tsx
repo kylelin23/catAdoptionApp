@@ -118,10 +118,6 @@ function InfoCard({
 
           <Text style={[styles.arrow, { color: item.border }]}>›</Text>
         </View>
-
-        <View style={styles.cardBottom}>
-          <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
-        </View>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -167,13 +163,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 5,
     paddingVertical: 17,
     paddingHorizontal: 20,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
 
   cardTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flex: 1,
   },
 
   leftRow: {

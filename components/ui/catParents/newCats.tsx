@@ -252,14 +252,14 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontFamily: 'Avenir',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
     color: INK,
     lineHeight: 20,
   },
   cardTagline: {
     fontFamily: 'Avenir',
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '400',
     color: INK_SOFT,
   },
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '400',
     color: INK_SOFT,
     lineHeight: 19,
