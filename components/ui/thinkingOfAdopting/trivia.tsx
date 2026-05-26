@@ -227,9 +227,8 @@ const styles = StyleSheet.create({
   answersArea: {
     flex: 1,
     paddingHorizontal: 22,
-    marginTop: 25,
+    marginTop: 20,
     gap: 10,
-    justifyContent: 'center',
   },
   answerBtn: {
     backgroundColor: WHITE,
