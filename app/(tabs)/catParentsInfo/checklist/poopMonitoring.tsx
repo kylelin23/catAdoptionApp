@@ -6,6 +6,16 @@ const WHITE    = '#FFFAF5';
 
 const PAW = require('../../../../assets/images/paw.png');
 
+const STOOL_IMAGES: { [key: number]: any } = {
+  1: require('../../../../assets/images/stools copy.png'),
+  2: require('../../../../assets/images/stools copy 2.png'),
+  3: require('../../../../assets/images/stools copy 3.png'),
+  4: require('../../../../assets/images/stools copy 4.png'),
+  5: require('../../../../assets/images/stools copy 5.png'),
+  6: require('../../../../assets/images/stools copy 6.png'),
+  7: require('../../../../assets/images/stools copy 7.png'),
+};
+
 const TYPES = [
   {
     type: 4,
@@ -118,6 +128,13 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
                 <Image source={PAW} style={styles.pawIcon} resizeMode="contain" />
               </View>
 
+              {/* Stool image */}
+              <Image
+                source={STOOL_IMAGES[item.type]}
+                style={styles.stoolImage}
+                resizeMode="contain"
+              />
+
               {/* Description */}
               <View style={styles.cardMiddle}>
                 <Text style={styles.typeDescription}>{item.description}</Text>
@@ -225,6 +242,12 @@ const styles = StyleSheet.create({
   pawIcon: {
     width: 18, height: 18,
     tintColor: WHITE,
+  },
+
+  stoolImage: {
+    width: 52,
+    height: 52,
+    flexShrink: 0,
   },
 
   cardMiddle: {
