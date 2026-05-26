@@ -18,7 +18,7 @@ const expectCards: Card[] = [
     },
     {
         category: 'Toys',
-        bullet1: 'Do not leave strong or ribbon toys out when your cat is not supervised.',
+        bullet1: 'Do not leave string or ribbon toys out when your cat is not supervised.',
         bullet2: 'If you have kittens, they need no urging to play. Get some tunnels or toy mice for them.',
         bullet3: 'Older cats may be shy but are still curious and watchful. Gently encourage them with a wand toy or a hide and seek toy.',
         bullet4: 'Cat TV? Turn on the cat channel to see if the birds and wildlife is holding their attention.',
