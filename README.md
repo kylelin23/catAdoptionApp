@@ -5,9 +5,10 @@ This app was made using React Native, and the goal of this app is to let new cat
 
 #  Summary
 - [Demo](#Demo)
-- [How To Start](#How-to-Start)
+- [App Screenshots](#App-Screenshots)
 - [Features](#Features)
 - [Tech Stack](#Tech-Stack)
+- [How To Start](#How-to-Start)
 
 ## Demo
 **Youtube Link:** https://www.youtube.com/shorts/lzamWX11MFQ
