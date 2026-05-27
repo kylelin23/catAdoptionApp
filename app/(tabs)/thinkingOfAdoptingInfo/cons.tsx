@@ -109,52 +109,52 @@ export default function Cons({ navigation }: { navigation: any }) {
   };
 
   const panResponder = useRef(
-  PanResponder.create({
-    onMoveShouldSetPanResponder: (_, gesture) =>
-      Math.abs(gesture.dx) > 4 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.abs(gesture.dx) > 4 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
 
-    onPanResponderMove: (_, gesture) => {
-      translateX.setValue(gesture.dx);
-    },
+      onPanResponderMove: (_, gesture) => {
+        translateX.setValue(gesture.dx);
+      },
 
-    onPanResponderRelease: (_, gesture) => {
-      const idx = currentIndexRef.current;
+      onPanResponderRelease: (_, gesture) => {
+        const idx = currentIndexRef.current;
 
-      const swipedLeft =
-        gesture.dx < -SWIPE_THRESHOLD || gesture.vx < -SWIPE_VELOCITY;
+        const swipedLeft =
+          gesture.dx < -SWIPE_THRESHOLD || gesture.vx < -SWIPE_VELOCITY;
 
-      const swipedRight =
-        gesture.dx > SWIPE_THRESHOLD || gesture.vx > SWIPE_VELOCITY;
+        const swipedRight =
+          gesture.dx > SWIPE_THRESHOLD || gesture.vx > SWIPE_VELOCITY;
 
-      if (swipedLeft && idx < cons.length - 1) {
-        Animated.timing(translateX, {
-          toValue: -screenWidth,
-          duration: 180,
-          useNativeDriver: true,
-        }).start(() => {
-          goToIndex(idx + 1);
-          translateX.setValue(0);
-        });
-      } else if (swipedRight && idx > 0) {
-        Animated.timing(translateX, {
-          toValue: screenWidth,
-          duration: 180,
-          useNativeDriver: true,
-        }).start(() => {
-          goToIndex(idx - 1);
-          translateX.setValue(0);
-        });
-      } else {
-        Animated.spring(translateX, {
-          toValue: 0,
-          useNativeDriver: true,
-          friction: 7,
-          tension: 80,
-        }).start();
-      }
-    },
-  })
-).current;
+        if (swipedLeft && idx < cons.length - 1) {
+          Animated.timing(translateX, {
+            toValue: -screenWidth,
+            duration: 180,
+            useNativeDriver: true,
+          }).start(() => {
+            goToIndex(idx + 1);
+            translateX.setValue(0);
+          });
+        } else if (swipedRight && idx > 0) {
+          Animated.timing(translateX, {
+            toValue: screenWidth,
+            duration: 180,
+            useNativeDriver: true,
+          }).start(() => {
+            goToIndex(idx - 1);
+            translateX.setValue(0);
+          });
+        } else {
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+            friction: 7,
+            tension: 80,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -235,12 +235,14 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     maxWidth: 380,
-    padding: 22,
+    paddingVertical: 22,
     alignSelf: 'center',
     gap: 16,
   },
 
   header: {
+    width: CARD_WIDTH,
+    alignSelf: 'center',
     gap: 10,
   },
 
@@ -406,6 +408,8 @@ const styles = StyleSheet.create({
   },
 
   bottomNav: {
+    width: CARD_WIDTH,
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

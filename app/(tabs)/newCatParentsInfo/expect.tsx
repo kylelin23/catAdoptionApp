@@ -231,12 +231,14 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     maxWidth: 380,
-    padding: 22,
+    paddingVertical: 22,
     alignSelf: 'center',
     gap: 16,
   },
 
   header: {
+    width: CARD_WIDTH,
+    alignSelf: 'center',
     gap: 10,
   },
 
@@ -361,6 +363,8 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   bulletsContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
     gap: 10,
     paddingVertical: 20,
   },
@@ -384,6 +388,8 @@ const styles = StyleSheet.create({
   },
 
   bottomNav: {
+    width: CARD_WIDTH,
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

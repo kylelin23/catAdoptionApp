@@ -24,6 +24,7 @@ const screenHeight = Dimensions.get('window').height;
 
 const CARD_WIDTH = screenWidth * 0.88;
 const CARD_HEIGHT = screenHeight * 0.5;
+const CARD_PADDING = (screenWidth - CARD_WIDTH) / 2; // = screenWidth * 0.06
 
 const PAW = require('../../../assets/images/paw.png');
 
@@ -144,7 +145,16 @@ export default function Pros({ navigation }: { navigation: any }) {
 
   const goNext = () => {
     const idx = currentIndexRef.current;
-    if (idx >= pros.length - 1) return;
+    if (idx >= pros.length - 1) {
+      // snap back instead of animating off screen
+      Animated.spring(translateX, {
+        toValue: 0,
+        useNativeDriver: true,
+        friction: 7,
+        tension: 80,
+      }).start();
+      return;
+    }
 
     Animated.timing(translateX, {
       toValue: -screenWidth,
@@ -157,7 +167,16 @@ export default function Pros({ navigation }: { navigation: any }) {
 
   const goBack = () => {
     const idx = currentIndexRef.current;
-    if (idx <= 0) return;
+    if (idx <= 0) {
+      // snap back instead of animating off screen
+      Animated.spring(translateX, {
+        toValue: 0,
+        useNativeDriver: true,
+        friction: 7,
+        tension: 80,
+      }).start();
+      return;
+    }
 
     Animated.timing(translateX, {
       toValue: screenWidth,
@@ -285,14 +304,17 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     maxWidth: 380,
-    padding: 22,
+    paddingVertical: 22,
+    // paddingHorizontal: CARD_PADDING,
     alignSelf: 'center',
     gap: 16,
   },
 
   header: {
+    width: CARD_WIDTH,       // ← add these two
+    alignSelf: 'center',     // ← lines
     gap: 10,
-  },
+},
 
   headerRow: {
     flexDirection: 'row',
@@ -456,6 +478,8 @@ const styles = StyleSheet.create({
   },
 
   bottomNav: {
+    width: CARD_WIDTH,       // ← add these two
+    alignSelf: 'center',     // ← lines
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
