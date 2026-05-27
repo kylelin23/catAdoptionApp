@@ -44,10 +44,20 @@ export default function Info({ navigation }: { navigation: any }) {
   }, []);
 
   const handlePress = (index: number, destination: string) => {
+    navigation.navigate(destination);
+
     Animated.sequence([
-      Animated.spring(scales[index], { toValue: 0.92, useNativeDriver: true, friction: 4 }),
-      Animated.spring(scales[index], { toValue: 1,    useNativeDriver: true, friction: 4 }),
-    ]).start(() => navigation.navigate(destination));
+      Animated.spring(scales[index], {
+        toValue: 0.92,
+        useNativeDriver: true,
+        friction: 4,
+      }),
+      Animated.spring(scales[index], {
+        toValue: 1,
+        useNativeDriver: true,
+        friction: 4,
+      }),
+    ]).start();
   };
 
   return (

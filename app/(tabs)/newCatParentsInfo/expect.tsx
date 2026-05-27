@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView, ScrollView } from 'react-native';
 import expectCards from '../../data/newCatParents/expect';
 
@@ -8,6 +8,7 @@ const WHITE      = '#FFFAF5';
 const GREEN      = '#7BAE6E';
 const GREEN_DARK = '#5A8F50';
 const GREEN_LIGHT = '#C4DDB0';
+
 const screenWidth  = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
@@ -32,64 +33,31 @@ function FlipCard({ card, index }: { card: any; index: number }) {
   const frontOpacity     = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [1, 0] });
   const backOpacity      = flipAnim.interpolate({ inputRange: [89, 90], outputRange: [0, 1] });
 
-  const flip = () => {
-    Animated.spring(flipAnim, {
-      toValue: flipped ? 0 : 180,
-      friction: 8, tension: 60,
-      useNativeDriver: true,
-    }).start();
-    setFlipped(!flipped);
+  const flipFrontToBack = () => {
+    if (!flipped) {
+      Animated.spring(flipAnim, { toValue: 180, friction: 8, tension: 60, useNativeDriver: true }).start();
+      setFlipped(true);
+    }
   };
 
-  const bullets = [card.bullet1, card.bullet2, card.bullet3, card.bullet4, card.bullet5]
-    .filter(b => b && b !== '');
+  const bullets = [card.bullet1, card.bullet2, card.bullet3, card.bullet4, card.bullet5].filter(b => b && b !== '');
 
   return (
     <View style={styles.flipContainer}>
-
-      {/* Front — fully tappable */}
-      <TouchableOpacity
-        onPress={flip}
-        activeOpacity={0.95}
-        style={[
-          styles.card,
-          { position: flipped ? 'absolute' : 'relative' },
-        ]}
-      >
-        <Animated.View style={[
-          StyleSheet.absoluteFill,
-          { padding: 26, alignItems: 'center', justifyContent: 'space-between', backgroundColor: GREEN_LIGHT, borderRadius: 24 },
-          { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
-        ]}>
+      {/* Front Face — Tapping triggers the one-way flip */}
+      <TouchableOpacity onPress={flipFrontToBack} disabled={flipped} activeOpacity={1} style={StyleSheet.absoluteFill}>
+        <Animated.View style={[styles.card, { backgroundColor: GREEN_LIGHT }, { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity }]}>
           <Text style={styles.frontTitle}>{card.category}</Text>
-          <Image
-            source={CAT_IMAGES[index % CAT_IMAGES.length]}
-            style={styles.catSticker}
-            resizeMode="contain"
-          />
-          <View style={styles.tapHint}>
-            <Text style={styles.tapHintText}>Tap to see more</Text>
-          </View>
+          <Image source={CAT_IMAGES[index % CAT_IMAGES.length]} style={styles.catSticker} resizeMode="contain" />
+          <View style={styles.tapHint}><Text style={styles.tapHintText}>Tap to see more</Text></View>
         </Animated.View>
       </TouchableOpacity>
 
-      {/* Back — scrollable */}
-      <Animated.View style={[
-        styles.card,
-        styles.cardBack,
-        { backgroundColor: 'transparent' },
-        { transform: [{ rotateY: backInterpolate }], opacity: backOpacity },
-      ]}>
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: WHITE, borderRadius: 24 }]} />
+      {/* Back Face — Scrollable content area with no option to flip back */}
+      <Animated.View pointerEvents={flipped ? 'auto' : 'none'} style={[styles.card, styles.cardBack, { backgroundColor: WHITE }, { transform: [{ rotateY: backInterpolate }], opacity: backOpacity }]}>
         <Text style={styles.backHeading}>{card.category}</Text>
         <View style={styles.divider} />
-
-        <ScrollView
-          style={styles.bulletsScroll}
-          contentContainerStyle={styles.bulletsContent}
-          showsVerticalScrollIndicator={false}
-          bounces={true}
-        >
+        <ScrollView style={styles.bulletsScroll} contentContainerStyle={styles.bulletsContent} showsVerticalScrollIndicator={false} bounces={true}>
           {bullets.map((bullet, i) => (
             <View key={i} style={styles.bulletRow}>
               <Image source={PAW} style={styles.bulletPaw} resizeMode="contain" />
@@ -98,66 +66,93 @@ function FlipCard({ card, index }: { card: any; index: number }) {
           ))}
         </ScrollView>
       </Animated.View>
-
     </View>
   );
 }
 
 export default function Expect({ navigation }: { navigation: any }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showReviewScreen, setShowReviewScreen] = useState(false);
   const currentIndexRef = useRef(0);
-  const translateX = useRef(new Animated.Value(0)).current;
-  const SWIPE_THRESHOLD = screenWidth * 0.18;
-  const SWIPE_VELOCITY = 0.38;
 
-  const goToIndex = (index: number) => {
-    currentIndexRef.current = index;
-    setCurrentIndex(index);
+  const cardAnimations = useRef(
+    expectCards.map(() => ({
+      pan: new Animated.ValueXY({ x: 0, y: 0 }),
+      scale: new Animated.Value(1),
+    }))
+  ).current;
+
+  const SWIPE_THRESHOLD = screenWidth * 0.25;
+  const SWIPE_VELOCITY  = 0.4;
+
+  const resetDeck = () => {
+    expectCards.forEach((_, index) => {
+      cardAnimations[index].pan.setValue({ x: 0, y: 0 });
+      cardAnimations[index].scale.setValue(index === 0 ? 1 : 0.95);
+    });
+    currentIndexRef.current = 0;
+    setCurrentIndex(0);
+    setShowReviewScreen(false);
+  };
+
+  useEffect(() => {
+    resetDeck();
+  }, []);
+
+  const goNext = () => {
+    const idx = currentIndexRef.current;
+    const currentCard = cardAnimations[idx];
+    const nextCard = idx < expectCards.length - 1 ? cardAnimations[idx + 1] : null;
+
+    Animated.parallel([
+      Animated.timing(currentCard.pan, {
+        toValue: { x: -screenWidth * 1.3, y: 0 },
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      nextCard
+        ? Animated.spring(nextCard.scale, { toValue: 1, friction: 8, useNativeDriver: true })
+        : Animated.timing(new Animated.Value(0), { toValue: 0, duration: 0, useNativeDriver: true }),
+    ]).start(() => {
+      if (idx >= expectCards.length - 1) {
+        setShowReviewScreen(true);
+      } else {
+        currentIndexRef.current = idx + 1;
+        setCurrentIndex(idx + 1);
+      }
+    });
   };
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) =>
-        Math.abs(gesture.dx) > 4 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 5 && Math.abs(g.dx) > Math.abs(g.dy),
 
-      onPanResponderMove: (_, gesture) => {
-        translateX.setValue(gesture.dx);
+      onPanResponderMove: (_, g) => {
+        const idx = currentIndexRef.current;
+        const dx = g.dx;
+
+        if (dx < 0) {
+          cardAnimations[idx].pan.setValue({ x: dx, y: g.dy * 0.1 });
+          if (idx < expectCards.length - 1) {
+            const progress = Math.min(Math.abs(dx) / (screenWidth * 0.5), 1);
+            cardAnimations[idx + 1].scale.setValue(0.95 + progress * 0.05);
+          }
+        } else if (dx > 0) {
+          cardAnimations[idx].pan.setValue({ x: dx * 0.18, y: g.dy * 0.05 });
+        }
       },
 
-      onPanResponderRelease: (_, gesture) => {
+      onPanResponderRelease: (_, g) => {
         const idx = currentIndexRef.current;
+        const swipedLeft = g.dx < -SWIPE_THRESHOLD || g.vx < -SWIPE_VELOCITY;
 
-        const swipedLeft =
-          gesture.dx < -SWIPE_THRESHOLD || gesture.vx < -SWIPE_VELOCITY;
-
-        const swipedRight =
-          gesture.dx > SWIPE_THRESHOLD || gesture.vx > SWIPE_VELOCITY;
-
-        if (swipedLeft && idx < expectCards.length - 1) {
-          Animated.timing(translateX, {
-            toValue: -screenWidth,
-            duration: 180,
-            useNativeDriver: true,
-          }).start(() => {
-            goToIndex(idx + 1);
-            translateX.setValue(0);
-          });
-        } else if (swipedRight && idx > 0) {
-          Animated.timing(translateX, {
-            toValue: screenWidth,
-            duration: 180,
-            useNativeDriver: true,
-          }).start(() => {
-            goToIndex(idx - 1);
-            translateX.setValue(0);
-          });
+        if (g.dx < 0 && swipedLeft) {
+          goNext();
         } else {
-          Animated.spring(translateX, {
-            toValue: 0,
-            useNativeDriver: true,
-            friction: 7,
-            tension: 80,
-          }).start();
+          Animated.parallel([
+            Animated.spring(cardAnimations[idx].pan, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 5 }),
+            idx < expectCards.length - 1 ? Animated.spring(cardAnimations[idx + 1].scale, { toValue: 0.95, useNativeDriver: true, friction: 5 }) : null
+          ].filter(Boolean) as Animated.CompositeAnimation[]).start();
         }
       },
     })
@@ -166,269 +161,116 @@ export default function Expect({ navigation }: { navigation: any }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-            <Text style={styles.backBtnText}>{"<"}</Text>
+            <Text style={styles.backBtnText}>{'<'}</Text>
           </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.eyebrow}>NEW CAT PARENTS</Text>
-            <Text style={styles.pageTitle}>First Week</Text>
+          <View style={styles.headerRow}>
+            <View style={styles.headerCenter}>
+              <Text style={styles.eyebrow}>NEW CAT PARENTS</Text>
+              <Text style={styles.pageTitle}>First Week</Text>
+            </View>
           </View>
         </View>
 
-        {/* Card */}
         <View style={styles.cardArea}>
-          <Animated.View
-            style={{ transform: [{ translateX }] }}
-            {...panResponder.panHandlers}
-          >
-            <FlipCard
-              key={currentIndex}
-              card={expectCards[currentIndex]}
-              index={currentIndex}
-            />
-          </Animated.View>
+          {showReviewScreen ? (
+            <View style={styles.reviewContainer}>
+              <Text style={styles.reviewHeading}>Great Job!</Text>
+              <Text style={styles.reviewSubheading}>You've finished! Click below to go through the cards again! </Text>
+              <TouchableOpacity style={styles.reviewBtn} onPress={resetDeck} activeOpacity={0.8}>
+                <Text style={styles.reviewBtnText}>Review Again</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            expectCards.map((card, index) => {
+              if (index < currentIndex || index > currentIndex + 1) {
+                return null;
+              }
+
+              const cardAnim = cardAnimations[index];
+
+              const rotateCard = cardAnim.pan.x.interpolate({
+                inputRange: [-screenWidth / 2, 0, screenWidth / 2],
+                outputRange: ['-10deg', '0deg', '10deg'],
+                extrapolate: 'clamp',
+              });
+
+              const animatedStyles = {
+                transform: [
+                  { translateX: cardAnim.pan.x },
+                  { translateY: cardAnim.pan.y },
+                  { scale: cardAnim.scale },
+                  { rotate: rotateCard },
+                ],
+                zIndex: expectCards.length - index,
+              };
+
+              const isCurrent = index === currentIndex;
+              const isUnderneath = index === currentIndex + 1;
+
+              return (
+                <Animated.View
+                  key={index}
+                  style={[
+                    styles.cardWrapper,
+                    animatedStyles,
+                    isUnderneath && styles.backgroundCard,
+                  ]}
+                  {...(isCurrent ? panResponder.panHandlers : {})}
+                >
+                  <FlipCard card={card} index={index} />
+                </Animated.View>
+              );
+            })
+          )}
         </View>
 
-        {/* Nav */}
         <View style={styles.bottomNav}>
-          <TouchableOpacity
-            style={[styles.navBtn, currentIndex === 0 && styles.navBtnDisabled]}
-            onPress={() => currentIndex > 0 && goToIndex(currentIndex - 1)}
-            disabled={currentIndex === 0}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowTextDisabled]}>←</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.pageCounter}>{currentIndex + 1} / {expectCards.length}</Text>
-
-          <TouchableOpacity
-            style={[styles.navBtn, styles.navBtnNext, currentIndex === expectCards.length - 1 && styles.navBtnDisabled]}
-            onPress={() => currentIndex < expectCards.length - 1 && goToIndex(currentIndex + 1)}
-            disabled={currentIndex === expectCards.length - 1}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.arrowText, styles.arrowTextNext]}>→</Text>
-          </TouchableOpacity>
+          <Text style={styles.pageCounter}>
+            {showReviewScreen ? expectCards.length : currentIndex + 1} / {expectCards.length}
+          </Text>
         </View>
-
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: 'white' },
+  container: { flex: 1, width: '100%', maxWidth: 380, paddingVertical: 22, alignSelf: 'center', gap: 16 },
+  header: { width: CARD_WIDTH, alignSelf: 'center', gap: 10 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  backBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(44,26,14,0.08)', alignItems: 'center', justifyContent: 'center' },
+  backBtnText: { fontSize: 18, fontWeight: '700', color: INK, lineHeight: 22 },
+  headerCenter: { flex: 1, gap: 2 },
+  eyebrow: { fontFamily: 'Avenir', fontSize: 10, fontWeight: '800', color: 'rgba(44,26,14,0.4)', letterSpacing: 2 },
+  pageTitle: { fontFamily: 'Avenir', fontSize: 28, fontWeight: '900', color: INK, letterSpacing: -0.5 },
+  cardArea: { flex: 1, justifyContent: 'center', alignItems: 'center', position: 'relative', width: CARD_WIDTH, alignSelf: 'center' },
+  cardWrapper: { position: 'absolute', width: CARD_WIDTH, height: CARD_HEIGHT },
+  backgroundCard: { opacity: 1 },
+  flipContainer: { width: CARD_WIDTH, height: CARD_HEIGHT },
+  card: { width: CARD_WIDTH, height: CARD_HEIGHT, borderRadius: 24, padding: 26, shadowColor: INK, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.1, shadowRadius: 16, elevation: 6, backfaceVisibility: 'hidden', overflow: 'hidden', alignItems: 'center', justifyContent: 'space-between', borderWidth: 2, borderColor: 'rgba(44,26,14,0.06)', borderBottomWidth: 5, borderBottomColor: 'rgba(44,26,14,0.12)' },
+  cardBack: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'flex-start' },
+  frontTitle: { fontFamily: 'Avenir', fontSize: 22, fontWeight: '900', color: INK, letterSpacing: -0.3, lineHeight: 28, textAlign: 'center', alignSelf: 'stretch' },
+  catSticker: { width: CARD_HEIGHT * 0.35, height: CARD_HEIGHT * 0.35 },
+  tapHint: { backgroundColor: 'rgba(44,26,14,0.1)', borderRadius: 50, paddingVertical: 6, paddingHorizontal: 14 },
+  tapHintText: { fontFamily: 'Avenir', fontSize: 11, fontWeight: '700', color: INK, letterSpacing: 0.3 },
+  backHeading: { fontFamily: 'Avenir', fontSize: 18, fontWeight: '900', color: INK, letterSpacing: -0.2, lineHeight: 21, alignSelf: 'stretch' },
+  divider: { height: 1.5, backgroundColor: 'rgba(44,26,14,0.08)', borderRadius: 1, alignSelf: 'stretch', marginBottom: 4 },
 
-  safeArea: {
-    flex: 1,
-    backgroundColor: WHITE,
-  },
+  bulletsScroll: { flex: 1, alignSelf: 'stretch' },
+  bulletsContent: { flexGrow: 1, justifyContent: 'center', gap: 10, paddingVertical: 10 },
+  bulletRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  bulletPaw: { width: 18, height: 18, tintColor: GREEN, flexShrink: 0 },
+  bulletText: { flex: 1, fontFamily: 'Avenir', fontSize: 15, fontWeight: '400', color: INK_SOFT, lineHeight: 19 },
 
-  container: {
-    flex: 1,
-    width: '100%',
-    maxWidth: 380,
-    paddingVertical: 22,
-    alignSelf: 'center',
-    gap: 16,
-  },
+  reviewContainer: { width: CARD_WIDTH, height: CARD_HEIGHT, borderRadius: 24, padding: 32, backgroundColor: WHITE, borderWidth: 2, borderColor: 'rgba(44,26,14,0.06)', borderBottomWidth: 5, borderBottomColor: 'rgba(44,26,14,0.12)', alignItems: 'center', justifyContent: 'center', gap: 12 },
+  reviewHeading: { fontFamily: 'Avenir', fontSize: 26, fontWeight: '900', color: INK, textAlign: 'center' },
+  reviewSubheading: { fontFamily: 'Avenir', fontSize: 15, fontWeight: '500', color: INK_SOFT, textAlign: 'center', paddingHorizontal: 10, lineHeight: 20, marginBottom: 12 },
+  reviewBtn: { backgroundColor: GREEN, paddingVertical: 14, paddingHorizontal: 36, borderRadius: 50, borderBottomWidth: 4, borderBottomColor: GREEN_DARK },
+  reviewBtnText: { fontFamily: 'Avenir', fontSize: 16, fontWeight: '800', color: WHITE },
 
-  header: {
-    width: CARD_WIDTH,
-    alignSelf: 'center',
-    gap: 10,
-  },
-
-  backBtn: {
-    width: 38, height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(44,26,14,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backBtnText: {
-    fontSize: 18, fontWeight: '700',
-    color: INK, lineHeight: 22,
-  },
-
-  headerCenter: {
-    gap: 2,
-  },
-  eyebrow: {
-    fontFamily: 'Avenir',
-    fontSize: 10,
-    fontWeight: '800',
-    color: 'rgba(44,26,14,0.4)',
-    letterSpacing: 2,
-  },
-  pageTitle: {
-    fontFamily: 'Avenir',
-    fontSize: 28,
-    fontWeight: '900',
-    color: INK,
-    letterSpacing: -0.5,
-  },
-
-  cardArea: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-
-  flipContainer: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    alignSelf: 'center',
-  },
-
-  card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 24,
-    padding: 26,
-    shadowColor: INK,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 6,
-    backfaceVisibility: 'hidden',
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 2,
-    borderColor: 'rgba(44,26,14,0.06)',
-    borderBottomWidth: 5,
-    borderBottomColor: 'rgba(44,26,14,0.12)',
-  },
-
-  cardBack: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  frontTitle: {
-    fontFamily: 'Avenir',
-    fontSize: 22,
-    fontWeight: '900',
-    color: INK,
-    letterSpacing: -0.3,
-    lineHeight: 28,
-    textAlign: 'center',
-    alignSelf: 'stretch',
-  },
-
-  catSticker: {
-    width: CARD_HEIGHT * 0.35,
-    height: CARD_HEIGHT * 0.35,
-  },
-
-  tapHint: {
-    backgroundColor: 'rgba(44,26,14,0.1)',
-    borderRadius: 50,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-  },
-  tapHintText: {
-    fontFamily: 'Avenir',
-    fontSize: 11,
-    fontWeight: '700',
-    color: INK,
-    letterSpacing: 0.3,
-  },
-
-  backHeading: {
-    fontFamily: 'Avenir',
-    fontSize: 18,
-    fontWeight: '900',
-    color: INK,
-    letterSpacing: -0.2,
-    lineHeight: 21,
-    alignSelf: 'stretch',
-  },
-
-  divider: {
-    height: 1.5,
-    backgroundColor: 'rgba(44,26,14,0.08)',
-    borderRadius: 1,
-    alignSelf: 'stretch',
-    marginBottom: 4,
-  },
-
-  bulletsScroll: {
-    flex: 1,
-    alignSelf: 'stretch',
-  },
-  bulletsContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 20,
-  },
-  bulletRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  bulletPaw: {
-    width: 18, height: 18,
-    tintColor: GREEN,
-    flexShrink: 0,
-  },
-  bulletText: {
-    flex: 1,
-    fontFamily: 'Avenir',
-    fontSize: 15,
-    fontWeight: '400',
-    color: INK_SOFT,
-    lineHeight: 19,
-  },
-
-  bottomNav: {
-    width: CARD_WIDTH,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 18,
-    paddingBottom: 4,
-  },
-  navBtn: {
-    width: 92, height: 54,
-    borderRadius: 28,
-    backgroundColor: 'rgba(44,26,14,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomWidth: 3,
-    borderBottomColor: 'rgba(44,26,14,0.12)',
-  },
-  navBtnNext: {
-    backgroundColor: GREEN,
-    borderBottomWidth: 4,
-    borderBottomColor: GREEN_DARK,
-  },
-  navBtnDisabled: {
-    opacity: 0.35,
-  },
-  arrowText: {
-    fontSize: 34,
-    fontWeight: '700',
-    color: INK_SOFT,
-    lineHeight: 38,
-  },
-  arrowTextNext: {
-    color: WHITE,
-  },
-  arrowTextDisabled: {
-    color: 'rgba(107,76,53,0.35)',
-  },
-  pageCounter: {
-    fontFamily: 'Avenir',
-    fontSize: 17,
-    fontWeight: '800',
-    color: INK_SOFT,
-  },
+  bottomNav: { width: CARD_WIDTH, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingBottom: 4 },
+  pageCounter: { fontFamily: 'Avenir', fontSize: 17, fontWeight: '800', color: INK_SOFT },
 });
