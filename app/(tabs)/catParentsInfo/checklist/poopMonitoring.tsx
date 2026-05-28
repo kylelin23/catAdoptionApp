@@ -4,8 +4,6 @@ const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
 const WHITE    = '#FFFAF5';
 
-const PAW = require('../../../../assets/images/paw.png');
-
 const STOOL_IMAGES: { [key: number]: any } = {
   1: require('../../../../assets/images/stools copy.png'),
   2: require('../../../../assets/images/stools copy 2.png'),
@@ -18,10 +16,32 @@ const STOOL_IMAGES: { [key: number]: any } = {
 
 const TYPES = [
   {
-    type: 4,
-    description: 'Smooth, soft sausage or snake',
+    type: 1,
+    description: 'Separate hard lumps',
+    label: 'Severe Constipation',
+    rating: 'See a Vet',
+    border: '#C0392B',
+    dark: '#922B21',
+    cardColor: '#F2B8B0',
+    ratingColor: '#C0392B',
+    ratingDark: '#922B21',
+  },
+  {
+    type: 2,
+    description: 'Lumpy and sausage-like',
+    label: 'Mild Constipation',
+    rating: 'Monitor',
+    border: '#D4956A',
+    dark: '#A86E45',
+    cardColor: '#F2D9A0',
+    ratingColor: '#D4956A',
+    ratingDark: '#A86E45',
+  },
+  {
+    type: 3,
+    description: 'Sausage shape with cracks in the surface',
     label: 'Normal',
-    rating: 'Perfect!',
+    rating: 'Great!',
     border: '#7BAE6E',
     dark: '#5A8F50',
     cardColor: '#C4DDB0',
@@ -29,10 +49,10 @@ const TYPES = [
     ratingDark: '#5A8F50',
   },
   {
-    type: 3,
-    description: 'Sausage shape with cracks in the surface',
+    type: 4,
+    description: 'Smooth, soft sausage or snake',
     label: 'Normal',
-    rating: 'Great!',
+    rating: 'Perfect!',
     border: '#7BAE6E',
     dark: '#5A8F50',
     cardColor: '#C4DDB0',
@@ -51,17 +71,6 @@ const TYPES = [
     ratingDark: '#A86E45',
   },
   {
-    type: 2,
-    description: 'Lumpy and sausage-like',
-    label: 'Mild Constipation',
-    rating: 'Monitor',
-    border: '#D4956A',
-    dark: '#A86E45',
-    cardColor: '#F2D9A0',
-    ratingColor: '#D4956A',
-    ratingDark: '#A86E45',
-  },
-  {
     type: 6,
     description: 'Mushy consistency with ragged edges',
     label: 'Mild Diarrhea',
@@ -71,17 +80,6 @@ const TYPES = [
     cardColor: '#F2C9A0',
     ratingColor: '#C47A45',
     ratingDark: '#9E5C2E',
-  },
-  {
-    type: 1,
-    description: 'Separate hard lumps',
-    label: 'Severe Constipation',
-    rating: 'See a Vet',
-    border: '#C0392B',
-    dark: '#922B21',
-    cardColor: '#F2B8B0',
-    ratingColor: '#C0392B',
-    ratingDark: '#922B21',
   },
   {
     type: 7,
@@ -123,9 +121,9 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
                 borderBottomColor: item.dark,
               }]}
             >
-              {/* Paw badge */}
-              <View style={[styles.pawBadge, { backgroundColor: item.border, borderBottomColor: item.dark }]}>
-                <Image source={PAW} style={styles.pawIcon} resizeMode="contain" />
+              {/* Type Number Badge */}
+              <View style={[styles.typeBadge, { backgroundColor: item.border, borderBottomColor: item.dark }]}>
+                <Text style={styles.typeBadgeText}>{item.type}</Text>
               </View>
 
               {/* Stool image */}
@@ -231,7 +229,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 
-  pawBadge: {
+  typeBadge: {
     width: 36, height: 36,
     borderRadius: 11,
     alignItems: 'center',
@@ -239,9 +237,10 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     borderBottomWidth: 3,
   },
-  pawIcon: {
-    width: 18, height: 18,
-    tintColor: WHITE,
+  typeBadgeText: {
+    fontFamily: 'Avenir',
+    fontSize: 16, fontWeight: '900',
+    color: WHITE,
   },
 
   stoolImage: {

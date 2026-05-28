@@ -125,12 +125,6 @@ export default function Trivia() {
     });
   };
 
-  const handleRetry = () => {
-    setSelected('');
-    setChecked(false);
-    setIsCorrect(false);
-  };
-
   const reset = () => {
     setCurrentQ(0);
     setSelected('');
@@ -219,8 +213,9 @@ export default function Trivia() {
         </Animated.View>
       </View>
 
-      {/* Answers + result banner centered together */}
+      {/* Answers + result banner */}
       <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
+
         {ANSWERS.map((answer) => (
           <TouchableOpacity
             key={answer.key}
@@ -243,25 +238,31 @@ export default function Trivia() {
           </TouchableOpacity>
         ))}
 
-        {checked && (
-          <View style={[styles.resultBanner, isCorrect ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
-            <View style={{ width: 32 }} />
-            <Text style={[styles.resultBannerText, { color: isCorrect ? GREEN : RED, flex: 1, textAlign: 'center' }]}>
-              {isCorrect ? 'Correct!' : 'Not quite!'}
-            </Text>
-            <TouchableOpacity
-              style={[styles.arrowBadge, { backgroundColor: isCorrect ? GREEN : RED, borderBottomColor: isCorrect ? GREEN_DARK : RED_DARK, marginLeft: 0 }]}
-              onPress={handleNext}
-              activeOpacity={0.8}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Text style={styles.arrowBadgeText}>{isLast ? '✓' : '→'}</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </Animated.View>
+        {/* Fixed height container — banner appears without shifting answers */}
+        <View style={styles.resultBannerContainer}>
+          {checked && (
+            <View style={[styles.resultBanner, isCorrect ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
+              <View style={{ width: 32 }} />
+              <Text style={[styles.resultBannerText, { color: isCorrect ? GREEN : RED, flex: 1, textAlign: 'center' }]}>
+                {isCorrect ? 'Correct!' : 'Not quite!'}
+              </Text>
+              <TouchableOpacity
+                style={[styles.arrowBadge, {
+                  backgroundColor: isCorrect ? GREEN : RED,
+                  borderBottomColor: isCorrect ? GREEN_DARK : RED_DARK,
+                  marginLeft: 0,
+                }]}
+                onPress={handleNext}
+                activeOpacity={0.8}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={styles.arrowBadgeText}>{isLast ? '✓' : '→'}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
 
-      <View style={styles.bottomSection} />
+      </Animated.View>
 
     </SafeAreaView>
   );
@@ -272,11 +273,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+
   topSection: {
     paddingHorizontal: 22,
     paddingTop: 50,
     gap: 16,
   },
+
   progressArea: { marginBottom: 4 },
   progressTrack: {
     height: 10,
@@ -294,6 +297,7 @@ const styles = StyleSheet.create({
     width: 36, height: 36,
     top: -30,
   },
+
   questionText: {
     fontFamily: 'Avenir',
     fontSize: 18,
@@ -302,7 +306,6 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
 
-  // FIXED SECTION: Centered the items vertically
   answersArea: {
     flex: 1,
     paddingHorizontal: 22,
@@ -314,6 +317,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   answerBtn: {
     backgroundColor: WHITE,
     borderRadius: 16,
@@ -343,6 +347,7 @@ const styles = StyleSheet.create({
     borderBottomColor: RED_DARK,
     backgroundColor: 'rgba(196,122,69,0.12)',
   },
+
   answerText: {
     fontFamily: 'Avenir',
     fontSize: 14,
@@ -354,6 +359,7 @@ const styles = StyleSheet.create({
     color: INK,
     fontWeight: '800',
   },
+
   arrowBadge: {
     width: 32, height: 32,
     borderRadius: 10,
@@ -371,13 +377,12 @@ const styles = StyleSheet.create({
     color: WHITE,
     lineHeight: 20,
   },
+
+  // Fixed height — always reserves space so answers never shift
   resultBannerContainer: {
-    height: 64,
+    height: 72,
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 8,
-    paddingHorizontal: 22,
+    marginTop: 4,
   },
   resultBanner: {
     width: '100%',
@@ -388,13 +393,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderBottomWidth: 4,
-    marginTop: 10,
-  },
-  arrowBadgeAbsolute: {
-    position: 'absolute',
-    right: 12,
-    top: '50%',
-    marginTop: -16,
   },
   resultBannerCorrect: {
     backgroundColor: 'rgba(123,174,110,0.1)',
@@ -412,54 +410,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 0.3,
   },
-  bottomSection: {
-    paddingHorizontal: 22,
-    paddingBottom: 28,
-    alignItems: 'center',
-    minHeight: 70,
-    justifyContent: 'center',
-  },
-  nextBtn: {
-    width: '70%',
-    paddingVertical: 16,
-    backgroundColor: GREEN,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomWidth: 4,
-    borderBottomColor: GREEN_DARK,
-    shadowColor: GREEN,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  nextBtnText: {
-    fontFamily: 'Avenir',
-    color: WHITE,
-    fontSize: 16,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
-  retryBtn: {
-    width: '70%',
-    paddingVertical: 16,
-    backgroundColor: WHITE,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2.5,
-    borderColor: RED,
-    borderBottomWidth: 4,
-    borderBottomColor: RED_DARK,
-  },
-  retryBtnText: {
-    fontFamily: 'Avenir',
-    color: RED,
-    fontSize: 16,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
+
   resultScreen: {
     flex: 1,
     backgroundColor: WHITE,
@@ -468,7 +419,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     gap: 24,
   },
-  resultCat: { width: 140, height: 140 },
   resultCard: {
     backgroundColor: WHITE,
     borderRadius: 24,
