@@ -89,10 +89,10 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
   const [openMoodKey, setOpenMoodKey] = useState<string | null>(null);
 
   const currentIndexRef = useRef(0);
-  const translateX = useRef(new Animated.Value(0)).current;
+  const swipeAnim = useRef(new Animated.Value(0)).current;
   const catProgress = useRef(new Animated.Value(0)).current;
 
-  const SWIPE_THRESHOLD = screenWidth * 0.3;
+  const SWIPE_THRESHOLD = screenWidth * 0.25;
   const CAT_SIZE = 36;
   const TRACK_WIDTH = screenWidth - 44;
 
@@ -115,54 +115,84 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
     currentIndexRef.current = index;
     setCurrentIndex(index);
     setOpenMoodKey(null);
+    swipeAnim.setValue(0);
   };
 
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 10,
-
       onPanResponderMove: (_, gesture) => {
-        translateX.setValue(gesture.dx);
+        swipeAnim.setValue(gesture.dx);
       },
-
       onPanResponderRelease: (_, gesture) => {
         const idx = currentIndexRef.current;
 
         if (gesture.dx < -SWIPE_THRESHOLD && idx < cards.length - 1) {
-          Animated.timing(translateX, {
+          // Swipe Left -> Next Card
+          Animated.timing(swipeAnim, {
             toValue: -screenWidth,
-            duration: 250,
+            duration: 200,
             useNativeDriver: true,
           }).start(() => {
             goToIndex(idx + 1);
-            translateX.setValue(0);
           });
         } else if (gesture.dx > SWIPE_THRESHOLD && idx > 0) {
-          Animated.timing(translateX, {
+          // Swipe Right -> Prev Card
+          Animated.timing(swipeAnim, {
             toValue: screenWidth,
-            duration: 250,
+            duration: 200,
             useNativeDriver: true,
           }).start(() => {
             goToIndex(idx - 1);
-            translateX.setValue(0);
           });
         } else {
-          Animated.spring(translateX, {
+          // Reset positioning snap back
+          Animated.spring(swipeAnim, {
             toValue: 0,
             useNativeDriver: true,
-            friction: 6,
+            friction: 5,
+            tension: 40,
           }).start();
         }
       },
     })
   ).current;
 
-  const card = cards[currentIndex];
+  // Animated Interpolations for Quizlet Stack Effect
+  const currentCardTranslateX = swipeAnim;
+
+  const currentCardRotate = swipeAnim.interpolate({
+    inputRange: [-screenWidth, 0, screenWidth],
+    outputRange: ['-6deg', '0deg', '6deg'],
+  });
+
+  // Next peek card moves into center view as you drag
+  const nextCardTranslateX = swipeAnim.interpolate({
+    inputRange: [-screenWidth, 0, screenWidth],
+    outputRange: [0, screenWidth - 28, screenWidth * 2],
+  });
+
+  // Previous peek card moves into center view as you drag
+  const prevCardTranslateX = swipeAnim.interpolate({
+    inputRange: [-screenWidth, 0, screenWidth],
+    outputRange: [-screenWidth * 2, -screenWidth + 28, 0],
+  });
+
+  const triggerButtonNav = (targetIndex: number, direction: 'forward' | 'backward') => {
+    Animated.timing(swipeAnim, {
+      toValue: direction === 'forward' ? -screenWidth : screenWidth,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(() => {
+      goToIndex(targetIndex);
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
 
+        {/* Header Section */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Text style={styles.backBtnText}>{"<"}</Text>
@@ -179,13 +209,13 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
           </View>
         </View>
 
+        {/* Top Progress bar tracking */}
         <View style={styles.progressArea}>
           <Animated.Image
             source={CAT}
             style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
             resizeMode="contain"
           />
-
           <View style={styles.progressTrack}>
             <Animated.View
               style={[
@@ -202,47 +232,83 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        <Animated.View
-          style={[styles.cardArea, { transform: [{ translateX }] }]}
-          {...panResponder.panHandlers}
-        >
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{card.title}</Text>
+        {/* Dynamic Quizlet Card Slider Container */}
+        <View style={styles.cardContainerArea} {...panResponder.panHandlers}>
 
-            <View style={styles.moodsArea}>
-              {MOODS.map((mood) => (
-                <MoodRow
-                  key={`${currentIndex}-${mood.key}`}
-                  label={mood.label}
-                  answer={(card as any)[mood.key]}
-                  color={mood.color}
-                  border={mood.border}
-                  dark={mood.dark}
-                  isOpen={openMoodKey === mood.key}
-                  onToggle={() =>
-                    setOpenMoodKey(openMoodKey === mood.key ? null : mood.key)
-                  }
-                />
-              ))}
+          {/* Glimpse Card: PREVIOUS */}
+          {currentIndex > 0 && (
+            <Animated.View
+              style={[
+                styles.peekCardOuter,
+                { transform: [{ translateX: prevCardTranslateX }] }
+              ]}
+            >
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>{cards[currentIndex - 1].title}</Text>
+              </View>
+            </Animated.View>
+          )}
+
+          {/* Core Interactive Card: CURRENT */}
+          <Animated.View
+            style={[
+              styles.peekCardOuter,
+              {
+                transform: [
+                  { translateX: currentCardTranslateX },
+                  { rotate: currentCardRotate }
+                ],
+                zIndex: 10
+              }
+            ]}
+          >
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>{cards[currentIndex].title}</Text>
+
+              <View style={styles.moodsArea}>
+                {MOODS.map((mood) => (
+                  <MoodRow
+                    key={`${currentIndex}-${mood.key}`}
+                    label={mood.label}
+                    answer={(cards[currentIndex] as any)[mood.key]}
+                    color={mood.color}
+                    border={mood.border}
+                    dark={mood.dark}
+                    isOpen={openMoodKey === mood.key}
+                    onToggle={() =>
+                      setOpenMoodKey(openMoodKey === mood.key ? null : mood.key)
+                    }
+                  />
+                ))}
+              </View>
             </View>
-          </View>
-        </Animated.View>
+          </Animated.View>
 
+          {/* Glimpse Card: NEXT */}
+          {currentIndex < cards.length - 1 && (
+            <Animated.View
+              style={[
+                styles.peekCardOuter,
+                { transform: [{ translateX: nextCardTranslateX }] }
+              ]}
+            >
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>{cards[currentIndex + 1].title}</Text>
+              </View>
+            </Animated.View>
+          )}
+
+        </View>
+
+        {/* Carousel Pagination dots indicators */}
         <View style={styles.dotsRow}>
           {cards.map((_, i) => (
             <TouchableOpacity
               key={i}
               onPress={() => {
-                const direction = i > currentIndex ? -1 : 1;
-
-                Animated.timing(translateX, {
-                  toValue: direction * screenWidth,
-                  duration: 250,
-                  useNativeDriver: true,
-                }).start(() => {
-                  goToIndex(i);
-                  translateX.setValue(0);
-                });
+                if (i !== currentIndex) {
+                  triggerButtonNav(i, i > currentIndex ? 'forward' : 'backward');
+                }
               }}
             >
               <View
@@ -256,21 +322,11 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
           ))}
         </View>
 
+        {/* Navigation bottom bar */}
         <View style={styles.navRow}>
           <TouchableOpacity
             style={[styles.navBtn, currentIndex === 0 && styles.navBtnDisabled]}
-            onPress={() => {
-              if (currentIndex > 0) {
-                Animated.timing(translateX, {
-                  toValue: screenWidth,
-                  duration: 250,
-                  useNativeDriver: true,
-                }).start(() => {
-                  goToIndex(currentIndex - 1);
-                  translateX.setValue(0);
-                });
-              }
-            }}
+            onPress={() => currentIndex > 0 && triggerButtonNav(currentIndex - 1, 'backward')}
             disabled={currentIndex === 0}
             activeOpacity={0.8}
           >
@@ -287,18 +343,7 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
               styles.navBtnNext,
               currentIndex === cards.length - 1 && styles.navBtnDisabled,
             ]}
-            onPress={() => {
-              if (currentIndex < cards.length - 1) {
-                Animated.timing(translateX, {
-                  toValue: -screenWidth,
-                  duration: 250,
-                  useNativeDriver: true,
-                }).start(() => {
-                  goToIndex(currentIndex + 1);
-                  translateX.setValue(0);
-                });
-              }
-            }}
+            onPress={() => currentIndex < cards.length - 1 && triggerButtonNav(currentIndex + 1, 'forward')}
             disabled={currentIndex === cards.length - 1}
             activeOpacity={0.8}
           >
@@ -421,8 +466,19 @@ const styles = StyleSheet.create({
     top: -28,
   },
 
-  cardArea: {
+  /* Quizlet Card Carousel Engine Layout Specs */
+  cardContainerArea: {
     flex: 1,
+    position: 'relative',
+    marginHorizontal: -12, // Extends container boundaries to allow smooth overflow peeking
+  },
+
+  peekCardOuter: {
+    position: 'absolute',
+    top: 0,
+    left: 12,
+    right: 12,
+    bottom: 0,
   },
 
   card: {
@@ -514,6 +570,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 6,
+    marginTop: 4,
   },
 
   dot: {

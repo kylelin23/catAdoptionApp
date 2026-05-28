@@ -1,84 +1,103 @@
-import React, { useRef } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Animated, Image } from "react-native";
+import React, { useRef, useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  Animated,
+  Image,
+  SafeAreaView,
+} from 'react-native';
 
-const INK      = '#2C1A0E';
+const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
-const WHITE    = '#FFFAF5';
+const WHITE = '#FFFAF5';
 
-const PAW      = require('../../../assets/images/paw.png');
-const CAT_PEEK = require('../../../assets/images/catWave.png');
+const PAW = require('../../../assets/images/paw.png');
 
 const STEPS = [
   {
-    key:     'separate',
-    number:  '01',
-    title:   'Separate Spaces',
+    key: 'separate',
+    number: '01',
+    title: 'Separate Spaces',
     tagline: 'Keep them apart at first',
-    accent:  '#7A9BBE',
-    dark:    '#5C7A9A',
+    accent: '#7A9BBE',
+    dark: '#5C7A9A',
     bullets: [
-      'Keep the cats in separate spaces',
-      'Set up the new cat in a quiet room with litter box, food, water, hiding spot and scratching post',
-      'Keep the door closed',
-      'Do not allow face to face contact for the first 3–5 days',
+      'Keep the cats in separate spaces.',
+      'Set up the new cat in a quiet room with a litter box, food, water, a hiding spot, and a scratching post.',
+      'Keep the door closed.',
+      'Do not allow face-to-face contact for the first 3–5 days.',
     ],
   },
   {
-    key:     'scent',
-    number:  '02',
-    title:   'Exchange Scents',
+    key: 'scent',
+    number: '02',
+    title: 'Exchange Scents',
     tagline: 'Cats recognize by scent before sight',
-    accent:  '#D4956A',
-    dark:    '#A86E45',
+    accent: '#D4956A',
+    dark: '#A86E45',
     bullets: [
-      'Exchange bedding or blankets between cats',
-      'Feed cats on opposite sides of the door',
-      "Provide treats so cats associate each other's scents with something positive",
+      'Exchange bedding or blankets between cats.',
+      'Feed cats on opposite sides of the closed door.',
+      "Provide treats so cats associate each other's scents with positive outcomes.",
     ],
   },
   {
-    key:     'supervised',
-    number:  '03',
-    title:   'Supervised Meetings',
+    key: 'supervised',
+    number: '03',
+    title: 'Supervised Meetings',
     tagline: 'Short and sweet visits',
-    accent:  '#7BAE6E',
-    dark:    '#5A8F50',
+    accent: '#7BAE6E',
+    dark: '#5A8F50',
     bullets: [
-      'Cats are ready when they show curious sniffing at the door',
-      'After several days, open the door slightly',
-      'Let the cats meet briefly',
-      'Continue to provide treats and keep sessions short',
+      'Cats are ready when they show curious sniffing at the door baseline.',
+      'After several days, crack open the door slightly.',
+      'Let the cats meet briefly under close watch.',
+      'Continue to provide treats and keep sessions deliberately short.',
     ],
   },
   {
-    key:     'slow',
-    number:  '04',
-    title:   'Slow and Gradual',
+    key: 'slow',
+    number: '04',
+    title: 'Slow and Gradual',
     tagline: 'Patience is key',
-    accent:  '#C47A45',
-    dark:    '#9E5C2E',
+    accent: '#C47A45',
+    dark: '#9E5C2E',
     bullets: [
-      'Maintain the same structure over days or weeks',
-      'Keep the pace slow and gradual',
-      'Keep routines consistent',
-      'Do not force interaction',
-      'Remember: Hissing = communication and is totally common!',
+      'Maintain the same gradual structure over days or weeks.',
+      'Keep your daily routines entirely consistent.',
+      'Do not force interactive spaces if either cat pulls away.',
+      'Remember: Hissing is safe communication and is totally common!',
     ],
   },
 ];
 
-function StepItem({ step, isOpen, onPress }: {
+function StepItem({
+  step,
+  isOpen,
+  onPress,
+}: {
   step: typeof STEPS[0];
   isOpen: boolean;
   onPress: () => void;
 }) {
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  const peekAnim   = useRef(new Animated.Value(0)).current;
+  const contentHeightAnim = useRef(new Animated.Value(0)).current;
 
-  React.useEffect(() => {
+  useEffect(() => {
     Animated.parallel([
-      Animated.timing(rotateAnim, { toValue: isOpen ? 1 : 0, duration: 200, useNativeDriver: true }),
-      Animated.spring(peekAnim,   { toValue: isOpen ? 1 : 0, friction: 5, tension: 70, useNativeDriver: true }),
+      Animated.timing(rotateAnim, {
+        toValue: isOpen ? 1 : 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(contentHeightAnim, {
+        toValue: isOpen ? 1 : 0,
+        duration: 250,
+        useNativeDriver: false,
+      }),
     ]).start();
   }, [isOpen]);
 
@@ -87,215 +106,249 @@ function StepItem({ step, isOpen, onPress }: {
     outputRange: ['0deg', '180deg'],
   });
 
-  const catTranslateX = peekAnim.interpolate({
+  const contentOpacity = contentHeightAnim.interpolate({
+    inputRange: [0, 0.4, 1],
+    outputRange: [0, 0, 1],
+  });
+
+  const maxHeight = contentHeightAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [-10, 0],
+    outputRange: [0, 320],
   });
 
   return (
     <View style={styles.itemWrapper}>
-
-      {/* Cat peeks from left */}
-      <Animated.Image
-        source={CAT_PEEK}
+      {/* Main UI Card */}
+      <View
         style={[
-          styles.peekingCat,
-          {
-            opacity: peekAnim,
-            transform: [{ translateX: catTranslateX }, { rotate: '-45deg' }],
-          },
+          styles.card,
+          { borderColor: 'rgba(44,26,14,0.06)', borderBottomColor: 'rgba(44,26,14,0.12)' },
+          isOpen && { borderLeftColor: step.accent },
         ]}
-        resizeMode="contain"
-      />
-
-      {/* Card */}
-      <View style={[
-        styles.card,
-        { borderColor: step.accent, borderBottomColor: step.dark },
-        isOpen && { borderLeftWidth: 3, borderLeftColor: step.accent },
-      ]}>
-        <TouchableOpacity style={styles.headerRow} onPress={onPress} activeOpacity={0.8}>
-
-          <View style={[styles.numberBadge, { backgroundColor: step.accent, borderBottomColor: step.dark }]}>
+      >
+        <TouchableOpacity
+          style={styles.headerRow}
+          onPress={onPress}
+          activeOpacity={0.9}
+        >
+          <View
+            style={[
+              styles.numberBadge,
+              { backgroundColor: step.accent, borderBottomColor: step.dark },
+            ]}
+          >
             <Text style={styles.numberText}>{step.number}</Text>
           </View>
 
           <View style={styles.titleArea}>
+            <Text style={styles.eyebrow}>STEP {step.number}</Text>
             <Text style={styles.cardTitle}>{step.title}</Text>
             <Text style={styles.cardTagline}>{step.tagline}</Text>
           </View>
 
           <Animated.Image
             source={PAW}
-            style={[styles.pawChevron, { tintColor: step.accent, transform: [{ rotate }] }]}
+            style={[
+              styles.pawChevron,
+              { tintColor: INK_SOFT, transform: [{ rotate }] },
+            ]}
             resizeMode="contain"
           />
-
         </TouchableOpacity>
 
-        {isOpen && (
+        {/* Smooth Expandable Content */}
+        <Animated.View style={{ maxHeight, opacity: contentOpacity, overflow: 'hidden' }}>
           <View style={styles.bulletsArea}>
             <View style={styles.divider} />
             {step.bullets.map((bullet, i) => (
               <View key={i} style={styles.bulletRow}>
-                <Image source={PAW} style={[styles.bulletPaw, { tintColor: step.accent }]} resizeMode="contain" />
+                <Image
+                  source={PAW}
+                  style={[styles.bulletPaw, { tintColor: step.accent }]}
+                  resizeMode="contain"
+                />
                 <Text style={styles.bulletText}>{bullet}</Text>
               </View>
             ))}
           </View>
-        )}
+        </Animated.View>
       </View>
-
     </View>
   );
 }
 
 export default function NewCats() {
-  const [openIndex, setOpenIndex] = React.useState(-1);
+  const [openIndex, setOpenIndex] = useState(0);
 
   const toggle = (index: number) => {
     setOpenIndex(openIndex === index ? -1 : index);
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {STEPS.map((step, index) => (
-          <StepItem
-            key={step.key}
-            step={step}
-            isOpen={openIndex === index}
-            onPress={() => toggle(index)}
-          />
-        ))}
-        <View style={{ height: 40 }} />
-      </ScrollView>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.pageSubtitle}>Follow these steps to safely introduce new feline friends.</Text>
+
+          {STEPS.map((step, index) => (
+            <StepItem
+              key={step.key}
+              step={step}
+              isOpen={openIndex === index}
+              onPress={() => toggle(index)}
+            />
+          ))}
+          <View style={{ height: 40 }} />
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
 
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
 
-  scroll: { flex: 1 },
+  scroll: {
+    flex: 1,
+  },
 
   scrollContent: {
-    paddingLeft: 0,
-    paddingRight: 20,
-    paddingTop: 20,
-    gap: 12,
+    paddingHorizontal: 22,
+    paddingTop: 24,
+    gap: 16,
+  },
+
+  pageSubtitle: {
+    fontFamily: 'Avenir',
+    fontSize: 15,
+    color: INK_SOFT,
+    lineHeight: 22,
+    marginBottom: 4,
   },
 
   itemWrapper: {
     position: 'relative',
-  },
-
-  peekingCat: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    left: 0,
-    top: '50%',
-    marginTop: -60,
-    zIndex: 0,
+    marginVertical: 2,
   },
 
   card: {
     backgroundColor: WHITE,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
+    borderRadius: 24,
+    padding: 20,
     shadowColor: INK,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
     zIndex: 2,
-    marginLeft: 55,
-    borderWidth: 2.5,
-    borderBottomWidth: 4,
+    borderWidth: 2,
+    borderBottomWidth: 5,
+    borderLeftWidth: 6,
   },
 
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 14,
   },
 
   numberBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
     borderBottomWidth: 3,
   },
+
   numberText: {
     fontFamily: 'Avenir',
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: '900',
     color: WHITE,
   },
 
   titleArea: {
     flex: 1,
-    gap: 2,
+    gap: 1,
   },
+
+  eyebrow: {
+    fontFamily: 'Avenir',
+    fontSize: 10,
+    fontWeight: '800',
+    color: 'rgba(44,26,14,0.35)',
+    letterSpacing: 1.5,
+  },
+
   cardTitle: {
     fontFamily: 'Avenir',
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '900',
     color: INK,
-    lineHeight: 20,
+    letterSpacing: -0.3,
   },
+
   cardTagline: {
     fontFamily: 'Avenir',
-    fontSize: 12,
-    fontWeight: '400',
+    fontSize: 13,
+    fontWeight: '500',
     color: INK_SOFT,
+    lineHeight: 16,
+    marginTop: 2,
   },
 
   pawChevron: {
-    width: 26,
-    height: 26,
+    width: 22,
+    height: 22,
     flexShrink: 0,
   },
 
   bulletsArea: {
-    gap: 10,
-    marginTop: 6,
+    gap: 12,
+    marginTop: 16,
+    paddingBottom: 4,
   },
+
   divider: {
     height: 1.5,
-    backgroundColor: 'rgba(44,26,14,0.08)',
+    backgroundColor: 'rgba(44,26,14,0.06)',
     borderRadius: 1,
+    marginBottom: 4,
   },
+
   bulletRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 10,
+    gap: 12,
   },
+
   bulletPaw: {
     width: 14,
     height: 14,
     marginTop: 3,
     flexShrink: 0,
   },
+
   bulletText: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 12,
-    fontWeight: '400',
-    color: INK_SOFT,
-    lineHeight: 19,
+    fontSize: 14,
+    fontWeight: '500',
+    color: INK,
+    lineHeight: 21,
   },
 });

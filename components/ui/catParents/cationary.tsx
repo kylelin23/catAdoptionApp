@@ -51,6 +51,12 @@ function FlipCard({
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
 
+  // If the word changes via nav buttons, reset the card to its front face immediately
+  useEffect(() => {
+    setFlipped(false);
+    flipAnim.setValue(0);
+  }, [word]);
+
   const frontInterpolate = flipAnim.interpolate({
     inputRange: [0, 180],
     outputRange: ['0deg', '180deg'],
@@ -156,6 +162,9 @@ export default function Cationary() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const catProgress = useRef(new Animated.Value(0)).current;
+  // Animated value handling the card slide and opacity transitions
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const cardOpacity = useRef(new Animated.Value(1)).current;
 
   const CAT_SIZE = 36;
   const TRACK_WIDTH = screenWidth - 44;
@@ -171,12 +180,51 @@ export default function Cationary() {
       toValue: currentIndex / (WORDS.length - 1),
       friction: 6,
       tension: 80,
-      useNativeDriver: false,
+      useNativeDriver: false, // standard progress bar width animation
     }).start();
   }, [currentIndex]);
 
-  const goToIndex = (index: number) => {
-    setCurrentIndex(index);
+  const handleNavigation = (direction: 'next' | 'prev') => {
+    const isNext = direction === 'next';
+    const nextIndex = isNext ? currentIndex + 1 : currentIndex - 1;
+
+    // Boundary check
+    if (nextIndex < 0 || nextIndex >= WORDS.length) return;
+
+    // 1. Slide old card out & fade out slightly
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: isNext ? -screenWidth : screenWidth,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardOpacity, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      })
+    ]).start(() => {
+      // 2. Change the actual content state while invisible
+      setCurrentIndex(nextIndex);
+
+      // 3. Teleport card to the opposite side immediately
+      slideAnim.setValue(isNext ? screenWidth : -screenWidth);
+
+      // 4. Slide the new card back into view & fade in
+      Animated.parallel([
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          friction: 7,
+          tension: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(cardOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        })
+      ]).start();
+    });
   };
 
   return (
@@ -212,11 +260,18 @@ export default function Cationary() {
 
         {/* Card */}
         <View style={styles.cardArea}>
-          <FlipCard
-            key={currentIndex}
-            word={WORDS[currentIndex]}
-            color={CARD_COLOR}
-          />
+          <Animated.View
+            style={{
+              transform: [{ translateX: slideAnim }],
+              opacity: cardOpacity,
+            }}
+          >
+            {/* Note: Removed 'key={currentIndex}' so React reuses the DOM node, avoiding sudden flashing during animation */}
+            <FlipCard
+              word={WORDS[currentIndex]}
+              color={CARD_COLOR}
+            />
+          </Animated.View>
         </View>
 
         {/* Navigation */}
@@ -226,10 +281,7 @@ export default function Cationary() {
               styles.navBtn,
               currentIndex === 0 && styles.navBtnDisabled,
             ]}
-            onPress={() =>
-              currentIndex > 0 &&
-              goToIndex(currentIndex - 1)
-            }
+            onPress={() => handleNavigation('prev')}
             disabled={currentIndex === 0}
             activeOpacity={0.8}
           >
@@ -255,10 +307,7 @@ export default function Cationary() {
               currentIndex === WORDS.length - 1 &&
                 styles.navBtnDisabled,
             ]}
-            onPress={() =>
-              currentIndex < WORDS.length - 1 &&
-              goToIndex(currentIndex + 1)
-            }
+            onPress={() => handleNavigation('next')}
             disabled={
               currentIndex === WORDS.length - 1
             }
