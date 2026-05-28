@@ -70,6 +70,15 @@ export default function Pros({ navigation }: { navigation: any }) {
   const [showReviewScreen, setShowReviewScreen] = useState(false);
   const currentIndexRef = useRef(0);
 
+  // ENTRY/EXIT SCREEN ANIMATIONS
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  // REVIEW CARD ANIMS
+  const reviewCardOpacity = useRef(new Animated.Value(1)).current;
+  const reviewCardSlide   = useRef(new Animated.Value(0)).current;
+  const reviewBtnScale    = useRef(new Animated.Value(0)).current;
+
   const cardAnimations = useRef(
     pros.map(() => ({
       pan: new Animated.ValueXY({ x: 0, y: 0 }),
@@ -88,11 +97,56 @@ export default function Pros({ navigation }: { navigation: any }) {
     currentIndexRef.current = 0;
     setCurrentIndex(0);
     setShowReviewScreen(false);
+
+    // Reset structural review animation tracking states
+    reviewCardOpacity.setValue(1);
+    reviewCardSlide.setValue(0);
+
+    // Re-trigger entrance slide up sequence for the newly reloaded deck
+    fadeAnim.setValue(0);
+    slideAnim.setValue(25);
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 350, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
+    ]).start();
   };
 
   useEffect(() => {
-    resetDeck();
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 450, useNativeDriver: true }),
+    ]).start();
   }, []);
+
+  // Pop introduction handling for review card buttons
+  useEffect(() => {
+    if (showReviewScreen) {
+      reviewBtnScale.setValue(0.5);
+      Animated.spring(reviewBtnScale, {
+        toValue: 1,
+        friction: 6,
+        tension: 50,
+        useNativeDriver: true
+      }).start();
+    }
+  }, [showReviewScreen]);
+
+  // COMBINED BUTTON CLICK AND EXIT SEQUENCE
+  const handleReviewAgainPress = () => {
+    // 1. Button press scale click flash response
+    Animated.sequence([
+      Animated.timing(reviewBtnScale, { toValue: 0.92, duration: 80, useNativeDriver: true }),
+      Animated.timing(reviewBtnScale, { toValue: 1, duration: 100, useNativeDriver: true }),
+
+      // 2. Clear out container completely downward
+      Animated.parallel([
+        Animated.timing(reviewCardOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
+        Animated.timing(reviewCardSlide, { toValue: 40, duration: 280, useNativeDriver: true })
+      ])
+    ]).start(() => {
+      resetDeck();
+    });
+  };
 
   const goNext = () => {
     const idx = currentIndexRef.current;
@@ -155,7 +209,8 @@ export default function Pros({ navigation }: { navigation: any }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Text style={styles.backBtnText}>{'<'}</Text>
@@ -170,13 +225,23 @@ export default function Pros({ navigation }: { navigation: any }) {
 
         <View style={styles.cardArea}>
           {showReviewScreen ? (
-            <View style={styles.reviewContainer}>
+            <Animated.View style={[
+              styles.reviewContainer,
+              { opacity: reviewCardOpacity, transform: [{ translateY: reviewCardSlide }] }
+            ]}>
               <Text style={styles.reviewHeading}>Great Job!</Text>
               <Text style={styles.reviewSubheading}>You've finished! Click below to go through the cards again! </Text>
-              <TouchableOpacity style={styles.reviewBtn} onPress={resetDeck} activeOpacity={0.8}>
-                <Text style={styles.reviewBtnText}>Review Again</Text>
-              </TouchableOpacity>
-            </View>
+
+              <Animated.View style={{ transform: [{ scale: reviewBtnScale }] }}>
+                <TouchableOpacity
+                  style={styles.reviewBtn}
+                  onPress={handleReviewAgainPress}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.reviewBtnText}>Review Again</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </Animated.View>
           ) : (
             pros.map((pro, index) => {
               if (index < currentIndex || index > currentIndex + 1) {
@@ -184,7 +249,6 @@ export default function Pros({ navigation }: { navigation: any }) {
               }
 
               const cardAnim = cardAnimations[index];
-
               const rotateCard = cardAnim.pan.x.interpolate({
                 inputRange: [-screenWidth / 2, 0, screenWidth / 2],
                 outputRange: ['-10deg', '0deg', '10deg'],
@@ -226,7 +290,8 @@ export default function Pros({ navigation }: { navigation: any }) {
             {showReviewScreen ? pros.length : currentIndex + 1} / {pros.length}
           </Text>
         </View>
-      </View>
+
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -235,7 +300,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: 'white' },
   container: { flex: 1, width: '100%', maxWidth: 380, paddingVertical: 22, alignSelf: 'center', gap: 16 },
   header: { width: CARD_WIDTH, alignSelf: 'center', gap: 10 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerRow: { flexDirection: 'row', alignItems: 'center', System: 'space-between' },
   backBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(44,26,14,0.08)', alignItems: 'center', justifyContent: 'center' },
   backBtnText: { fontSize: 18, fontWeight: '700', color: INK, lineHeight: 22 },
   headerCenter: { flex: 1, gap: 2 },

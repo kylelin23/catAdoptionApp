@@ -219,7 +219,7 @@ export default function Trivia() {
         </Animated.View>
       </View>
 
-      {/* Answers + result banner grouped together */}
+      {/* Answers + result banner centered together */}
       <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
         {ANSWERS.map((answer) => (
           <TouchableOpacity
@@ -268,18 +268,15 @@ export default function Trivia() {
 }
 
 const styles = StyleSheet.create({
-
   safeArea: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
   topSection: {
     paddingHorizontal: 22,
     paddingTop: 50,
     gap: 16,
   },
-
   progressArea: { marginBottom: 4 },
   progressTrack: {
     height: 10,
@@ -297,7 +294,6 @@ const styles = StyleSheet.create({
     width: 36, height: 36,
     top: -30,
   },
-
   questionText: {
     fontFamily: 'Avenir',
     fontSize: 18,
@@ -306,14 +302,14 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
 
+  // FIXED SECTION: Centered the items vertically
   answersArea: {
     flex: 1,
     paddingHorizontal: 22,
-    marginTop: 5,
+    justifyContent: 'center',
     gap: 10,
-    justifyContent: 'flex-start',
-    paddingTop: 8,
   },
+
   answerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -358,7 +354,6 @@ const styles = StyleSheet.create({
     color: INK,
     fontWeight: '800',
   },
-
   arrowBadge: {
     width: 32, height: 32,
     borderRadius: 10,
@@ -376,7 +371,6 @@ const styles = StyleSheet.create({
     color: WHITE,
     lineHeight: 20,
   },
-
   resultBannerContainer: {
     height: 64,
     justifyContent: 'center',
@@ -418,7 +412,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 0.3,
   },
-
   bottomSection: {
     paddingHorizontal: 22,
     paddingBottom: 28,
@@ -467,7 +460,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1,
   },
-
   resultScreen: {
     flex: 1,
     backgroundColor: WHITE,

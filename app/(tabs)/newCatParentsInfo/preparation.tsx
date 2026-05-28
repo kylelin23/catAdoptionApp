@@ -44,7 +44,7 @@ function FlipCard({ card, index }: { card: any; index: number }) {
 
   return (
     <View style={styles.flipContainer}>
-      {/* Front Face — Tapping triggers the one-way flip flip */}
+      {/* Front Face — Tapping triggers the one-way flip */}
       <TouchableOpacity onPress={flipFrontToBack} disabled={flipped} activeOpacity={1} style={StyleSheet.absoluteFill}>
         <Animated.View style={[styles.card, { backgroundColor: BLUE_LIGHT }, { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity }]}>
           <Text style={styles.frontTitle}>{card.category}</Text>
@@ -53,7 +53,7 @@ function FlipCard({ card, index }: { card: any; index: number }) {
         </Animated.View>
       </TouchableOpacity>
 
-      {/* Back Face — Purely scrollable list, tap back hints have been deleted */}
+      {/* Back Face — Purely scrollable list */}
       <Animated.View pointerEvents={flipped ? 'auto' : 'none'} style={[styles.card, styles.cardBack, { backgroundColor: WHITE }, { transform: [{ rotateY: backInterpolate }], opacity: backOpacity }]}>
         <Text style={styles.backHeading}>{card.category}</Text>
         <View style={styles.divider} />
@@ -75,6 +75,15 @@ export default function Preparation({ navigation }: { navigation: any }) {
   const [showReviewScreen, setShowReviewScreen] = useState(false);
   const currentIndexRef = useRef(0);
 
+  // ENTRY/EXIT SCREEN ANIMATIONS
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  // REVIEW CARD ANIMS
+  const reviewCardOpacity = useRef(new Animated.Value(1)).current;
+  const reviewCardSlide   = useRef(new Animated.Value(0)).current;
+  const reviewBtnScale    = useRef(new Animated.Value(0)).current;
+
   const cardAnimations = useRef(
     prepCards.map(() => ({
       pan: new Animated.ValueXY({ x: 0, y: 0 }),
@@ -93,11 +102,55 @@ export default function Preparation({ navigation }: { navigation: any }) {
     currentIndexRef.current = 0;
     setCurrentIndex(0);
     setShowReviewScreen(false);
+
+    // Reset layout animation parameters
+    reviewCardOpacity.setValue(1);
+    reviewCardSlide.setValue(0);
+
+    fadeAnim.setValue(0);
+    slideAnim.setValue(25);
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 350, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
+    ]).start();
   };
 
   useEffect(() => {
-    resetDeck();
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 450, useNativeDriver: true }),
+    ]).start();
   }, []);
+
+  // Pop intro sequence for the review screen button
+  useEffect(() => {
+    if (showReviewScreen) {
+      reviewBtnScale.setValue(0.5);
+      Animated.spring(reviewBtnScale, {
+        toValue: 1,
+        friction: 6,
+        tension: 50,
+        useNativeDriver: true
+      }).start();
+    }
+  }, [showReviewScreen]);
+
+  // COMBINED BUTTON CLICK AND DOWNWARD EXIT TRANSITION
+  const handleReviewAgainPress = () => {
+    Animated.sequence([
+      // 1. Interactive button bounce feedback
+      Animated.timing(reviewBtnScale, { toValue: 0.92, duration: 80, useNativeDriver: true }),
+      Animated.timing(reviewBtnScale, { toValue: 1, duration: 100, useNativeDriver: true }),
+
+      // 2. Drop the complete review block out of viewport
+      Animated.parallel([
+        Animated.timing(reviewCardOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
+        Animated.timing(reviewCardSlide, { toValue: 40, duration: 280, useNativeDriver: true })
+      ])
+    ]).start(() => {
+      resetDeck();
+    });
+  };
 
   const goNext = () => {
     const idx = currentIndexRef.current;
@@ -160,7 +213,8 @@ export default function Preparation({ navigation }: { navigation: any }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Text style={styles.backBtnText}>{'<'}</Text>
@@ -175,13 +229,23 @@ export default function Preparation({ navigation }: { navigation: any }) {
 
         <View style={styles.cardArea}>
           {showReviewScreen ? (
-            <View style={styles.reviewContainer}>
+            <Animated.View style={[
+              styles.reviewContainer,
+              { opacity: reviewCardOpacity, transform: [{ translateY: reviewCardSlide }] }
+            ]}>
               <Text style={styles.reviewHeading}>Great Job!</Text>
               <Text style={styles.reviewSubheading}>You've finished! Click below to go through the cards again! </Text>
-              <TouchableOpacity style={styles.reviewBtn} onPress={resetDeck} activeOpacity={0.8}>
-                <Text style={styles.reviewBtnText}>Review Again</Text>
-              </TouchableOpacity>
-            </View>
+
+              <Animated.View style={{ transform: [{ scale: reviewBtnScale }] }}>
+                <TouchableOpacity
+                  style={styles.reviewBtn}
+                  onPress={handleReviewAgainPress}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.reviewBtnText}>Review Again</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </Animated.View>
           ) : (
             prepCards.map((card, index) => {
               if (index < currentIndex || index > currentIndex + 1) {
@@ -189,7 +253,6 @@ export default function Preparation({ navigation }: { navigation: any }) {
               }
 
               const cardAnim = cardAnimations[index];
-
               const rotateCard = cardAnim.pan.x.interpolate({
                 inputRange: [-screenWidth / 2, 0, screenWidth / 2],
                 outputRange: ['-10deg', '0deg', '10deg'],
@@ -231,7 +294,8 @@ export default function Preparation({ navigation }: { navigation: any }) {
             {showReviewScreen ? prepCards.length : currentIndex + 1} / {prepCards.length}
           </Text>
         </View>
-      </View>
+
+      </Animated.View>
     </SafeAreaView>
   );
 }

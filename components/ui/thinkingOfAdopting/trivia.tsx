@@ -144,6 +144,7 @@ export default function Trivia() {
         </Animated.View>
       </View>
 
+      {/* Centered Answers Container */}
       <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
         {[
           { label: question.answer1, points: 3 },
@@ -184,18 +185,15 @@ export default function Trivia() {
 }
 
 const styles = StyleSheet.create({
-
   safeArea: {
     flex: 1,
     backgroundColor: 'white',
   },
-
   topSection: {
     paddingHorizontal: 22,
     paddingTop: 50,
     gap: 16,
   },
-
   progressArea: {
     marginBottom: 4,
   },
@@ -215,7 +213,6 @@ const styles = StyleSheet.create({
     width: 36, height: 36,
     top: -30,
   },
-
   questionText: {
     fontFamily: 'Avenir',
     fontSize: 18,
@@ -224,12 +221,14 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
 
+  // FIXED SECTION: Added justifyContent: 'center'
   answersArea: {
     flex: 1,
     paddingHorizontal: 22,
-    marginTop: 20,
+    justifyContent: 'center',
     gap: 10,
   },
+
   answerBtn: {
     backgroundColor: WHITE,
     borderRadius: 16,
@@ -262,7 +261,6 @@ const styles = StyleSheet.create({
     color: INK,
     fontWeight: '800',
   },
-
   arrowBadge: {
     width: 32, height: 32,
     borderRadius: 10,
@@ -280,12 +278,10 @@ const styles = StyleSheet.create({
     color: WHITE,
     lineHeight: 20,
   },
-
   bottomSection: {
     paddingBottom: 28,
     minHeight: 28,
   },
-
   resultScreen: {
     flex: 1,
     backgroundColor: 'white',
