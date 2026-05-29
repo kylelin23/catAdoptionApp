@@ -71,7 +71,6 @@ export default function AreYou({ navigation }: { navigation: any }) {
   const headerY     = useRef(new Animated.Value(-20)).current;
   const headerOp    = useRef(new Animated.Value(0)).current;
   const bubbleScale = useRef(new Animated.Value(0)).current;
-  const slideOut    = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
@@ -83,21 +82,27 @@ export default function AreYou({ navigation }: { navigation: any }) {
     ]).start();
   }, []);
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
 
       <View style={styles.bgTop} />
       <View style={styles.bgBottom} />
 
-      <TouchableOpacity style={styles.backBtn} onPress={handleBack} activeOpacity={0.7}>
-        <Text style={styles.backText}>{"<"}</Text>
-      </TouchableOpacity>
+      {/* Top row — back + stories */}
+      <View style={styles.topRow}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
+          <Text style={styles.backText}>{"<"}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.storiesBtn}
+          onPress={() => navigation.navigate('Cat Stories')}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.storiesBtnText}>🐾 Stories</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Speech bubble header — unchanged */}
+      {/* Speech bubble header */}
       <Animated.View style={[styles.mascotArea, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
         <Image source={CAT_IMG} style={styles.catImg} resizeMode="contain" />
         <Animated.View style={[styles.bubbleWrapper, { transform: [{ scale: bubbleScale }] }]}>
@@ -110,7 +115,7 @@ export default function AreYou({ navigation }: { navigation: any }) {
         </Animated.View>
       </Animated.View>
 
-      {/* Cards fill the white area */}
+      {/* Cards */}
       <View style={styles.cardsArea}>
         {CATEGORIES.map((cat, i) => (
           <CategoryCard
@@ -148,23 +153,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 4,
+  },
+
   backBtn: {
     width: 34, height: 34,
     borderRadius: 17,
     backgroundColor: 'rgba(44,26,14,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'flex-start',
-    marginLeft: 20,
-    marginTop: 10,
-    marginBottom: 4,
   },
   backText: {
     fontSize: 18, fontWeight: '700',
     color: INK, lineHeight: 22,
   },
 
-  // Mascot — unchanged
+  storiesBtn: {
+    backgroundColor: 'rgba(44,26,14,0.08)',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  storiesBtnText: {
+    fontFamily: 'Avenir',
+    fontSize: 13, fontWeight: '700',
+    color: INK,
+  },
+
   mascotArea: {
     paddingHorizontal: 12,
     paddingTop: H * 0.035,

@@ -38,6 +38,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "CatWise would like to access your photos to let you share pictures of your cat."
+        }
       ]
     ],
     "experiments": {

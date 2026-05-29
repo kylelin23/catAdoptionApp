@@ -1,4 +1,5 @@
-import { View, StyleSheet, TouchableOpacity, Text, ScrollView, SafeAreaView, Image } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, TouchableOpacity, Text, ScrollView, SafeAreaView, Image, Modal, Pressable } from "react-native";
 
 const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -95,6 +96,8 @@ const TYPES = [
 ];
 
 export default function PoopMonitoring({ navigation }: { navigation: any }) {
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -111,7 +114,12 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Added delaysContentTouches={false} here to instantly bypass ScrollView responder latency */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          delaysContentTouches={false}
+        >
           {TYPES.map((item) => (
             <View
               key={item.type}
@@ -126,12 +134,18 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
                 <Text style={styles.typeBadgeText}>{item.type}</Text>
               </View>
 
-              {/* Stool image */}
-              <Image
-                source={STOOL_IMAGES[item.type]}
-                style={styles.stoolImage}
-                resizeMode="contain"
-              />
+              {/* Stool Image inside a specialized Pressable container */}
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={STOOL_IMAGES[item.type]}
+                  style={styles.stoolImage}
+                  resizeMode="contain"
+                />
+                <Pressable
+                  style={styles.absolutePressable}
+                  onPress={() => setSelectedImage(item.type)}
+                />
+              </View>
 
               {/* Description */}
               <View style={styles.cardMiddle}>
@@ -149,18 +163,40 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
           <View style={{ height: 40 }} />
         </ScrollView>
 
+        {/* Lightbox Modal for Previewing Bigger Stool Images */}
+        <Modal
+          visible={selectedImage !== null}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setSelectedImage(null)}
+        >
+          <Pressable style={styles.modalOverlay} onPress={() => setSelectedImage(null)}>
+            <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
+              {selectedImage && (
+                <>
+                  <Text style={styles.modalTitle}>Type {selectedImage}</Text>
+                  <Image
+                    source={STOOL_IMAGES[selectedImage]}
+                    style={styles.modalImage}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.modalCloseText}>Tap anywhere outside to close</Text>
+                </>
+              )}
+            </Pressable>
+          </Pressable>
+        </Modal>
+
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-
   safeArea: {
     flex: 1,
     backgroundColor: WHITE,
   },
-
   container: {
     flex: 1,
     paddingHorizontal: 22,
@@ -168,7 +204,6 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     gap: 16,
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -209,11 +244,9 @@ const styles = StyleSheet.create({
     fontSize: 12, fontWeight: '400',
     color: INK_SOFT,
   },
-
   scrollContent: {
     gap: 10,
   },
-
   card: {
     borderRadius: 20,
     padding: 14,
@@ -228,7 +261,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-
   typeBadge: {
     width: 36, height: 36,
     borderRadius: 11,
@@ -242,13 +274,26 @@ const styles = StyleSheet.create({
     fontSize: 16, fontWeight: '900',
     color: WHITE,
   },
-
+  imageWrapper: {
+    width: 52,
+    height: 52,
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   stoolImage: {
     width: 52,
     height: 52,
-    flexShrink: 0,
   },
-
+  absolutePressable: {
+    position: 'absolute',
+    top: -10,
+    left: -10,
+    right: -10,
+    bottom: -10,
+    backgroundColor: 'transparent',
+    zIndex: 99,
+  },
   cardMiddle: {
     flex: 1,
     gap: 3,
@@ -265,7 +310,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
-
   ratingBadge: {
     borderRadius: 12,
     paddingHorizontal: 10,
@@ -282,5 +326,44 @@ const styles = StyleSheet.create({
     color: WHITE,
     textAlign: 'center',
     letterSpacing: 0.3,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(44, 26, 14, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: WHITE,
+    borderRadius: 28,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: INK,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontFamily: 'Avenir',
+    fontSize: 22,
+    fontWeight: '900',
+    color: INK,
+    marginBottom: 16,
+  },
+  modalImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  modalCloseText: {
+    fontFamily: 'Avenir',
+    fontSize: 12,
+    fontWeight: '600',
+    color: INK_SOFT,
+    opacity: 0.6,
   },
 });

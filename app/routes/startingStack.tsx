@@ -4,7 +4,7 @@ import Home from "../(tabs)/areYou";
 import ThinkingOfAdopting from "../(tabs)/Categories/thinkingOfAdopting";
 import NewCatParents from "../(tabs)/Categories/newCatParents";
 import CatParents from "../(tabs)/Categories/catParents";
-import CatLovers from "../(tabs)/Categories/catLovers";
+import CatStories from "../(tabs)/Categories/catStories";
 import Pros from "../(tabs)/thinkingOfAdoptingInfo/pros";
 import Cons from "../(tabs)/thinkingOfAdoptingInfo/cons";
 import Preparation from '../(tabs)/newCatParentsInfo/preparation';
@@ -55,8 +55,8 @@ export default function App() {
         options={{ headerShown: false }}
       />
       <StartingStack.Screen
-        name="Cat Lovers"
-        component={CatLovers}
+        name="Cat Stories"
+        component={CatStories}
         options = {{headerShown: false}}
       />
       <StartingStack.Screen
