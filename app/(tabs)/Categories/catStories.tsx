@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   ScrollView, StyleSheet, SafeAreaView, ActivityIndicator,
-  Platform, Modal, Animated, KeyboardAvoidingView, Dimensions, Image,
+  Platform, Modal, Animated, KeyboardAvoidingView, Dimensions, Image, Linking,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../../lib/supabase';
@@ -15,6 +15,8 @@ const GREEN      = '#7BAE6E';
 const GREEN_DARK = '#5A8F50';
 const WARM       = '#D4956A';
 const WARM_DARK  = '#A86E45';
+
+const YOUR_EMAIL = 'catwise78@gmail.com'; // replace with your email
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -156,6 +158,14 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
     ]).start();
   }, []);
 
+  const handleContact = () => {
+    const subject = encodeURIComponent(`CatWise Story Request — ${item.cat_name} (ID: ${item.id})`);
+    const body = encodeURIComponent(
+      `Hi,\n\nI'd like to request an edit or removal of my cat story.\n\nStory details:\n- Cat name: ${item.cat_name}\n- Submitted by: ${item.name || 'Anonymous'}\n- Story ID: ${item.id}\n\nRequest:\n[Please describe what you'd like changed or removed]\n\nThanks!`
+    );
+    Linking.openURL(`mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`);
+  };
+
   return (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
       <TouchableOpacity style={styles.storyCard} onPress={() => setExpanded(!expanded)} activeOpacity={0.9}>
@@ -215,6 +225,15 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
             {!hasAnyContent && (
               <Text style={styles.noDescription}>No description</Text>
             )}
+
+            {/* Contact button */}
+            <TouchableOpacity
+              style={styles.contactBtn}
+              onPress={handleContact}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.contactBtnText}>Request edit or removal</Text>
+            </TouchableOpacity>
           </View>
         )}
       </TouchableOpacity>
@@ -386,7 +405,6 @@ export default function CatStories({ navigation }: { navigation: any }) {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showModal, setShowModal]       = useState(false);
 
-  // Top to bottom: header → prompt → section
   const headerY   = useRef(new Animated.Value(-16)).current;
   const headerOp  = useRef(new Animated.Value(0)).current;
   const promptY   = useRef(new Animated.Value(20)).current;
@@ -398,17 +416,14 @@ export default function CatStories({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     Animated.sequence([
-      // 1 — header
       Animated.parallel([
         Animated.spring(headerY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
         Animated.timing(headerOp, { toValue: 1, duration: 280, useNativeDriver: true }),
       ]),
-      // 2 — share prompt
       Animated.parallel([
         Animated.spring(promptY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
         Animated.timing(promptOp, { toValue: 1, duration: 260, useNativeDriver: true }),
       ]),
-      // 3 — section header + cards
       Animated.parallel([
         Animated.spring(sectionY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
         Animated.timing(sectionOp, { toValue: 1, duration: 240, useNativeDriver: true }),
@@ -471,7 +486,6 @@ export default function CatStories({ navigation }: { navigation: any }) {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-        {/* 1 — Header */}
         <Animated.View style={[styles.header, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Text style={styles.backBtnText}>{"<"}</Text>
@@ -483,14 +497,12 @@ export default function CatStories({ navigation }: { navigation: any }) {
           </View>
         </Animated.View>
 
-        {/* Success banner */}
         {submitted && (
           <Animated.View style={[styles.successBanner, { opacity: bannerOp, transform: [{ translateY: bannerY }] }]}>
             <Text style={styles.successText}>Your story was shared with the community!</Text>
           </Animated.View>
         )}
 
-        {/* 2 — Share prompt */}
         <Animated.View style={{ opacity: promptOp, transform: [{ translateY: promptY }] }}>
           <TouchableOpacity style={styles.sharePromptBtn} onPress={() => setShowModal(true)} activeOpacity={0.85}>
             <View style={styles.sharePromptInner}>
@@ -503,7 +515,6 @@ export default function CatStories({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         </Animated.View>
 
-        {/* 3 — Section header + cards */}
         <Animated.View style={{ opacity: sectionOp, transform: [{ translateY: sectionY }] }}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>From the Community</Text>
@@ -582,6 +593,24 @@ const styles = StyleSheet.create({
   storySectionText: { fontFamily: 'Avenir', fontSize: 13, fontWeight: '400', color: INK_SOFT, lineHeight: 20 },
   bestPartSection: { backgroundColor: 'rgba(123,174,110,0.08)', borderWidth: 1.5, borderColor: 'rgba(123,174,110,0.3)' },
   bestPartText: { fontFamily: 'Avenir', fontSize: 14, fontWeight: '700', color: INK, lineHeight: 22, fontStyle: 'italic' },
+
+  contactBtn: {
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(44,26,14,0.12)',
+    backgroundColor: 'rgba(44,26,14,0.04)',
+    marginTop: 4,
+  },
+  contactBtnText: {
+    fontFamily: 'Avenir',
+    fontSize: 12,
+    fontWeight: '700',
+    color: INK_SOFT,
+    letterSpacing: 0.2,
+  },
 
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)' },
   backdropDismiss: { position: 'absolute', top: 0, left: 0, right: 0, bottom: '30%' },
