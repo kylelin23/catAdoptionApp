@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.kylelin23.catwise",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": ["googlegmail"]
       }
     },
     "android": {

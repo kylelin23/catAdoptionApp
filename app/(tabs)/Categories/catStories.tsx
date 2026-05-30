@@ -163,7 +163,14 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
     const body = encodeURIComponent(
       `Hi,\n\nI'd like to request an edit or removal of my cat story.\n\nStory details:\n- Cat name: ${item.cat_name}\n- Submitted by: ${item.name || 'Anonymous'}\n- Story ID: ${item.id}\n\nRequest:\n[Please describe what you'd like changed or removed]\n\nThanks!`
     );
-    Linking.openURL(`mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`);
+
+    // Try Gmail app first, fall back to mailto
+    const gmailUrl = `googlegmail://co?to=${YOUR_EMAIL}&subject=${subject}&body=${body}`;
+    const mailUrl  = `mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`;
+
+    Linking.canOpenURL(gmailUrl).then(supported => {
+      Linking.openURL(supported ? gmailUrl : mailUrl);
+    });
   };
 
   return (
