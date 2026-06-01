@@ -9,8 +9,8 @@ const cons: Con[] = [
   {
     category: "Cost",
     support1: "As with all pets, vet visits are the bulk of the expenses",
-    support2: "Ongoing costs include food, litter, toys and vaccinations",
-    support3: "Pet insurance is optional but will help during unexpected visits"
+    support2: "Ongoing costs include food, litter, toys, flea medicine and vaccinations",
+    support3: "Pet insurance is optional but highly recommended and will greatly help during unexpected events"
   },
   {
     category: "Commitment",
