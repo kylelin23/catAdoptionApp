@@ -41,7 +41,7 @@ const faqs: FAQ[] = [
 
     {
         question: 'Does the cat stay indoor and/or outdoor?',
-        answer: 'Indoor please! Being indoor protects them from cars, other predatory animals, and diseases. It is also important o make sure your cat is spayed or neutered.'
+        answer: 'Indoor please! Being indoor protects them from cars, other predatory animals, and diseases. It is also important to make sure your cat is spayed or neutered.'
     },
 
     {
