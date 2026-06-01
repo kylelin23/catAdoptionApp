@@ -41,7 +41,7 @@ const faqs: FAQ[] = [
 
     {
         question: 'Does the cat stay indoor and/or outdoor?',
-        answer: 'Indoor please! Being indoor protects them from cars, other predatory animals, and diseases. It is also important to make sure your cat is spayed or neutered.'
+        answer: 'Indoor only please! Being indoor protects them from cars, other predatory animals, and diseases. It is also important to make sure your cat is spayed or neutered.'
     },
 
     {
@@ -57,6 +57,10 @@ const faqs: FAQ[] = [
     {
         question: 'What is the most important thing I should know before adopting?',
         answer: "Cats are not toys and they become part of your family when you adopt them. Please do not abandon them if they become sick or if you move. You are their entire lives."
+    },
+      {
+        question: 'Where can I adopt?',
+        answer: "Go to your local shelter or rescue. Information on our app is provided for reference but we encourage you to talk to the adoptions counselor or coordinator to ask more specific questions. Welcome to the cat community!"
     }
 ];
 
