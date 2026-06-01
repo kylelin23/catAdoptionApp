@@ -8,6 +8,10 @@ const faqs: FAQ[] = [
     question: 'What do I need for the first week?',
     answer: 'Start out with the basics! Litter (and litter box), wet and dry food (and food and water bowls) and some simple toys! Key here is to not over buy.'
   },
+      {
+    question: 'How can I prepare the house?',
+    answer: 'Identify an enclosed room that will serve as the safe room. Cats will need time to adjust so be prepared to have them in the room for a couple of weeks. Make sure you clear the room of potentially toxic plants and items. Hop over to our Cat Parents category for more info.'
+  },
   {
     question: 'My cat is not eating, what do I do?',
     answer: "It's common for cats to hide and not eat in new surroundings. Offer wet food as they're more likely to be enticed by the smell. Leave them alone and they're more likely to eat when no one is around."
@@ -18,7 +22,7 @@ const faqs: FAQ[] = [
   },
   {
     question: "I can't find my cat!",
-    answer: 'That happens to lots of new cat parents the first day! It helps to keep your cat contained in one room for the first week. But make sure there are covered cat beds or spaces for them to use and decompress.'
+    answer: 'That happens to lots of new cat parents the first day! It helps to keep your cat contained in one room for the first week (sometimes more!). But make sure there are covered cat beds or spaces for them to use and decompress.'
   },
   {
     question: 'My resident cat is hissing at our new cat',
