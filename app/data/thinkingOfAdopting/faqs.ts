@@ -11,22 +11,22 @@ const faqs: FAQ[] = [
 
     {
         question: 'How do I choose between a kitten, adult cat or senior cat?',
-        answer: "Each phase of a cat's life brings a different kind of joy, from the playful mischief of a kitten to the calm, affectionate companionship of a senior. What are you looking for?"
+        answer: "Each phase of a cat's life brings a different kind of joy, from the playful mischief of kittens to the calm, affectionate companionship of a senior. What are you looking for?"
     },
 
     {
         question: 'The cats are all so cute but I want to wait for a cat to choose me.',
-        answer: 'This is another common debate and there is no wrong way to choosing your cat. Some cats may naturally be more affectionate and other cats love from a distance.'
+        answer: 'This is another common debate and there is no wrong way to choosing your cat. Some cats may naturally be more affectionate and other cats love from a distance. Cat behavior in a shelter or a rescue place are also not indicative of what they will be like when they feel safe at home.'
     },
 
     {
         question: 'How do I prepare my home for a new cat?',
-        answer: "A cat's basic needs are food, water, and litter box. And of course, pets and love! When you are ready to adopt, head over to our New Cat Parents' section to find out more."
+        answer: "A cat's basic needs are food, water, and litter box. And of course, lots of pets and love! When you are ready to adopt, head over to our New Cat Parents' section to find out more."
     },
 
     {
         question: "What do I do when I need to go away?",
-        answer: 'Cats can be alone for one or two days with food and water but any longer than that, there should be a cat sitter checking in your cat at least once a day.'
+        answer: "You should always have a cat sitter check in at least once a day when you are out. Cats have been known to accidentally get locked in rooms with no access to food and water. It's never too early to start looking for cat sitters who you can trust."
     },
 
     {
@@ -41,12 +41,12 @@ const faqs: FAQ[] = [
 
     {
         question: 'Does the cat stay indoor and/or outdoor?',
-        answer: 'Indoor please! Being indoor protects them from cars, other predatory animals, and diseases.'
+        answer: 'Indoor please! Being indoor protects them from cars, other predatory animals, and diseases. It is also important o make sure your cat is spayed or neutered.'
     },
 
     {
         question: 'How much does it cost?',
-        answer: 'Providing cat food, water and litter are a necessity. On average, expect to pay a minimum of $30-50 each month.'
+        answer: 'Providing cat food, water and litter are a necessity. Cats are family and deserve quality food. Do not just buy the cheapest brand! Flea medicine is also a monthly expense that is important to budget for. On average, expect to pay a minimum of $80-100 each month.'
     },
 
     {
@@ -56,7 +56,7 @@ const faqs: FAQ[] = [
 
     {
         question: 'What is the most important thing I should know before adopting?',
-        answer: "Cats are not toys and they become part of your family when you adopt them. Please do not abandon them. You are their entire lives."
+        answer: "Cats are not toys and they become part of your family when you adopt them. Please do not abandon them if they become sick or if you move. You are their entire lives."
     }
 ];
 
