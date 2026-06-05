@@ -1,23 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, StatusBar, Image, Animated, Dimensions, SafeAreaView } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Text, View, StyleSheet, StatusBar, Image, Animated, Easing, Dimensions, SafeAreaView } from 'react-native';
 
 const { width: W, height: H } = Dimensions.get('window');
 
 const INK = '#2C1A0E';
-const INK_SOFT = '#6B4C35';
 const SAND = '#E8C9A0';
 const WHITE = '#FFFAF5';
 const GREEN = '#7BAE6E';
 
-const IMAGES = [
-  require('../../assets/images/catWave.png'),
-  require('../../assets/images/catStretch.png'),
-  require('../../assets/images/cat.png'),
-];
-
-const PAW = require('../../assets/images/paw.png');
+const CAT_IMG     = require('../../assets/images/catWave.png');
+const PAW         = require('../../assets/images/paw.png');
+const WALKING_CAT = require('../../assets/images/walkingCat.png');
 
 let hasVisited = false;
+
+const CAT_SIZE    = 36;
+const TRACK_WIDTH = W - 80;
 
 function FloatingPaw({ x, delay, duration, size, opacity }: {
   x: number, delay: number, duration: number, size: number, opacity: number
@@ -66,49 +64,44 @@ const PAWS = [
   { x: 0.45, delay: 2400, duration: 5500, size: 16, opacity: 0.07 },
 ];
 
-export default function HomeScreen({ navigation }: { navigation: any }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+const BAR_TOTAL_DURATION = 5000;
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const timeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const loadedRef   = useRef(false);
+export default function HomeScreen({ navigation }: { navigation: any }) {
+  const timeoutRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadedRef    = useRef(false);
+  const hasNavigated = useRef(false);
 
   const catScale    = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
   const catOpacity  = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
-  const catBounce   = useRef(new Animated.Value(0)).current;
   const circlePulse = useRef(new Animated.Value(1)).current;
-  const imgOpacity  = useRef(new Animated.Value(1)).current;
+  const logoOp      = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const logoY       = useRef(new Animated.Value(hasVisited ? 0 : -20)).current;
+  const barProgress = useRef(new Animated.Value(0)).current;
 
-  const logoOp  = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
-  const logoY   = useRef(new Animated.Value(hasVisited ? 0 : -20)).current;
-  const tagOp   = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
-  const tagY    = useRef(new Animated.Value(hasVisited ? 0 : 20)).current;
-  const pillsOp = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
-  const btnOp   = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
-  const btnY    = useRef(new Animated.Value(hasVisited ? 0 : 30)).current;
+  const navigateNow = () => {
+    if (hasNavigated.current) return;
+    hasNavigated.current = true;
+    navigation.replace('Home');
+  };
+
+  const startBar = (duration: number) => {
+    Animated.timing(barProgress, {
+      toValue: 1,
+      duration,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start(({ finished }) => {
+      if (finished) navigateNow();
+    });
+  };
 
   const startIdleAnimations = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(catBounce, { toValue: -6, duration: 1000, useNativeDriver: true }),
-        Animated.timing(catBounce, { toValue: 0,  duration: 1000, useNativeDriver: true }),
-      ])
-    ).start();
-
     Animated.loop(
       Animated.sequence([
         Animated.timing(circlePulse, { toValue: 1.05, duration: 1200, useNativeDriver: true }),
         Animated.timing(circlePulse, { toValue: 1,    duration: 1200, useNativeDriver: true }),
       ])
     ).start();
-
-    intervalRef.current = setInterval(() => {
-      Animated.timing(imgOpacity, { toValue: 0, duration: 350, useNativeDriver: true })
-        .start(() => {
-          setCurrentIndex(prev => (prev + 1) % IMAGES.length);
-          Animated.timing(imgOpacity, { toValue: 1, duration: 350, useNativeDriver: true }).start();
-        });
-    }, 2400);
   };
 
   const loadContent = () => {
@@ -116,22 +109,9 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
     loadedRef.current = true;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    Animated.sequence([
-      Animated.parallel([
-        Animated.spring(logoY, { toValue: 0, friction: 10, tension: 200, useNativeDriver: true }),
-        Animated.timing(logoOp, { toValue: 1, duration: 100, useNativeDriver: true }),
-      ]),
-      Animated.delay(15),
-      Animated.parallel([
-        Animated.spring(tagY, { toValue: 0, friction: 10, tension: 200, useNativeDriver: true }),
-        Animated.timing(tagOp, { toValue: 1, duration: 100, useNativeDriver: true }),
-        Animated.timing(pillsOp, { toValue: 1, duration: 120, useNativeDriver: true }),
-      ]),
-      Animated.delay(15),
-      Animated.parallel([
-        Animated.spring(btnY, { toValue: 0, friction: 10, tension: 180, useNativeDriver: true }),
-        Animated.timing(btnOp, { toValue: 1, duration: 100, useNativeDriver: true }),
-      ]),
+    Animated.parallel([
+      Animated.spring(logoY, { toValue: 0, friction: 10, tension: 200, useNativeDriver: true }),
+      Animated.timing(logoOp, { toValue: 1, duration: 200, useNativeDriver: true }),
     ]).start(() => {
       startIdleAnimations();
     });
@@ -141,8 +121,11 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
     if (hasVisited) {
       loadedRef.current = true;
       startIdleAnimations();
+      startBar(800);
       return;
     }
+
+    startBar(BAR_TOTAL_DURATION);
 
     Animated.sequence([
       Animated.delay(10),
@@ -150,18 +133,26 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
         Animated.spring(catScale, { toValue: 1, friction: 6, tension: 180, useNativeDriver: true }),
         Animated.timing(catOpacity, { toValue: 1, duration: 100, useNativeDriver: true }),
       ]),
-      Animated.spring(catBounce, { toValue: -12, friction: 5, tension: 250, useNativeDriver: true }),
-      Animated.spring(catBounce, { toValue: 0,   friction: 6, tension: 180,  useNativeDriver: true }),
     ]).start(() => {
       hasVisited = true;
-      timeoutRef.current = setTimeout(loadContent, 100);
+      timeoutRef.current = setTimeout(loadContent, 50);
     });
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
+
+  const catX = barProgress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, TRACK_WIDTH - CAT_SIZE],
+    extrapolate: 'clamp',
+  });
+
+  const barWidth = barProgress.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -172,56 +163,40 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
 
       {PAWS.map((p, i) => <FloatingPaw key={i} {...p} />)}
 
-      {/* Logo */}
       <Animated.View style={[styles.logoArea, { opacity: logoOp, transform: [{ translateY: logoY }] }]}>
         <Text style={styles.logoText}>catwise</Text>
       </Animated.View>
 
-      {/* Mascot */}
       <View style={styles.mascotArea}>
         <Animated.View style={[styles.shadowRing, { transform: [{ scale: circlePulse }] }]} />
         <Animated.View style={[
           styles.catWrapper,
           {
             opacity: catOpacity,
-            transform: [{ scale: catScale }, { translateY: catBounce }],
+            transform: [{ scale: catScale }],
           },
         ]}>
           <View style={styles.catCircle}>
-            <Animated.Image
-              source={IMAGES[currentIndex]}
-              style={[styles.catImage, { opacity: imgOpacity }]}
+            <Image
+              source={CAT_IMG}
+              style={styles.catImage}
               resizeMode="contain"
             />
           </View>
         </Animated.View>
       </View>
 
-      {/* White area content — centered */}
       <View style={styles.whiteContent}>
-
-        <Animated.View style={[styles.tagArea, { opacity: tagOp, transform: [{ translateY: tagY }] }]}>
-          <Text style={styles.tagTitle}>Your complete guide{'\n'}to cat adoption</Text>
-        </Animated.View>
-
-        <Animated.View style={[styles.pillsRow, { opacity: pillsOp }]}>
-          {['Food', 'Health', 'Toys', 'Home'].map((label) => (
-            <View key={label} style={styles.pill}>
-              <Text style={styles.pillText}>{label}</Text>
-            </View>
-          ))}
-        </Animated.View>
-
-        <Animated.View style={[styles.btnStack, { opacity: btnOp, transform: [{ translateY: btnY }] }]}>
-          <TouchableOpacity
-            style={styles.ctaPrimary}
-            onPress={() => navigation.navigate('Home')}
-            activeOpacity={0.88}
-          >
-            <Text style={styles.ctaPrimaryText}>Get Started</Text>
-          </TouchableOpacity>
-        </Animated.View>
-
+        <View style={styles.progressArea}>
+          <Animated.Image
+            source={WALKING_CAT}
+            style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
+            resizeMode="contain"
+          />
+          <View style={styles.progressTrack}>
+            <Animated.View style={[styles.progressFill, { width: barWidth }]} />
+          </View>
+        </View>
       </View>
 
     </SafeAreaView>
@@ -235,7 +210,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden',
   },
-
   bgTop: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
@@ -250,19 +224,18 @@ const styles = StyleSheet.create({
     height: H * 0.48,
     backgroundColor: WHITE,
   },
-
   logoArea: {
-    marginTop: 24,
+    marginTop: H * 0.08,
     alignItems: 'center',
   },
-    logoText: {
+  logoText: {
     fontFamily: 'Avenir',
     fontSize: 28, fontWeight: '900',
     color: INK, letterSpacing: -0.5,
   },
-
   mascotArea: {
-    height: H * 0.32,
+    position: 'absolute',
+    top: H * 0.22,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -285,54 +258,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,250,245,0.3)',
   },
   catImage: { width: '100%', height: '100%' },
-
   whiteContent: {
-    flex: 1,
+    position: 'absolute',
+    bottom: H * 0.15,
     width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    gap: 18,
+    paddingHorizontal: 40,
   },
-
-  tagArea: {
-    alignItems: 'center',
-  },
-  tagTitle: {
-    fontFamily: 'Avenir',
-    fontSize: 24, fontWeight: '900',
-    color: INK, letterSpacing: -0.5,
-    textAlign: 'center', lineHeight: 32,
-  },
-
-  pillsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    justifyContent: 'center',
-  },
-  pill: {
-    backgroundColor: 'rgba(44,26,14,0.06)',
-    borderRadius: 50, paddingVertical: 7, paddingHorizontal: 14,
-  },
-  pillText: { fontSize: 13, fontWeight: '600', color: INK, fontFamily: 'Avenir' },
-
-  btnStack: {
+  progressArea: {
     width: '100%',
-    marginTop: 35,
   },
-  ctaPrimary: {
-    width: '100%', paddingVertical: 18,
-    backgroundColor: GREEN, borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: GREEN,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35, shadowRadius: 12, elevation: 6,
-    borderBottomWidth: 4, borderBottomColor: '#5A8F50',
+  progressCat: {
+    position: 'absolute',
+    width: CAT_SIZE,
+    height: CAT_SIZE,
+    top: -CAT_SIZE + 6,
+    zIndex: 1,
   },
-  ctaPrimaryText: {
-    color: WHITE, fontSize: 17,
-    fontWeight: '800', letterSpacing: 0.3,
-    fontFamily: 'Avenir',
+  progressTrack: {
+    height: 10,
+    backgroundColor: 'rgba(44,26,14,0.1)',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: GREEN,
+    borderRadius: 5,
   },
 });

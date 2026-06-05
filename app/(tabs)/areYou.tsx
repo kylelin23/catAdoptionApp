@@ -88,11 +88,8 @@ export default function AreYou({ navigation }: { navigation: any }) {
       <View style={styles.bgTop} />
       <View style={styles.bgBottom} />
 
-      {/* Top row — back + stories */}
+      {/* Top row — stories only */}
       <View style={styles.topRow}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-          <Text style={styles.backText}>{"<"}</Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={styles.storiesBtn}
           onPress={() => navigation.navigate('Cat Stories')}
@@ -156,22 +153,10 @@ const styles = StyleSheet.create({
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginHorizontal: 20,
     marginTop: 10,
     marginBottom: 4,
-  },
-
-  backBtn: {
-    width: 34, height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(44,26,14,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backText: {
-    fontSize: 18, fontWeight: '700',
-    color: INK, lineHeight: 22,
   },
 
   storiesBtn: {
