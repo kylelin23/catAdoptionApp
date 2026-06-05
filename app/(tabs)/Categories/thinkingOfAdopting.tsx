@@ -21,7 +21,7 @@ export default function ThinkingOfAdopting({ navigation }: { navigation: any }) 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     { key: 'info',   title: 'Info'   },
-    { key: 'trivia', title: 'Trivia' },
+    { key: 'trivia', title: 'Checklist' },
     { key: 'faqs',   title: 'FAQs'   },
   ]);
   const [triviaKey, setTriviaKey] = React.useState(0);

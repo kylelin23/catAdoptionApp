@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Text, Dimensions, View, StyleSheet, TouchableOpacity, Animated, Image, SafeAreaView } from 'react-native';
+import { Text, Dimensions, View, StyleSheet, TouchableOpacity, Animated, Image, SafeAreaView, ScrollView } from 'react-native';
 import quiz from '../../../app/data/thinkingOfAdopting/trivia';
 
 const INK        = '#2C1A0E';
@@ -8,8 +8,8 @@ const WHITE      = '#FFFAF5';
 const GREEN      = '#7BAE6E';
 const GREEN_DARK = '#5A8F50';
 const WARM       = '#D4956A';
-const screenWidth = Dimensions.get('window').width;
 
+const screenWidth = Dimensions.get('window').width;
 const CAT = require('../../../assets/images/walkingCat.png');
 
 export default function Trivia() {
@@ -65,14 +65,11 @@ export default function Trivia() {
         alert(`Question ${firstUnanswered + 1} still needs an answer!`);
         return;
       }
-
       const finalTotal = questions.reduce((a, b) => a + b, 0);
-
       let resultText = '';
       if (finalTotal < 16)      resultText = 'Not Yet Ready. Nothing is ever a complete "no" but we want you to feel ready and be ready.';
       else if (finalTotal < 22) resultText = 'Almost There. Go cat sit or hang out at a shelter before taking the plunge.';
       else                      resultText = 'Ready to Adopt! You probably already have a name ready!';
-
       setResult(resultText);
       setShowResult(true);
     }
@@ -93,6 +90,7 @@ export default function Trivia() {
   const currentAnswer = questions[currentQ];
   const question      = quiz[currentQ];
   const isLast        = currentQ === quiz.length - 1;
+  const isAnswered    = currentAnswer !== 0;
 
   if (!question) return null;
 
@@ -120,66 +118,71 @@ export default function Trivia() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
 
-      <View style={styles.topSection}>
-        <View style={styles.progressArea}>
-          <Animated.Image
-            source={CAT}
-            style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
-            resizeMode="contain"
-          />
-          <View style={styles.progressTrack}>
-            <Animated.View style={[styles.progressFill, {
-              width: catProgress.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0%', '100%'],
-                extrapolate: 'clamp',
-              }),
-            }]} />
+        {/* Top layer layout style position: Cat progress track + Question layout */}
+        <View style={styles.topSection}>
+          <View style={styles.progressArea}>
+            <Animated.Image
+              source={CAT}
+              style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
+              resizeMode="contain"
+            />
+            <View style={styles.progressTrack}>
+              <Animated.View style={[styles.progressFill, {
+                width: catProgress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0%', '100%'],
+                  extrapolate: 'clamp',
+                }),
+              }]} />
+            </View>
           </View>
+          <Animated.View style={{ transform: [{ translateX: slideAnim }] }}>
+            <Text style={styles.questionText}>{question.question}</Text>
+          </Animated.View>
         </View>
 
-        <Animated.View style={{ transform: [{ translateX: slideAnim }] }}>
-          <Text style={styles.questionText}>{question.question}</Text>
-        </Animated.View>
-      </View>
-
-      {/* Centered Answers Container */}
-      <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
-        {[
-          { label: question.answer1, points: 3 },
-          { label: question.answer2, points: 2 },
-          { label: question.answer3, points: 1 },
-        ].map((answer, aIndex) => {
-          const isSelected = currentAnswer === answer.points;
-          return (
-            <TouchableOpacity
-              key={aIndex}
-              style={[styles.answerBtn, isSelected && styles.answerBtnSelected]}
-              onPress={() => selectAnswer(answer.points)}
-              activeOpacity={0.85}
-            >
-              <Text style={[styles.answerText, isSelected && styles.answerTextSelected, { flex: 1 }]}>
-                {answer.label}
-              </Text>
-              {isSelected && (
+        {/* Dynamic center flex layout block formatting choice elements vertically down page wrapper */}
+        <View style={styles.centeredBody}>
+          <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
+            {[
+              { label: question.answer1, points: 3 },
+              { label: question.answer2, points: 2 },
+              { label: question.answer3, points: 1 },
+            ].map((answer, aIndex) => {
+              const isSelected = currentAnswer === answer.points;
+              return (
                 <TouchableOpacity
-                  style={styles.arrowBadge}
-                  onPress={handleCheck}
-                  activeOpacity={0.8}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  key={aIndex}
+                  style={[styles.answerBtn, isSelected && styles.answerBtnSelected]}
+                  onPress={() => selectAnswer(answer.points)}
+                  activeOpacity={0.85}
                 >
-                  <Text style={styles.arrowBadgeText}>{isLast ? '✓' : '→'}</Text>
+                  <Text style={[styles.answerText, isSelected && styles.answerTextSelected, { flex: 1 }]}>
+                    {answer.label}
+                  </Text>
                 </TouchableOpacity>
-              )}
-            </TouchableOpacity>
-          );
-        })}
-      </Animated.View>
+              );
+            })}
+          </Animated.View>
+        </View>
 
-      {/* Spacer to keep layout stable */}
-      <View style={styles.bottomSection} />
+      </ScrollView>
 
+      {/* Persistent platform bottom locked interactive actionable response button layout component stack layer */}
+      <View style={styles.bottomSection}>
+        <TouchableOpacity
+          style={[styles.nextBtn, !isAnswered && styles.nextBtnDisabled]}
+          onPress={handleCheck}
+          disabled={!isAnswered}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.nextBtnText}>
+            {isLast ? 'Finish Quiz' : 'Next'}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -189,10 +192,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
+  scrollContainer: {
+    flexGrow: 1,
+  },
   topSection: {
     paddingHorizontal: 22,
     paddingTop: 50,
-    gap: 16,
+    paddingBottom: 10,
+  },
+  centeredBody: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingBottom: 20,
   },
   progressArea: {
     marginBottom: 4,
@@ -219,16 +230,12 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: INK,
     lineHeight: 26,
+    marginTop: 10,
   },
-
-  // FIXED SECTION: Added justifyContent: 'center'
   answersArea: {
-    flex: 1,
     paddingHorizontal: 22,
-    justifyContent: 'center',
     gap: 10,
   },
-
   answerBtn: {
     backgroundColor: WHITE,
     borderRadius: 16,
@@ -261,26 +268,38 @@ const styles = StyleSheet.create({
     color: INK,
     fontWeight: '800',
   },
-  arrowBadge: {
-    width: 32, height: 32,
-    borderRadius: 10,
+  bottomSection: {
+    paddingHorizontal: 22,
+    paddingBottom: 20,
+    paddingTop: 10,
+    backgroundColor: 'white',
+  },
+  nextBtn: {
     backgroundColor: GREEN,
+    borderRadius: 16,
+    paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 10,
-    flexShrink: 0,
-    borderBottomWidth: 3,
+    borderBottomWidth: 4,
     borderBottomColor: GREEN_DARK,
+    shadowColor: GREEN,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  arrowBadgeText: {
+  nextBtnDisabled: {
+    backgroundColor: '#D1E4CB',
+    borderBottomColor: '#A3C29B',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  nextBtnText: {
+    fontFamily: 'Avenir',
+    color: WHITE,
     fontSize: 16,
     fontWeight: '800',
-    color: WHITE,
-    lineHeight: 20,
-  },
-  bottomSection: {
-    paddingBottom: 28,
-    minHeight: 28,
+    letterSpacing: 0.5,
   },
   resultScreen: {
     flex: 1,

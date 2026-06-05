@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Text, Dimensions, View, StyleSheet, TouchableOpacity, Animated, Image, SafeAreaView } from 'react-native';
+import { Text, Dimensions, View, StyleSheet, TouchableOpacity, Animated, Image, SafeAreaView, ScrollView } from 'react-native';
 import quiz, { answers } from '../../../app/data/newCatParents/trivia';
 
 const INK        = '#2C1A0E';
@@ -184,86 +184,102 @@ export default function Trivia() {
     return [styles.answerText];
   };
 
+  const isSelected = selected !== '';
+  const getBottomButtonProps = () => {
+    if (!checked) {
+      return {
+        text: 'Check Answer',
+        onPress: handleCheck,
+        disabled: !isSelected,
+        style: [styles.nextBtn, !isSelected && styles.nextBtnDisabled]
+      };
+    }
+    return {
+      text: isLast ? 'Finish Quiz' : 'Next Question',
+      onPress: handleNext,
+      disabled: false,
+      style: [
+        styles.nextBtn,
+        isCorrect ? styles.nextBtnCorrect : styles.nextBtnWrong
+      ]
+    };
+  };
+
+  const buttonProps = getBottomButtonProps();
+
   return (
     <SafeAreaView style={styles.safeArea}>
-
       <Confetti show={showConfetti} />
 
-      {/* Progress bar + question */}
-      <View style={styles.topSection}>
-        <View style={styles.progressArea}>
-          <Animated.Image
-            source={CAT}
-            style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
-            resizeMode="contain"
-          />
-          <View style={styles.progressTrack}>
-            <Animated.View style={[styles.progressFill, {
-              width: catProgress.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0%', '100%'],
-                extrapolate: 'clamp',
-              }),
-            }]} />
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+
+        {/* Top layer: Cat progress track + Question statement */}
+        <View style={styles.topSection}>
+          <View style={styles.progressArea}>
+            <Animated.Image
+              source={CAT}
+              style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
+              resizeMode="contain"
+            />
+            <View style={styles.progressTrack}>
+              <Animated.View style={[styles.progressFill, {
+                width: catProgress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0%', '100%'],
+                  extrapolate: 'clamp',
+                }),
+              }]} />
+            </View>
           </View>
+
+          <Animated.View style={{ transform: [{ translateX: slideAnim }] }}>
+            <Text style={styles.questionText}>{currentQ_.question}</Text>
+          </Animated.View>
         </View>
 
-        <Animated.View style={{ transform: [{ translateX: slideAnim }] }}>
-          <Text style={styles.questionText}>{currentQ_.question}</Text>
-        </Animated.View>
-      </View>
-
-      {/* Answers + result banner */}
-      <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
-
-        {ANSWERS.map((answer) => (
-          <TouchableOpacity
-            key={answer.key}
-            style={[getAnswerStyle(answer.key), styles.answerRow]}
-            onPress={() => handleSelect(answer.key)}
-            activeOpacity={0.85}
-            disabled={checked}
-          >
-            <Text style={[...getAnswerTextStyle(answer.key), { flex: 1 }]}>{answer.label}</Text>
-            {!checked && selected === answer.key && (
+        {/* Centered Area: Houses only the choices cleanly centered vertically */}
+        <View style={styles.centeredBody}>
+          <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
+            {ANSWERS.map((answer) => (
               <TouchableOpacity
-                style={styles.arrowBadge}
-                onPress={handleCheck}
-                activeOpacity={0.8}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                key={answer.key}
+                style={[getAnswerStyle(answer.key), styles.answerRow]}
+                onPress={() => handleSelect(answer.key)}
+                activeOpacity={0.85}
+                disabled={checked}
               >
-                <Text style={styles.arrowBadgeText}>→</Text>
+                <Text style={[...getAnswerTextStyle(answer.key), { flex: 1 }]}>{answer.label}</Text>
               </TouchableOpacity>
-            )}
-          </TouchableOpacity>
-        ))}
+            ))}
+          </Animated.View>
+        </View>
 
-        {/* Fixed height container — banner appears without shifting answers */}
+      </ScrollView>
+
+      {/* Fixed bottom layout layer housing the result banner right above the primary interactive button */}
+      <View style={styles.bottomSection}>
+        {/* Banner message container handles visibility transitions without snapping layout shifts */}
         <View style={styles.resultBannerContainer}>
           {checked && (
             <View style={[styles.resultBanner, isCorrect ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
-              <View style={{ width: 32 }} />
               <Text style={[styles.resultBannerText, { color: isCorrect ? GREEN : RED, flex: 1, textAlign: 'center' }]}>
                 {isCorrect ? 'Correct!' : 'Not quite!'}
               </Text>
-              <TouchableOpacity
-                style={[styles.arrowBadge, {
-                  backgroundColor: isCorrect ? GREEN : RED,
-                  borderBottomColor: isCorrect ? GREEN_DARK : RED_DARK,
-                  marginLeft: 0,
-                }]}
-                onPress={handleNext}
-                activeOpacity={0.8}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Text style={styles.arrowBadgeText}>{isLast ? '✓' : '→'}</Text>
-              </TouchableOpacity>
             </View>
           )}
         </View>
 
-      </Animated.View>
-
+        <TouchableOpacity
+          style={buttonProps.style}
+          onPress={buttonProps.onPress}
+          disabled={buttonProps.disabled}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.nextBtnText}>
+            {buttonProps.text}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -273,13 +289,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
+  scrollContainer: {
+    flexGrow: 1,
+  },
   topSection: {
     paddingHorizontal: 22,
     paddingTop: 50,
-    gap: 16,
+    paddingBottom: 10,
   },
-
+  centeredBody: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingBottom: 20,
+  },
   progressArea: { marginBottom: 4 },
   progressTrack: {
     height: 10,
@@ -297,27 +319,22 @@ const styles = StyleSheet.create({
     width: 36, height: 36,
     top: -30,
   },
-
   questionText: {
     fontFamily: 'Avenir',
     fontSize: 18,
     fontWeight: '900',
     color: INK,
     lineHeight: 26,
+    marginTop: 10,
   },
-
   answersArea: {
-    flex: 1,
     paddingHorizontal: 22,
-    justifyContent: 'center',
     gap: 10,
   },
-
   answerRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   answerBtn: {
     backgroundColor: WHITE,
     borderRadius: 16,
@@ -347,7 +364,6 @@ const styles = StyleSheet.create({
     borderBottomColor: RED_DARK,
     backgroundColor: 'rgba(196,122,69,0.12)',
   },
-
   answerText: {
     fontFamily: 'Avenir',
     fontSize: 14,
@@ -359,30 +375,10 @@ const styles = StyleSheet.create({
     color: INK,
     fontWeight: '800',
   },
-
-  arrowBadge: {
-    width: 32, height: 32,
-    borderRadius: 10,
-    backgroundColor: GREEN,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 10,
-    flexShrink: 0,
-    borderBottomWidth: 3,
-    borderBottomColor: GREEN_DARK,
-  },
-  arrowBadgeText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: WHITE,
-    lineHeight: 20,
-  },
-
-  // Fixed height — always reserves space so answers never shift
   resultBannerContainer: {
-    height: 72,
+    height: 60,
     justifyContent: 'center',
-    marginTop: 4,
+    marginBottom: 12, // Spaces the banner exactly above the button
   },
   resultBanner: {
     width: '100%',
@@ -410,7 +406,47 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 0.3,
   },
-
+  bottomSection: {
+    paddingHorizontal: 22,
+    paddingBottom: 20,
+    paddingTop: 10,
+    backgroundColor: '#FFFFFF',
+  },
+  nextBtn: {
+    backgroundColor: GREEN,
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: GREEN_DARK,
+    shadowColor: GREEN,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  nextBtnDisabled: {
+    backgroundColor: '#D1E4CB',
+    borderBottomColor: '#A3C29B',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  nextBtnCorrect: {
+    backgroundColor: GREEN,
+    borderBottomColor: GREEN_DARK,
+  },
+  nextBtnWrong: {
+    backgroundColor: RED,
+    borderBottomColor: RED_DARK,
+  },
+  nextBtnText: {
+    fontFamily: 'Avenir',
+    color: WHITE,
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
   resultScreen: {
     flex: 1,
     backgroundColor: WHITE,
