@@ -16,7 +16,7 @@ const GREEN_DARK = '#5A8F50';
 const WARM       = '#D4956A';
 const WARM_DARK  = '#A86E45';
 
-const YOUR_EMAIL = 'catwise78@gmail.com'; // replace with your email
+const YOUR_EMAIL = 'catwise78@gmail.com';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -44,6 +44,8 @@ const FIELDS = [
   { key: 'memorable_story', label: 'A memorable story',               placeholder: 'Something unforgettable…',         required: false, multiline: true  },
   { key: 'best_part',       label: 'Best part of being a cat parent', placeholder: 'What do you love most?',           required: false, multiline: true  },
 ];
+
+const EMPTY_FORM = { name: '', cat_name: '', how_met: '', cat_description: '', memorable_story: '', best_part: '' };
 
 function ConfettiPiece({ color, delay }: { color: string; delay: number }) {
   const y       = useRef(new Animated.Value(-20)).current;
@@ -141,12 +143,23 @@ function AnimatedField({
 }
 
 function StoryCard({ item, index }: { item: Story; index: number }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded]     = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
   const avatarColor = AVATAR_COLORS[item.id % AVATAR_COLORS.length];
   const fadeAnim  = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(24)).current;
 
   const hasAnyContent = item.how_met || item.memorable_story || item.cat_description || item.best_part;
+
+  const photoUrls: string[] = (() => {
+    if (!item.photos) return [];
+    try {
+      const parsed = JSON.parse(item.photos);
+      return Array.isArray(parsed) ? parsed : [item.photos];
+    } catch {
+      return [item.photos];
+    }
+  })();
 
   useEffect(() => {
     Animated.sequence([
@@ -163,11 +176,8 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
     const body = encodeURIComponent(
       `Hi,\n\nI'd like to request an edit or removal of my cat story.\n\nStory details:\n- Cat name: ${item.cat_name}\n- Submitted by: ${item.name || 'Anonymous'}\n- Story ID: ${item.id}\n\nRequest:\n[Please describe what you'd like changed or removed]\n\nThanks!`
     );
-
-    // Try Gmail app first, fall back to mailto
     const gmailUrl = `googlegmail://co?to=${YOUR_EMAIL}&subject=${subject}&body=${body}`;
     const mailUrl  = `mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`;
-
     Linking.canOpenURL(gmailUrl).then(supported => {
       Linking.openURL(supported ? gmailUrl : mailUrl);
     });
@@ -187,9 +197,30 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
           <Text style={styles.expandIcon}>{expanded ? '↑' : '↓'}</Text>
         </View>
 
-        {item.photos ? (
-          <Image source={{ uri: item.photos }} style={styles.storyPhoto} resizeMode="cover" />
-        ) : null}
+        {photoUrls.length > 0 && (
+          <View>
+            <Image source={{ uri: photoUrls[photoIndex] }} style={styles.storyPhoto} resizeMode="cover" />
+            {photoUrls.length > 1 && (
+              <View style={styles.photoNav}>
+                <TouchableOpacity
+                  style={[styles.photoNavBtn, photoIndex === 0 && styles.photoNavBtnDisabled]}
+                  onPress={(e) => { e.stopPropagation?.(); setPhotoIndex(i => Math.max(0, i - 1)); }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.photoNavText}>‹</Text>
+                </TouchableOpacity>
+                <Text style={styles.photoNavCount}>{photoIndex + 1} / {photoUrls.length}</Text>
+                <TouchableOpacity
+                  style={[styles.photoNavBtn, photoIndex === photoUrls.length - 1 && styles.photoNavBtnDisabled]}
+                  onPress={(e) => { e.stopPropagation?.(); setPhotoIndex(i => Math.min(photoUrls.length - 1, i + 1)); }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.photoNavText}>›</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
 
         {!expanded && (
           item.how_met ? (
@@ -232,13 +263,7 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
             {!hasAnyContent && (
               <Text style={styles.noDescription}>No description</Text>
             )}
-
-            {/* Contact button */}
-            <TouchableOpacity
-              style={styles.contactBtn}
-              onPress={handleContact}
-              activeOpacity={0.8}
-            >
+            <TouchableOpacity style={styles.contactBtn} onPress={handleContact} activeOpacity={0.8}>
               <Text style={styles.contactBtnText}>Request edit or removal</Text>
             </TouchableOpacity>
           </View>
@@ -253,18 +278,16 @@ function StoryModal({
 }: {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (form: Record<string, string>, photoUrl: string | null) => Promise<void>;
+  onSubmit: (form: Record<string, string>, photoUrls: string[]) => Promise<void>;
   loading: boolean;
 }) {
   const slideAnim    = useRef(new Animated.Value(700)).current;
   const backdropAnim = useRef(new Animated.Value(0)).current;
 
-  const [form, setForm]         = useState<Record<string, string>>({
-    name: '', cat_name: '', how_met: '',
-    cat_description: '', memorable_story: '', best_part: '',
-  });
-  const [photoUri, setPhotoUri]   = useState<string | null>(null);
+  const [form, setForm]           = useState<Record<string, string>>(EMPTY_FORM);
+  const [photoUris, setPhotoUris] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [picking, setPicking]     = useState(false);
 
   useEffect(() => {
     if (visible) {
@@ -276,25 +299,38 @@ function StoryModal({
       Animated.parallel([
         Animated.timing(slideAnim,    { toValue: 700, duration: 240, useNativeDriver: true }),
         Animated.timing(backdropAnim, { toValue: 0,   duration: 200, useNativeDriver: true }),
-      ]).start();
+      ]).start(() => {
+        // ✅ defer state updates out of animation callback
+        setTimeout(() => {
+          setForm(EMPTY_FORM);
+          setPhotoUris([]);
+        }, 0);
+      });
     }
   }, [visible]);
 
-  const pickPhoto = async () => {
+  const pickPhotos = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') return;
+    setPicking(true);
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'] as any,
-      allowsEditing: true,
-      aspect: [4, 3],
+      allowsMultipleSelection: true,
       quality: 0.7,
     });
-    if (!result.canceled) setPhotoUri(result.assets[0].uri);
+    setPicking(false);
+    if (!result.canceled) {
+      setPhotoUris(prev => [...prev, ...result.assets.map(a => a.uri)]);
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotoUris(prev => prev.filter((_, i) => i !== index));
   };
 
   const uploadPhoto = async (uri: string): Promise<string | null> => {
     try {
-      const fileName = `${Date.now()}.jpg`;
+      const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
       const formData = new FormData();
       formData.append('file', { uri, name: fileName, type: 'image/jpeg' } as any);
       const { error } = await supabase.storage
@@ -313,15 +349,18 @@ function StoryModal({
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
-    let photoUrl: string | null = null;
-    if (photoUri) {
+    let uploadedUrls: string[] = [];
+    if (photoUris.length > 0) {
       setUploading(true);
-      photoUrl = await uploadPhoto(photoUri);
+      const results = await Promise.all(photoUris.map(uri => uploadPhoto(uri)));
+      uploadedUrls = results.filter(Boolean) as string[];
       setUploading(false);
     }
-    await onSubmit(form, photoUrl);
-    setForm({ name: '', cat_name: '', how_met: '', cat_description: '', memorable_story: '', best_part: '' });
-    setPhotoUri(null);
+    await onSubmit(form, uploadedUrls);
+    setTimeout(() => {
+      setForm(EMPTY_FORM);
+      setPhotoUris([]);
+    }, 0);
   };
 
   return (
@@ -366,29 +405,71 @@ function StoryModal({
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>
-                Photo <Text style={{ color: INK_SOFT, textTransform: 'none', letterSpacing: 0, fontWeight: '400' }}>(optional)</Text>
+                Photos <Text style={{ color: INK_SOFT, textTransform: 'none', letterSpacing: 0, fontWeight: '400' }}>(optional)</Text>
               </Text>
-              <TouchableOpacity style={styles.photoPicker} onPress={pickPhoto} activeOpacity={0.85}>
-                {photoUri ? (
-                  <>
-                    <Image source={{ uri: photoUri }} style={styles.photoPreview} resizeMode="cover" />
-                    <View style={styles.photoOverlay}>
-                      <Text style={styles.photoOverlayText}>Tap to change</Text>
+
+              {photoUris.length > 0 && (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.photoRow}
+                  contentContainerStyle={styles.photoRowContent}
+                >
+                  {photoUris.map((uri, i) => (
+                    <View key={i} style={styles.photoThumbWrapper}>
+                      <Image source={{ uri }} style={styles.photoThumb} resizeMode="cover" />
+                      <TouchableOpacity
+                        style={styles.photoRemoveBtn}
+                        onPress={() => removePhoto(i)}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={styles.photoRemoveText}>✕</Text>
+                      </TouchableOpacity>
                     </View>
-                  </>
-                ) : (
-                  <View style={styles.photoEmpty}>
-                    <Text style={styles.photoEmptyIcon}>+</Text>
-                    <Text style={styles.photoEmptyText}>Add a photo of your cat</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
+                  ))}
+                  <TouchableOpacity
+                    style={[styles.photoAddMore, picking && styles.photoAddMoreLoading]}
+                    onPress={pickPhotos}
+                    activeOpacity={0.8}
+                    disabled={picking}
+                  >
+                    {picking
+                      ? <ActivityIndicator color={INK_SOFT} size="small" />
+                      : <>
+                          <Text style={styles.photoEmptyIcon}>+</Text>
+                          <Text style={styles.photoAddMoreText}>Add more</Text>
+                        </>
+                    }
+                  </TouchableOpacity>
+                </ScrollView>
+              )}
+
+              {photoUris.length === 0 && (
+                <TouchableOpacity
+                  style={[styles.photoPicker, picking && styles.photoPickerLoading]}
+                  onPress={pickPhotos}
+                  activeOpacity={0.85}
+                  disabled={picking}
+                >
+                  {picking ? (
+                    <View style={styles.photoEmpty}>
+                      <ActivityIndicator color={INK_SOFT} size="small" />
+                      <Text style={styles.photoEmptyText}>Opening library…</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.photoEmpty}>
+                      <Text style={styles.photoEmptyIcon}>+</Text>
+                      <Text style={styles.photoEmptyText}>Add photos of your cat</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              )}
             </View>
 
             <TouchableOpacity
-              style={[styles.submitBtn, (!canSubmit || uploading) && styles.submitBtnDisabled]}
+              style={[styles.submitBtn, (!canSubmit || uploading || picking) && styles.submitBtnDisabled]}
               onPress={handleSubmit}
-              disabled={loading || uploading || !canSubmit}
+              disabled={loading || uploading || !canSubmit || picking}
               activeOpacity={0.85}
             >
               {loading || uploading
@@ -466,7 +547,7 @@ export default function CatStories({ navigation }: { navigation: any }) {
 
   useEffect(() => { fetchStories(); }, []);
 
-  const handleSubmit = async (form: Record<string, string>, photoUrl: string | null): Promise<void> => {
+  const handleSubmit = async (form: Record<string, string>, photoUrls: string[]): Promise<void> => {
     setLoading(true);
     const { error } = await supabase.from('cat_stories').insert([{
       name:            form.name.trim() || 'Anonymous',
@@ -475,7 +556,7 @@ export default function CatStories({ navigation }: { navigation: any }) {
       cat_description: form.cat_description.trim(),
       memorable_story: form.memorable_story.trim(),
       best_part:       form.best_part.trim(),
-      photos:          photoUrl,
+      photos:          photoUrls.length > 0 ? JSON.stringify(photoUrls) : null,
     }]);
     setLoading(false);
     if (!error) {
@@ -591,7 +672,12 @@ const styles = StyleSheet.create({
   storyName: { fontFamily: 'Avenir', fontSize: 14, fontWeight: '900', color: INK },
   storyCatBadge: { fontFamily: 'Avenir', fontSize: 12, fontWeight: '400', color: INK_SOFT },
   expandIcon: { fontSize: 18, color: INK_SOFT, fontWeight: '600' },
-  storyPhoto: { width: '100%', height: 180, borderRadius: 14, marginTop: 4 },
+  storyPhoto: { width: '100%', height: 200, borderRadius: 14, marginTop: 4 },
+  photoNav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 8 },
+  photoNavBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(44,26,14,0.08)', alignItems: 'center', justifyContent: 'center' },
+  photoNavBtnDisabled: { opacity: 0.3 },
+  photoNavText: { fontSize: 20, fontWeight: '700', color: INK, lineHeight: 24 },
+  photoNavCount: { fontFamily: 'Avenir', fontSize: 12, fontWeight: '600', color: INK_SOFT },
   storyPreview: { fontFamily: 'Avenir', fontSize: 13, fontWeight: '400', color: INK_SOFT, lineHeight: 20 },
   noDescription: { fontFamily: 'Avenir', fontSize: 13, fontWeight: '400', color: 'rgba(44,26,14,0.3)', lineHeight: 20, fontStyle: 'italic' },
   expandedContent: { gap: 12, marginTop: 4 },
@@ -600,24 +686,8 @@ const styles = StyleSheet.create({
   storySectionText: { fontFamily: 'Avenir', fontSize: 13, fontWeight: '400', color: INK_SOFT, lineHeight: 20 },
   bestPartSection: { backgroundColor: 'rgba(123,174,110,0.08)', borderWidth: 1.5, borderColor: 'rgba(123,174,110,0.3)' },
   bestPartText: { fontFamily: 'Avenir', fontSize: 14, fontWeight: '700', color: INK, lineHeight: 22, fontStyle: 'italic' },
-
-  contactBtn: {
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(44,26,14,0.12)',
-    backgroundColor: 'rgba(44,26,14,0.04)',
-    marginTop: 4,
-  },
-  contactBtnText: {
-    fontFamily: 'Avenir',
-    fontSize: 12,
-    fontWeight: '700',
-    color: INK_SOFT,
-    letterSpacing: 0.2,
-  },
+  contactBtn: { borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, alignItems: 'center', borderWidth: 1.5, borderColor: 'rgba(44,26,14,0.12)', backgroundColor: 'rgba(44,26,14,0.04)', marginTop: 4 },
+  contactBtnText: { fontFamily: 'Avenir', fontSize: 12, fontWeight: '700', color: INK_SOFT, letterSpacing: 0.2 },
 
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)' },
   backdropDismiss: { position: 'absolute', top: 0, left: 0, right: 0, bottom: '30%' },
@@ -637,13 +707,21 @@ const styles = StyleSheet.create({
   input: { fontFamily: 'Avenir', fontSize: 14, fontWeight: '500', color: INK, backgroundColor: 'rgba(44,26,14,0.04)', borderRadius: 12, padding: 12, borderWidth: 1.5, borderColor: 'rgba(44,26,14,0.1)' },
   inputMultiline: { height: 80, paddingTop: 12 },
 
-  photoPicker: { height: 150, borderRadius: 16, borderWidth: 1.5, borderColor: 'rgba(44,26,14,0.12)', borderStyle: 'dashed', backgroundColor: 'rgba(44,26,14,0.03)', overflow: 'hidden' },
-  photoPreview: { width: '100%', height: '100%' },
-  photoOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)', alignItems: 'center', justifyContent: 'center' },
-  photoOverlayText: { fontFamily: 'Avenir', fontSize: 13, fontWeight: '700', color: WHITE },
+  photoPicker: { height: 120, borderRadius: 16, borderWidth: 1.5, borderColor: 'rgba(44,26,14,0.12)', borderStyle: 'dashed', backgroundColor: 'rgba(44,26,14,0.03)', overflow: 'hidden' },
+  photoPickerLoading: { opacity: 0.6 },
   photoEmpty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 6 },
   photoEmptyIcon: { fontSize: 28, color: INK_SOFT, fontWeight: '300' },
   photoEmptyText: { fontFamily: 'Avenir', fontSize: 13, fontWeight: '600', color: INK_SOFT },
+
+  photoRow: { overflow: 'visible' },
+  photoRowContent: { flexDirection: 'row', paddingTop: 10, paddingBottom: 4, paddingRight: 10 },
+  photoThumbWrapper: { marginRight: 10, position: 'relative' },
+  photoThumb: { width: 90, height: 90, borderRadius: 12 },
+  photoRemoveBtn: { position: 'absolute', top: -8, right: -8, width: 22, height: 22, borderRadius: 11, backgroundColor: INK, alignItems: 'center', justifyContent: 'center', zIndex: 10 },
+  photoRemoveText: { fontSize: 10, fontWeight: '800', color: WHITE },
+  photoAddMore: { width: 90, height: 90, borderRadius: 12, borderWidth: 1.5, borderColor: 'rgba(44,26,14,0.12)', borderStyle: 'dashed', backgroundColor: 'rgba(44,26,14,0.03)', alignItems: 'center', justifyContent: 'center', gap: 4 },
+  photoAddMoreLoading: { opacity: 0.6 },
+  photoAddMoreText: { fontFamily: 'Avenir', fontSize: 11, fontWeight: '600', color: INK_SOFT },
 
   submitBtn: { backgroundColor: GREEN, borderRadius: 14, paddingVertical: 16, alignItems: 'center', borderBottomWidth: 4, borderBottomColor: GREEN_DARK },
   submitBtnDisabled: { opacity: 0.4 },
