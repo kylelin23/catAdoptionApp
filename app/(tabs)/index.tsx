@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Text, View, StyleSheet, StatusBar, Image, Animated, Easing, Dimensions, SafeAreaView } from 'react-native';
 
 const { width: W, height: H } = Dimensions.get('window');
@@ -11,6 +11,31 @@ const GREEN = '#7BAE6E';
 const CAT_IMG     = require('../../assets/images/catWave.png');
 const PAW         = require('../../assets/images/paw.png');
 const WALKING_CAT = require('../../assets/images/walkingCat.png');
+
+// A selection of fun facts extracted from your spreadsheet image
+const CAT_FACTS = [
+  "About 80% of orange (ginger) cats are male.",
+  "Calico cats are almost always female — roughly 99.9%.",
+  "Tortoiseshell cats are overwhelmingly female.",
+  "White cats with two blue eyes have a roughly 65–85% chance of being deaf.",
+  "All cats are born with blue eyes — permanent eye color develops between 6–8 weeks of age.",
+  "Kittens are born blind and deaf, with eyes and ears opening around 10–14 days after birth.",
+  "Kittens can't regulate body temperature until about 4 weeks old, relying on mom and littermates for warmth.",
+  "The optimal window for socializing kittens is between 2–7 weeks of age.",
+  "Cats \"slow blink\" as a sign of trust and affection.",
+  "A cat shows you its belly as a sign of trust.",
+  "Cats bring their owners \"gifts\" like prey or toys when they treat you as family.",
+  "Cats chirp and chatter at birds and squirrels through windows.",
+  "Cats rub their faces on people to mark them as safe and familiar.",
+  "Cats always land on their feet thanks to a \"righting reflex\".",
+  "A cat's purr vibrates at 25–150 Hz, known to promote healing.",
+  "Cats have 32 muscles in each ear and can rotate them 180 degrees independently.",
+  "Cats can squeeze through any opening their head fits through, thanks to a highly flexible collarbone.",
+  "All domestic cats share about 95.6% of their DNA with tigers.",
+  "A cat's nose print is as unique as a human fingerprint.",
+  "Cats sleep 12–16 hours a day on average.",
+  "Adult cats almost never meow at other cats."
+];
 
 let hasVisited = false;
 
@@ -71,6 +96,8 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
   const loadedRef    = useRef(false);
   const hasNavigated = useRef(false);
 
+  const [currentFact, setCurrentFact] = useState('');
+
   const catScale    = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
   const catOpacity  = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
   const circlePulse = useRef(new Animated.Value(1)).current;
@@ -118,6 +145,10 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
   };
 
   useEffect(() => {
+    // Select a random fact when the screen is mounted
+    const randomIndex = Math.floor(Math.random() * CAT_FACTS.length);
+    setCurrentFact(CAT_FACTS[randomIndex]);
+
     if (hasVisited) {
       loadedRef.current = true;
       startIdleAnimations();
@@ -187,6 +218,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
       </View>
 
       <View style={styles.whiteContent}>
+        {/* Dynamic fact container placed right above the loading bar */}
+        <View style={styles.factContainer}>
+          <Text style={styles.factLabel}>Did you know?</Text>
+          <Text style={styles.factText}>{currentFact}</Text>
+        </View>
+
         <View style={styles.progressArea}>
           <Animated.Image
             source={WALKING_CAT}
@@ -260,9 +297,30 @@ const styles = StyleSheet.create({
   catImage: { width: '100%', height: '100%' },
   whiteContent: {
     position: 'absolute',
-    bottom: H * 0.15,
+    bottom: H * 0.12,
     width: '100%',
     paddingHorizontal: 40,
+  },
+  factContainer: {
+    marginBottom: 30,
+    alignItems: 'center',
+  },
+  factLabel: {
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: GREEN,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  factText: {
+    fontFamily: 'Avenir',
+    fontSize: 15,
+    color: INK,
+    textAlign: 'center',
+    lineHeight: 22,
+    fontWeight: '500',
   },
   progressArea: {
     width: '100%',
