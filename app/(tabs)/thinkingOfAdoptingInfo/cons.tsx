@@ -316,9 +316,14 @@ const styles = StyleSheet.create({
   catSticker: { width: CARD_HEIGHT * 0.35, height: CARD_HEIGHT * 0.35 },
   tapHint: { backgroundColor: 'rgba(44,26,14,0.1)', borderRadius: 50, paddingVertical: 6, paddingHorizontal: 14 },
   tapHintText: { fontFamily: 'Avenir', fontSize: 11, fontWeight: '700', color: INK, letterSpacing: 0.3 },
-  backHeading: { fontFamily: 'Avenir', fontSize: 20, fontWeight: '900', color: INK, letterSpacing: -0.2, lineHeight: 21, alignSelf: 'stretch' },
-  divider: { height: 1.5, backgroundColor: 'rgba(44,26,14,0.08)', borderRadius: 1, alignSelf: 'stretch' },
-  bulletsArea: { gap: 10, flex: 1, justifyContent: 'center', alignSelf: 'stretch' },
+
+  // FIXED: Added safety top padding and increased multiline line-height
+  backHeading: { fontFamily: 'Avenir', fontSize: 20, fontWeight: '900', color: INK, letterSpacing: -0.2, lineHeight: 24, alignSelf: 'stretch', paddingTop: 8 },
+  // FIXED: Added space below the heading to push the divider down
+  divider: { height: 1.5, backgroundColor: 'rgba(44,26,14,0.08)', borderRadius: 1, alignSelf: 'stretch', marginTop: 10 },
+  // FIXED: Balanced content vertical spacing symmetrically
+  bulletsArea: { gap: 10, flex: 1, justifyContent: 'center', alignSelf: 'stretch', marginVertical: 10 },
+
   bulletRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   bulletPaw: { width: 18, height: 18, tintColor: ORANGE, flexShrink: 0 },
   bulletText: { flex: 1, fontFamily: 'Avenir', fontSize: 17, fontWeight: '400', color: INK_SOFT, lineHeight: 19 },

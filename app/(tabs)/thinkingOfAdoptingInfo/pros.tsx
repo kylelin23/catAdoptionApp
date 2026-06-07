@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: 'white' },
   container: { flex: 1, width: '100%', maxWidth: 380, paddingVertical: 22, alignSelf: 'center', gap: 16 },
   header: { width: CARD_WIDTH, alignSelf: 'center', gap: 10 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', System: 'space-between' },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   backBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(44,26,14,0.08)', alignItems: 'center', justifyContent: 'center' },
   backBtnText: { fontSize: 18, fontWeight: '700', color: INK, lineHeight: 22 },
   headerCenter: { flex: 1, gap: 2 },
@@ -316,9 +316,14 @@ const styles = StyleSheet.create({
   catSticker: { width: CARD_HEIGHT * 0.35, height: CARD_HEIGHT * 0.35 },
   tapHint: { backgroundColor: 'rgba(44,26,14,0.1)', borderRadius: 50, paddingVertical: 6, paddingHorizontal: 14 },
   tapHintText: { fontFamily: 'Avenir', fontSize: 11, fontWeight: '700', color: INK, letterSpacing: 0.3 },
-  backHeading: { fontFamily: 'Avenir', fontSize: 20, fontWeight: '900', color: INK, letterSpacing: -0.2, lineHeight: 21, alignSelf: 'stretch' },
-  divider: { height: 1.5, backgroundColor: 'rgba(44,26,14,0.08)', borderRadius: 1, alignSelf: 'stretch' },
-  bulletsArea: { gap: 10, flex: 1, justifyContent: 'center', alignSelf: 'stretch' },
+
+  // FIXED: added paddingTop and expanded lineHeight for multi-line support
+  backHeading: { fontFamily: 'Avenir', fontSize: 20, fontWeight: '900', color: INK, letterSpacing: -0.2, lineHeight: 24, alignSelf: 'stretch', paddingTop: 8 },
+  // FIXED: added top margin to separate gracefully from heading
+  divider: { height: 1.5, backgroundColor: 'rgba(44,26,14,0.08)', borderRadius: 1, alignSelf: 'stretch', marginTop: 10 },
+  // FIXED: unified spacing with vertical margin to protect layout consistency
+  bulletsArea: { gap: 10, flex: 1, justifyContent: 'center', alignSelf: 'stretch', marginVertical: 10 },
+
   bulletRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   bulletPaw: { width: 18, height: 18, tintColor: GREEN, flexShrink: 0 },
   bulletText: { flex: 1, fontFamily: 'Avenir', fontSize: 17, fontWeight: '400', color: INK_SOFT, lineHeight: 19 },
