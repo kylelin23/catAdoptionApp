@@ -300,7 +300,6 @@ function StoryModal({
         Animated.timing(slideAnim,    { toValue: 700, duration: 240, useNativeDriver: true }),
         Animated.timing(backdropAnim, { toValue: 0,   duration: 200, useNativeDriver: true }),
       ]).start(() => {
-        // ✅ defer state updates out of animation callback
         setTimeout(() => {
           setForm(EMPTY_FORM);
           setPhotoUris([]);
@@ -493,8 +492,6 @@ export default function CatStories({ navigation }: { navigation: any }) {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showModal, setShowModal]       = useState(false);
 
-  const headerY   = useRef(new Animated.Value(-16)).current;
-  const headerOp  = useRef(new Animated.Value(0)).current;
   const promptY   = useRef(new Animated.Value(20)).current;
   const promptOp  = useRef(new Animated.Value(0)).current;
   const sectionY  = useRef(new Animated.Value(20)).current;
@@ -504,10 +501,6 @@ export default function CatStories({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     Animated.sequence([
-      Animated.parallel([
-        Animated.spring(headerY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
-        Animated.timing(headerOp, { toValue: 1, duration: 280, useNativeDriver: true }),
-      ]),
       Animated.parallel([
         Animated.spring(promptY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
         Animated.timing(promptOp, { toValue: 1, duration: 260, useNativeDriver: true }),
@@ -574,17 +567,6 @@ export default function CatStories({ navigation }: { navigation: any }) {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-        <Animated.View style={[styles.header, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-            <Text style={styles.backBtnText}>{"<"}</Text>
-          </TouchableOpacity>
-          <View style={styles.headerText}>
-            <Text style={styles.eyebrow}>COMMUNITY</Text>
-            <Text style={styles.pageTitle}>Cat Stories</Text>
-            <Text style={styles.pageSub}>Real stories from cat parents like you</Text>
-          </View>
-        </Animated.View>
-
         {submitted && (
           <Animated.View style={[styles.successBanner, { opacity: bannerOp, transform: [{ translateY: bannerY }] }]}>
             <Text style={styles.successText}>Your story was shared with the community!</Text>
@@ -636,15 +618,7 @@ export default function CatStories({ navigation }: { navigation: any }) {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: WHITE },
-  scrollContent: { paddingHorizontal: 22, paddingTop: 12, gap: 14 },
-
-  header: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 4 },
-  backBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(44,26,14,0.08)', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 },
-  backBtnText: { fontSize: 18, fontWeight: '700', color: INK, lineHeight: 22 },
-  headerText: { flex: 1, gap: 3 },
-  eyebrow: { fontFamily: 'Avenir', fontSize: 10, fontWeight: '800', color: 'rgba(44,26,14,0.4)', letterSpacing: 2 },
-  pageTitle: { fontFamily: 'Avenir', fontSize: 26, fontWeight: '900', color: INK, letterSpacing: -0.5 },
-  pageSub: { fontFamily: 'Avenir', fontSize: 12, fontWeight: '400', color: INK_SOFT },
+  scrollContent: { paddingHorizontal: 22, paddingTop: 40, gap: 14 },
 
   successBanner: { backgroundColor: 'rgba(123,174,110,0.15)', borderRadius: 14, padding: 14, alignItems: 'center', borderWidth: 2, borderColor: GREEN, borderBottomWidth: 3, borderBottomColor: GREEN_DARK },
   successText: { fontFamily: 'Avenir', fontSize: 14, fontWeight: '800', color: GREEN, textAlign: 'center' },

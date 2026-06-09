@@ -25,6 +25,7 @@ const CATEGORIES = [
   { key: 'thinking', route: 'Thinking of Adopting', title: 'Thinking of Adopting', subtitle: 'Considering getting a cat', color: '#C4DDB0', border: '#7BAE6E', dark: '#5A8F50' },
   { key: 'new',      route: 'New Cat Parents',       title: 'New Cat Parents',       subtitle: 'Just brought a cat home',    color: '#C8D8E8', border: '#7A9BBE', dark: '#5C7A9A' },
   { key: 'parents',  route: 'Cat Parents',            title: 'Cat Parents',            subtitle: 'Already a cat parent',       color: '#F2C9A0', border: '#D4956A', dark: '#A86E45' },
+  { key: 'lovers',   route: 'Cat Lovers',            title: 'Cat Lovers',            subtitle: 'Just obsessed with cats!',   color: '#F9D5D5', border: '#E29A9A', dark: '#B56B6B' },
 ];
 
 function CategoryCard({ cat, index, onPress }: { cat: typeof CATEGORIES[0]; index: number; onPress: () => void }) {
@@ -88,17 +89,11 @@ export default function AreYou({ navigation }: { navigation: any }) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.spring(headerY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
-        Animated.timing(headerOp, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.spring(catScale,   { toValue: 1, friction: 6, tension: 180, useNativeDriver: true }),
-        Animated.timing(catOpacity, { toValue: 1, duration: 200, useNativeDriver: true }),
-      ]),
-      Animated.spring(catBounce, { toValue: -10, friction: 5, tension: 250, useNativeDriver: true }),
-      Animated.spring(catBounce, { toValue: 0,   friction: 6, tension: 180, useNativeDriver: true }),
+    Animated.parallel([
+      Animated.spring(headerY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
+      Animated.timing(headerOp, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.spring(catScale,   { toValue: 1, friction: 6, tension: 180, useNativeDriver: true }),
+      Animated.timing(catOpacity, { toValue: 1, duration: 200, useNativeDriver: true }),
     ]).start(() => {
       Animated.loop(
         Animated.sequence([
@@ -132,18 +127,11 @@ export default function AreYou({ navigation }: { navigation: any }) {
     <View style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Sand section — top inset handled manually */}
+      {/* Sand section */}
       <View style={[styles.sandSection, { paddingTop: insets.top }]}>
 
-        <View style={styles.topRow}>
-          <TouchableOpacity
-            style={styles.storiesBtn}
-            onPress={() => navigation.navigate('Cat Stories')}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.storiesBtnText}>🐾 Stories</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Top spacer container to replace the removed topRow button area */}
+        <View style={styles.topSpacer} />
 
         <Animated.View style={[styles.headerArea, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
           <Text style={styles.eyebrow}>CATWISE</Text>
@@ -170,7 +158,7 @@ export default function AreYou({ navigation }: { navigation: any }) {
         </View>
       </View>
 
-      {/* White section — bottom inset handled manually */}
+      {/* White section */}
       <View style={[styles.whiteSection, { paddingBottom: insets.bottom + 16 }]}>
         {CATEGORIES.map((cat, i) => (
           <CategoryCard
@@ -196,25 +184,9 @@ const styles = StyleSheet.create({
     backgroundColor: SAND,
   },
 
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 20,
+  topSpacer: {
+    height: 14,
     marginTop: 10,
-    marginBottom: 4,
-  },
-
-  storiesBtn: {
-    backgroundColor: 'rgba(44,26,14,0.08)',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  storiesBtnText: {
-    fontFamily: 'Avenir',
-    fontSize: 13, fontWeight: '700',
-    color: INK,
   },
 
   headerArea: {
