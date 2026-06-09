@@ -278,17 +278,17 @@ const styles = StyleSheet.create({
   },
   shadowRing: {
     position: 'absolute',
-    width: 220, height: 220, borderRadius: 110,
+    width: 170, height: 170, borderRadius: 85,  // was 220
     backgroundColor: 'rgba(44,26,14,0.06)',
   },
   catWrapper: {
-    width: 200, height: 200, borderRadius: 100,
+    width: 154, height: 154, borderRadius: 77,  // was 200
     shadowColor: '#A0622A',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.25, shadowRadius: 24, elevation: 12,
   },
   catCircle: {
-    width: 200, height: 200, borderRadius: 100,
+    width: 154, height: 154, borderRadius: 77,  // was 200
     overflow: 'hidden',
     borderWidth: 4,
     borderColor: 'rgba(255,250,245,0.8)',

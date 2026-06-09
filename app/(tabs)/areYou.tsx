@@ -1,8 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   Text, View, StyleSheet, TouchableOpacity,
-  Animated, Dimensions, Image, SafeAreaView,
+  Animated, Dimensions, Image, StatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: W, height: H } = Dimensions.get('window');
 
@@ -12,8 +13,13 @@ const SAND     = '#E8C9A0';
 const WHITE    = '#FFFAF5';
 const GREEN    = '#7BAE6E';
 
-const PAW     = require('../../assets/images/paw.png');
-const CAT_IMG = require('../../assets/images/catWave.png');
+const PAW = require('../../assets/images/paw.png');
+
+const CAT_IMAGES = [
+  require('../../assets/images/catWave.png'),
+  require('../../assets/images/catStretch.png'),
+  require('../../assets/images/cat.png'),
+];
 
 const CATEGORIES = [
   { key: 'thinking', route: 'Thinking of Adopting', title: 'Thinking of Adopting', subtitle: 'Considering getting a cat', color: '#C4DDB0', border: '#7BAE6E', dark: '#5A8F50' },
@@ -68,9 +74,18 @@ function CategoryCard({ cat, index, onPress }: { cat: typeof CATEGORIES[0]; inde
 }
 
 export default function AreYou({ navigation }: { navigation: any }) {
+  const insets = useSafeAreaInsets();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const headerY     = useRef(new Animated.Value(-20)).current;
   const headerOp    = useRef(new Animated.Value(0)).current;
-  const bubbleScale = useRef(new Animated.Value(0)).current;
+  const catScale    = useRef(new Animated.Value(0)).current;
+  const catOpacity  = useRef(new Animated.Value(0)).current;
+  const catBounce   = useRef(new Animated.Value(0)).current;
+  const circlePulse = useRef(new Animated.Value(1)).current;
+  const imgOpacity  = useRef(new Animated.Value(1)).current;
+
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     Animated.sequence([
@@ -78,42 +93,85 @@ export default function AreYou({ navigation }: { navigation: any }) {
         Animated.spring(headerY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
         Animated.timing(headerOp, { toValue: 1, duration: 300, useNativeDriver: true }),
       ]),
-      Animated.spring(bubbleScale, { toValue: 1, friction: 5, tension: 100, useNativeDriver: true }),
-    ]).start();
+      Animated.parallel([
+        Animated.spring(catScale,   { toValue: 1, friction: 6, tension: 180, useNativeDriver: true }),
+        Animated.timing(catOpacity, { toValue: 1, duration: 200, useNativeDriver: true }),
+      ]),
+      Animated.spring(catBounce, { toValue: -10, friction: 5, tension: 250, useNativeDriver: true }),
+      Animated.spring(catBounce, { toValue: 0,   friction: 6, tension: 180, useNativeDriver: true }),
+    ]).start(() => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(catBounce, { toValue: -6, duration: 1000, useNativeDriver: true }),
+          Animated.timing(catBounce, { toValue: 0,  duration: 1000, useNativeDriver: true }),
+        ])
+      ).start();
+
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(circlePulse, { toValue: 1.05, duration: 1200, useNativeDriver: true }),
+          Animated.timing(circlePulse, { toValue: 1,    duration: 1200, useNativeDriver: true }),
+        ])
+      ).start();
+
+      intervalRef.current = setInterval(() => {
+        Animated.timing(imgOpacity, { toValue: 0, duration: 350, useNativeDriver: true })
+          .start(() => {
+            setCurrentIndex(prev => (prev + 1) % CAT_IMAGES.length);
+            Animated.timing(imgOpacity, { toValue: 1, duration: 350, useNativeDriver: true }).start();
+          });
+      }, 2400);
+    });
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
 
-      <View style={styles.bgTop} />
-      <View style={styles.bgBottom} />
+      {/* Sand section — top inset handled manually */}
+      <View style={[styles.sandSection, { paddingTop: insets.top }]}>
 
-      {/* Top row — stories only */}
-      <View style={styles.topRow}>
-        <TouchableOpacity
-          style={styles.storiesBtn}
-          onPress={() => navigation.navigate('Cat Stories')}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.storiesBtnText}>🐾 Stories</Text>
-        </TouchableOpacity>
+        <View style={styles.topRow}>
+          <TouchableOpacity
+            style={styles.storiesBtn}
+            onPress={() => navigation.navigate('Cat Stories')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.storiesBtnText}>🐾 Stories</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Animated.View style={[styles.headerArea, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
+          <Text style={styles.eyebrow}>CATWISE</Text>
+          <Text style={styles.pageTitle}>Who are you?</Text>
+        </Animated.View>
+
+        <View style={styles.mascotArea}>
+          <Animated.View style={[styles.shadowRing, { transform: [{ scale: circlePulse }] }]} />
+          <Animated.View style={[
+            styles.catWrapper,
+            {
+              opacity: catOpacity,
+              transform: [{ scale: catScale }, { translateY: catBounce }],
+            },
+          ]}>
+            <View style={styles.catCircle}>
+              <Animated.Image
+                source={CAT_IMAGES[currentIndex]}
+                style={[styles.catImage, { opacity: imgOpacity }]}
+                resizeMode="contain"
+              />
+            </View>
+          </Animated.View>
+        </View>
       </View>
 
-      {/* Speech bubble header */}
-      <Animated.View style={[styles.mascotArea, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
-        <Image source={CAT_IMG} style={styles.catImg} resizeMode="contain" />
-        <Animated.View style={[styles.bubbleWrapper, { transform: [{ scale: bubbleScale }] }]}>
-          <View style={styles.bubbleRow}>
-            <View style={styles.tail} />
-            <View style={styles.bubble}>
-              <Text style={styles.bubbleText}>Who are you?</Text>
-            </View>
-          </View>
-        </Animated.View>
-      </Animated.View>
-
-      {/* Cards */}
-      <View style={styles.cardsArea}>
+      {/* White section — bottom inset handled manually */}
+      <View style={[styles.whiteSection, { paddingBottom: insets.bottom + 16 }]}>
         {CATEGORIES.map((cat, i) => (
           <CategoryCard
             key={cat.key}
@@ -123,38 +181,26 @@ export default function AreYou({ navigation }: { navigation: any }) {
           />
         ))}
       </View>
-
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: WHITE,
     overflow: 'hidden',
   },
 
-  bgTop: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0,
-    height: H * 0.4,
+  sandSection: {
+    flex: 0.75,
     backgroundColor: SAND,
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
-  },
-  bgBottom: {
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    height: H * 0.65,
-    backgroundColor: '#FFFFFF',
   },
 
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    marginHorizontal: 20,
+    paddingHorizontal: 20,
     marginTop: 10,
     marginBottom: 4,
   },
@@ -171,56 +217,54 @@ const styles = StyleSheet.create({
     color: INK,
   },
 
-  mascotArea: {
-    paddingHorizontal: 12,
-    paddingTop: H * 0.035,
-    flexDirection: 'row',
+  headerArea: {
     alignItems: 'center',
+    marginTop: 6,
+    gap: 2,
   },
-  catImg: {
-    width: H * 0.24, height: H * 0.24,
-    flexShrink: 0,
-    marginRight: -(W * 0.1),
-  },
-  bubbleWrapper: {
-    flex: 1,
-    shadowColor: INK,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  bubbleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  tail: {
-    width: 0, height: 0,
-    borderTopWidth: 12,
-    borderBottomWidth: 12,
-    borderRightWidth: 14,
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-    borderRightColor: WHITE,
-  },
-  bubble: {
-    backgroundColor: WHITE,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  bubbleText: {
+  eyebrow: {
     fontFamily: 'Avenir',
-    fontSize: 18, fontWeight: '900',
-    color: INK, letterSpacing: -0.3,
+    fontSize: 10, fontWeight: '800',
+    color: 'rgba(44,26,14,0.4)',
+    letterSpacing: 2,
+  },
+  pageTitle: {
+    fontFamily: 'Avenir',
+    fontSize: 24, fontWeight: '900',
+    color: INK, letterSpacing: -0.5,
   },
 
-  cardsArea: {
+  mascotArea: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shadowRing: {
+    position: 'absolute',
+    width: 150, height: 150, borderRadius: 75,
+    backgroundColor: 'rgba(44,26,14,0.06)',
+  },
+  catWrapper: {
+    width: 136, height: 136, borderRadius: 68,
+    shadowColor: '#A0622A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2, shadowRadius: 16, elevation: 10,
+  },
+  catCircle: {
+    width: 136, height: 136, borderRadius: 68,
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: 'rgba(255,250,245,0.8)',
+    backgroundColor: 'rgba(255,250,245,0.3)',
+  },
+  catImage: { width: '100%', height: '100%' },
+
+  whiteSection: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingBottom: 20,
-    gap: 20,
-    justifyContent: 'center',
+    paddingTop: 16,
+    gap: 12,
+    backgroundColor: WHITE,
   },
 
   cardWrapper: {
@@ -244,8 +288,8 @@ const styles = StyleSheet.create({
   },
 
   cardSwatch: {
-    width: 44, height: 44,
-    borderRadius: 13,
+    width: 42, height: 42,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
@@ -253,24 +297,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
   },
   cardPaw: {
-    width: 22, height: 22,
+    width: 20, height: 20,
     tintColor: WHITE,
   },
 
   cardText: { flex: 1, gap: 3 },
   cardTitle: {
     fontFamily: 'Avenir',
-    fontSize: 16, fontWeight: '900',
+    fontSize: 15, fontWeight: '900',
     color: INK, letterSpacing: -0.2,
   },
   cardSub: {
     fontFamily: 'Avenir',
-    fontSize: 12, fontWeight: '400',
+    fontSize: 11, fontWeight: '400',
     color: INK_SOFT,
   },
 
   chevron: {
-    width: 34, height: 34,
+    width: 32, height: 32,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -279,8 +323,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
   },
   chevronText: {
-    fontSize: 22, fontWeight: '800',
-    lineHeight: 26,
+    fontSize: 20, fontWeight: '800',
+    lineHeight: 24,
     color: WHITE,
   },
 });
