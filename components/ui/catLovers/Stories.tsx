@@ -500,15 +500,12 @@ export default function CatStories({ navigation }: { navigation: any }) {
   const bannerY   = useRef(new Animated.Value(-10)).current;
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.spring(promptY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
-        Animated.timing(promptOp, { toValue: 1, duration: 260, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.spring(sectionY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
-        Animated.timing(sectionOp, { toValue: 1, duration: 240, useNativeDriver: true }),
-      ]),
+    // Replaced the Animated.sequence wrapper with a single parallel layout execution
+    Animated.parallel([
+      Animated.spring(promptY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
+      Animated.timing(promptOp, { toValue: 1, duration: 260, useNativeDriver: true }),
+      Animated.spring(sectionY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
+      Animated.timing(sectionOp, { toValue: 1, duration: 240, useNativeDriver: true }),
     ]).start();
   }, []);
 
