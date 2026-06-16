@@ -359,7 +359,7 @@ export default function Shelters({ navigation }: { navigation: any }) {
         </Text>
         <TextInput
           style={styles.searchInput}
-          placeholder="City, zip code, or shelter/rescue"
+          placeholder="Enter city, zip code, or name"
           placeholderTextColor="rgba(44,26,14,0.3)"
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -372,7 +372,7 @@ export default function Shelters({ navigation }: { navigation: any }) {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.searchDisclaimer}>
-          Listings come from Google and may not be cat-specific. Please check a
+          Disclaimer: Listings come from Google and may not be cat-specific. Please check a
           shelter/rescue's website to confirm before reaching out or visiting.
         </Text>
         {loadingShelters ? (
