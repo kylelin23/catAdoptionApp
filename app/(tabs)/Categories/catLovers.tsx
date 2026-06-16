@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react';
 import { Dimensions, View, StyleSheet, Text, TouchableOpacity, SafeAreaView, Animated, Image } from 'react-native';
 import { TabView } from 'react-native-tab-view';
 
-// Update these paths to where your new sub-components live
 import Stories from '@/components/ui/catLovers/Stories';
 import Community from '@/components/ui/catLovers/Community';
 import Shelters from '@/components/ui/catLovers/Shelters';
