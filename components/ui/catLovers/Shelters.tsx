@@ -322,7 +322,8 @@ export default function Shelters({ navigation }: { navigation: any }) {
 
   // For a zip search, show only the shelters whose own address has that exact
   // zip, closest first. For a city search, float results in that place to the
-  // top and keep the rest below in Google's order.
+  // top and keep the rest below. With no place searched (initial load, an empty
+  // box, or a name search), order everything by distance from the user.
   let displayShelters = processedShelters;
   if (searchedLocality) {
     const searchedZip = searchedLocality.match(/\b\d{5}\b/)?.[0] ?? null;
@@ -339,6 +340,8 @@ export default function Shelters({ navigation }: { navigation: any }) {
       const others = processedShelters.filter(s => !s.address.toLowerCase().includes(needle));
       displayShelters = [...inPlace, ...others];
     }
+  } else if (distanceOrigin) {
+    displayShelters = [...processedShelters].sort((a, b) => a.distanceVal - b.distanceVal);
   }
 
   const handleDirections = (address: string) => {
@@ -359,7 +362,7 @@ export default function Shelters({ navigation }: { navigation: any }) {
         </Text>
         <TextInput
           style={styles.searchInput}
-          placeholder="Enter city, zip code, or name"
+          placeholder="City, zip code, or shelter/rescue"
           placeholderTextColor="rgba(44,26,14,0.3)"
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -372,7 +375,7 @@ export default function Shelters({ navigation }: { navigation: any }) {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.searchDisclaimer}>
-          Disclaimer: Listings come from Google and may not be cat-specific. Please check a
+          Listings come from Google and may not be cat-specific. Please check a
           shelter/rescue's website to confirm before reaching out or visiting.
         </Text>
         {loadingShelters ? (
