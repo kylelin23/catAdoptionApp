@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   cardSubtitle: {
     fontFamily: 'Avenir',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '400',
     color: INK_SOFT,
   },

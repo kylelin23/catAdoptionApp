@@ -120,8 +120,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingLeft: 0,
     paddingRight: 20,
-    paddingTop: 20,
-    gap: 12,
+    paddingTop: 24,
+    gap: 16,
   },
 
   faqWrapper: {
@@ -141,8 +141,8 @@ const styles = StyleSheet.create({
   faqCard: {
     backgroundColor: WHITE,
     borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 18,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -158,18 +158,18 @@ const styles = StyleSheet.create({
 
   questionRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 14,
   },
 
   questionText: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
     color: INK,
-    lineHeight: 20,
+    lineHeight: 24,
   },
 
   pawChevron: {
@@ -177,11 +177,12 @@ const styles = StyleSheet.create({
     height: 26,
     tintColor: GREEN,
     flexShrink: 0,
+    marginTop: 1,
   },
 
   answerWrapper: {
-    gap: 10,
-    marginTop: 6,
+    gap: 12,
+    marginTop: 12,
   },
 
   answerDivider: {
@@ -192,9 +193,9 @@ const styles = StyleSheet.create({
 
   answerText: {
     fontFamily: 'Avenir',
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '400',
     color: INK_SOFT,
-    lineHeight: 19,
+    lineHeight: 24,
   },
 });

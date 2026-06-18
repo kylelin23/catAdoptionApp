@@ -454,12 +454,14 @@ const styles = StyleSheet.create({
   },
 
   scrollTextContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
     paddingBottom: 8,
   },
 
   cardDefinition: {
     fontFamily: 'Avenir',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '400',
     color: INK_SOFT,
     lineHeight: 22,

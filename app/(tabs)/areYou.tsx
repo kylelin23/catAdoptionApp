@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontFamily: 'Avenir',
-    fontSize: 24, fontWeight: '900',
+    fontSize: 29, fontWeight: '900',
     color: INK, letterSpacing: -0.5,
   },
 
@@ -276,12 +276,12 @@ const styles = StyleSheet.create({
   cardText: { flex: 1, gap: 3 },
   cardTitle: {
     fontFamily: 'Avenir',
-    fontSize: 15, fontWeight: '900',
+    fontSize: 17, fontWeight: '900',
     color: INK, letterSpacing: -0.2,
   },
   cardSub: {
     fontFamily: 'Avenir',
-    fontSize: 11, fontWeight: '400',
+    fontSize: 14, fontWeight: '400',
     color: INK_SOFT,
   },
 

@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   pageSub: {
     fontFamily: 'Avenir',
-    fontSize: 12, fontWeight: '400',
+    fontSize: 14, fontWeight: '400',
     color: INK_SOFT,
   },
   scrollContent: {
@@ -300,8 +300,9 @@ const styles = StyleSheet.create({
   },
   typeDescription: {
     fontFamily: 'Avenir',
-    fontSize: 13, fontWeight: '600',
+    fontSize: 15, fontWeight: '600',
     color: INK, lineHeight: 18,
+    marginBottom: 2,
   },
   typeLabel: {
     fontFamily: 'Avenir',

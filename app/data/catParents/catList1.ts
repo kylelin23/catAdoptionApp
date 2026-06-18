@@ -168,7 +168,7 @@ export const others: Item[] = [ // Is it toxic ?
         fakeAnswer: 'yes',
     },
     {
-        item: 'flea and tick medication for dogs',
+        item: 'Dog flea/tick medication',
         answer: 'yes',
         fakeAnswer: 'yes',
     },

@@ -9,6 +9,7 @@ import {
   Image,
   PanResponder,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import cards from '../../../data/catParents/catLang';
 
@@ -128,7 +129,6 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
         const idx = currentIndexRef.current;
 
         if (gesture.dx < -SWIPE_THRESHOLD && idx < cards.length - 1) {
-          // Swipe Left -> Next Card
           Animated.timing(swipeAnim, {
             toValue: -screenWidth,
             duration: 200,
@@ -137,7 +137,6 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
             goToIndex(idx + 1);
           });
         } else if (gesture.dx > SWIPE_THRESHOLD && idx > 0) {
-          // Swipe Right -> Prev Card
           Animated.timing(swipeAnim, {
             toValue: screenWidth,
             duration: 200,
@@ -146,7 +145,6 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
             goToIndex(idx - 1);
           });
         } else {
-          // Reset positioning snap back
           Animated.spring(swipeAnim, {
             toValue: 0,
             useNativeDriver: true,
@@ -158,7 +156,6 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
     })
   ).current;
 
-  // Animated Interpolations for Quizlet Stack Effect
   const currentCardTranslateX = swipeAnim;
 
   const currentCardRotate = swipeAnim.interpolate({
@@ -166,13 +163,11 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
     outputRange: ['-6deg', '0deg', '6deg'],
   });
 
-  // Next peek card moves into center view as you drag
   const nextCardTranslateX = swipeAnim.interpolate({
     inputRange: [-screenWidth, 0, screenWidth],
     outputRange: [0, screenWidth - 28, screenWidth * 2],
   });
 
-  // Previous peek card moves into center view as you drag
   const prevCardTranslateX = swipeAnim.interpolate({
     inputRange: [-screenWidth, 0, screenWidth],
     outputRange: [-screenWidth * 2, -screenWidth + 28, 0],
@@ -191,8 +186,6 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-
-        {/* Header Section */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Text style={styles.backBtnText}>{"<"}</Text>
@@ -209,7 +202,6 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* Top Progress bar tracking */}
         <View style={styles.progressArea}>
           <Animated.Image
             source={CAT}
@@ -232,15 +224,12 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* Dynamic Quizlet Card Slider Container */}
         <View style={styles.cardContainerArea} {...panResponder.panHandlers}>
-
-          {/* Glimpse Card: PREVIOUS */}
           {currentIndex > 0 && (
             <Animated.View
               style={[
                 styles.peekCardOuter,
-                { transform: [{ translateX: prevCardTranslateX }] }
+                { transform: [{ translateX: prevCardTranslateX }] },
               ]}
             >
               <View style={styles.card}>
@@ -249,58 +238,59 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
             </Animated.View>
           )}
 
-          {/* Core Interactive Card: CURRENT */}
           <Animated.View
             style={[
               styles.peekCardOuter,
               {
                 transform: [
                   { translateX: currentCardTranslateX },
-                  { rotate: currentCardRotate }
+                  { rotate: currentCardRotate },
                 ],
-                zIndex: 10
-              }
+                zIndex: 10,
+              },
             ]}
           >
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>{cards[currentIndex].title}</Text>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.cardScrollContent}
+              >
+                <Text style={styles.cardTitle}>{cards[currentIndex].title}</Text>
 
-              <View style={styles.moodsArea}>
-                {MOODS.map((mood) => (
-                  <MoodRow
-                    key={`${currentIndex}-${mood.key}`}
-                    label={mood.label}
-                    answer={(cards[currentIndex] as any)[mood.key]}
-                    color={mood.color}
-                    border={mood.border}
-                    dark={mood.dark}
-                    isOpen={openMoodKey === mood.key}
-                    onToggle={() =>
-                      setOpenMoodKey(openMoodKey === mood.key ? null : mood.key)
-                    }
-                  />
-                ))}
-              </View>
+                <View style={styles.moodsArea}>
+                  {MOODS.map((mood) => (
+                    <MoodRow
+                      key={`${currentIndex}-${mood.key}`}
+                      label={mood.label}
+                      answer={(cards[currentIndex] as any)[mood.key]}
+                      color={mood.color}
+                      border={mood.border}
+                      dark={mood.dark}
+                      isOpen={openMoodKey === mood.key}
+                      onToggle={() =>
+                        setOpenMoodKey(openMoodKey === mood.key ? null : mood.key)
+                      }
+                    />
+                  ))}
+                </View>
+              </ScrollView>
             </View>
           </Animated.View>
 
-          {/* Glimpse Card: NEXT */}
           {currentIndex < cards.length - 1 && (
             <Animated.View
               style={[
                 styles.peekCardOuter,
-                { transform: [{ translateX: nextCardTranslateX }] }
+                { transform: [{ translateX: nextCardTranslateX }] },
               ]}
             >
               <View style={styles.card}>
-                <Text style={styles.cardTitle}>{cards[currentIndex + 1].title}</Text>
+                {/* <Text style={styles.cardTitle}>{cards[currentIndex + 1].title}</Text> */}
               </View>
             </Animated.View>
           )}
-
         </View>
 
-        {/* Carousel Pagination dots indicators */}
         <View style={styles.dotsRow}>
           {cards.map((_, i) => (
             <TouchableOpacity
@@ -322,7 +312,6 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
           ))}
         </View>
 
-        {/* Navigation bottom bar */}
         <View style={styles.navRow}>
           <TouchableOpacity
             style={[styles.navBtn, currentIndex === 0 && styles.navBtnDisabled]}
@@ -350,7 +339,6 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
             <Text style={[styles.arrowText, styles.arrowNext]}>→</Text>
           </TouchableOpacity>
         </View>
-
       </View>
     </SafeAreaView>
   );
@@ -361,21 +349,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: WHITE,
   },
-
   container: {
     flex: 1,
     paddingHorizontal: 22,
-    paddingTop: 12,
+    paddingTop: 16,
     paddingBottom: 28,
-    gap: 14,
+    gap: 18,
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-
   backBtn: {
     width: 38,
     height: 38,
@@ -385,19 +370,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-
   backBtnText: {
     fontSize: 18,
     fontWeight: '700',
     color: INK,
     lineHeight: 22,
   },
-
   headerCenter: {
     flex: 1,
-    gap: 2,
+    gap: 6,
   },
-
   eyebrow: {
     fontFamily: 'Avenir',
     fontSize: 10,
@@ -405,7 +387,6 @@ const styles = StyleSheet.create({
     color: 'rgba(44,26,14,0.4)',
     letterSpacing: 2,
   },
-
   pageTitle: {
     fontFamily: 'Avenir',
     fontSize: 22,
@@ -413,12 +394,11 @@ const styles = StyleSheet.create({
     color: INK,
     letterSpacing: -0.5,
   },
-
   counterBadge: {
     backgroundColor: GREEN,
     borderRadius: 16,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 7,
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 2,
@@ -426,53 +406,44 @@ const styles = StyleSheet.create({
     borderBottomColor: GREEN_DARK,
     flexShrink: 0,
   },
-
   counterNum: {
     fontFamily: 'Avenir',
     fontSize: 16,
     fontWeight: '900',
     color: WHITE,
   },
-
   counterDenom: {
     fontFamily: 'Avenir',
     fontSize: 11,
     fontWeight: '600',
     color: 'rgba(255,250,245,0.7)',
   },
-
   progressArea: {
-    marginTop: 16,
-    marginBottom: 12,
+    marginTop: 18,
+    marginBottom: 16,
   },
-
   progressTrack: {
     height: 10,
     backgroundColor: 'rgba(44,26,14,0.1)',
     borderRadius: 5,
     overflow: 'hidden',
   },
-
   progressFill: {
     height: '100%',
     backgroundColor: GREEN,
     borderRadius: 5,
   },
-
   progressCat: {
     position: 'absolute',
     width: 36,
     height: 36,
     top: -28,
   },
-
-  /* Quizlet Card Carousel Engine Layout Specs */
   cardContainerArea: {
     flex: 1,
     position: 'relative',
-    marginHorizontal: -12, // Extends container boundaries to allow smooth overflow peeking
+    marginHorizontal: -12,
   },
-
   peekCardOuter: {
     position: 'absolute',
     top: 0,
@@ -480,13 +451,12 @@ const styles = StyleSheet.create({
     right: 12,
     bottom: 0,
   },
-
   card: {
     flex: 1,
     backgroundColor: WHITE,
     borderRadius: 24,
-    padding: 20,
-    gap: 12,
+    padding: 24,
+    gap: 16,
     borderWidth: 2,
     borderColor: 'rgba(44,26,14,0.06)',
     borderBottomWidth: 5,
@@ -497,105 +467,98 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
-
+  cardScrollContent: {
+    paddingBottom: 20,
+  },
   cardTitle: {
     fontFamily: 'Avenir',
     fontSize: 20,
     fontWeight: '900',
     color: INK,
     letterSpacing: -0.5,
+    lineHeight: 26,
+    marginBottom: 16,
   },
-
   moodsArea: {
-    gap: 8,
-    flex: 1,
+    gap: 10,
   },
-
   moodRow: {
     borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 2,
     borderBottomWidth: 4,
   },
-
   moodHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    padding: 12,
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
-
   moodDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
     flexShrink: 0,
+    marginTop: 7,
   },
-
   moodLabel: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '700',
     color: INK,
+    lineHeight: 24,
   },
-
   moodPaw: {
     width: 20,
     height: 20,
     flexShrink: 0,
+    marginTop: 2,
   },
-
   moodAnswer: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingBottom: 12,
-    gap: 8,
+    gap: 10,
   },
-
   moodDivider: {
     height: 1.5,
     borderRadius: 1,
     opacity: 0.3,
   },
-
   moodAnswerText: {
     fontFamily: 'Avenir',
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '400',
     color: INK_SOFT,
-    lineHeight: 20,
+    lineHeight: 25,
   },
-
   dotsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 6,
-    marginTop: 4,
+    gap: 8,
+    marginTop: 8,
   },
-
   dot: {
     width: 7,
     height: 7,
     borderRadius: 4,
     backgroundColor: 'rgba(44,26,14,0.15)',
   },
-
   dotActive: {
     backgroundColor: INK,
     width: 20,
   },
-
   dotSeen: {
     backgroundColor: GREEN,
   },
-
   navRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 18,
+    gap: 20,
+    marginTop: 4,
   },
-
   navBtn: {
     width: 92,
     height: 54,
@@ -606,32 +569,26 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBottomColor: 'rgba(44,26,14,0.12)',
   },
-
   navBtnNext: {
     backgroundColor: GREEN,
     borderBottomWidth: 4,
     borderBottomColor: GREEN_DARK,
   },
-
   navBtnDisabled: {
     opacity: 0.35,
   },
-
   arrowText: {
     fontSize: 34,
     fontWeight: '700',
     color: INK_SOFT,
     lineHeight: 38,
   },
-
   arrowNext: {
     color: WHITE,
   },
-
   arrowDisabled: {
     color: 'rgba(107,76,53,0.35)',
   },
-
   counterText: {
     fontFamily: 'Avenir',
     fontSize: 17,

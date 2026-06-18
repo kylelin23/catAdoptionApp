@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontFamily: 'Avenir',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '500',
     color: INK,
     lineHeight: 21,

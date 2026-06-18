@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Text, Dimensions, View, StyleSheet, TouchableOpacity, Animated, Image, SafeAreaView, ScrollView } from 'react-native';
+import { Text, Dimensions, View, StyleSheet, TouchableOpacity, Animated, SafeAreaView, ScrollView } from 'react-native';
 import quiz, { answers } from '../../../app/data/newCatParents/trivia';
 
 const INK        = '#2C1A0E';
@@ -9,6 +9,7 @@ const GREEN      = '#7BAE6E';
 const GREEN_DARK = '#5A8F50';
 const RED        = '#C47A45';
 const RED_DARK   = '#9E5C2E';
+
 const screenWidth  = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
@@ -26,8 +27,8 @@ function ConfettiPiece({ color, delay }: { color: string; delay: number }) {
     Animated.sequence([
       Animated.delay(delay),
       Animated.parallel([
-        Animated.timing(y,      { toValue: screenHeight, duration: 2000 + Math.random() * 1000, useNativeDriver: true }),
-        Animated.timing(x,      { toValue: (Math.random() - 0.5) * 200 + Math.random() * screenWidth, duration: 2000 + Math.random() * 1000, useNativeDriver: true }),
+        Animated.timing(y, { toValue: screenHeight, duration: 2000 + Math.random() * 1000, useNativeDriver: true }),
+        Animated.timing(x, { toValue: (Math.random() - 0.5) * 200 + Math.random() * screenWidth, duration: 2000 + Math.random() * 1000, useNativeDriver: true }),
         Animated.timing(rotate, { toValue: Math.random() > 0.5 ? 10 : -10, duration: 2000, useNativeDriver: true }),
         Animated.sequence([
           Animated.delay(1200),
@@ -37,27 +38,38 @@ function ConfettiPiece({ color, delay }: { color: string; delay: number }) {
     ]).start();
   }, []);
 
-  const spin = rotate.interpolate({ inputRange: [-10, 10], outputRange: ['-360deg', '360deg'] });
+  const spin = rotate.interpolate({
+    inputRange: [-10, 10],
+    outputRange: ['-360deg', '360deg'],
+  });
 
   return (
-    <Animated.View style={{
-      position: 'absolute',
-      width: Math.random() > 0.5 ? 10 : 7,
-      height: Math.random() > 0.5 ? 10 : 7,
-      borderRadius: Math.random() > 0.5 ? 5 : 0,
-      backgroundColor: color,
-      transform: [{ translateY: y }, { translateX: x }, { rotate: spin }],
-      opacity, zIndex: 999,
-    }} />
+    <Animated.View
+      style={{
+        position: 'absolute',
+        width: Math.random() > 0.5 ? 10 : 7,
+        height: Math.random() > 0.5 ? 10 : 7,
+        borderRadius: Math.random() > 0.5 ? 5 : 0,
+        backgroundColor: color,
+        transform: [{ translateY: y }, { translateX: x }, { rotate: spin }],
+        opacity,
+        zIndex: 999,
+      }}
+    />
   );
 }
 
 function Confetti({ show }: { show: boolean }) {
   if (!show) return null;
+
   return (
     <>
       {Array.from({ length: 40 }).map((_, i) => (
-        <ConfettiPiece key={i} color={CONFETTI_COLORS[i % CONFETTI_COLORS.length]} delay={i * 40} />
+        <ConfettiPiece
+          key={i}
+          color={CONFETTI_COLORS[i % CONFETTI_COLORS.length]}
+          delay={i * 40}
+        />
       ))}
     </>
   );
@@ -81,21 +93,33 @@ export default function Trivia() {
   useEffect(() => {
     Animated.spring(catProgress, {
       toValue: progress,
-      friction: 6, tension: 80,
+      friction: 6,
+      tension: 80,
       useNativeDriver: false,
     }).start();
   }, [currentQ]);
 
   const animateSlide = (callback: () => void) => {
     if (isAnimating.current) return;
+
     isAnimating.current = true;
-    Animated.timing(slideAnim, { toValue: -screenWidth, duration: 180, useNativeDriver: true })
-      .start(() => {
-        callback();
-        slideAnim.setValue(screenWidth);
-        Animated.timing(slideAnim, { toValue: 0, duration: 180, useNativeDriver: true })
-          .start(() => { isAnimating.current = false; });
+
+    Animated.timing(slideAnim, {
+      toValue: -screenWidth,
+      duration: 180,
+      useNativeDriver: true,
+    }).start(() => {
+      callback();
+      slideAnim.setValue(screenWidth);
+
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }).start(() => {
+        isAnimating.current = false;
       });
+    });
   };
 
   const handleSelect = (key: string) => {
@@ -105,9 +129,12 @@ export default function Trivia() {
 
   const handleCheck = () => {
     if (!selected || checked) return;
+
     const correct = answers[currentQ] === selected;
+
     setIsCorrect(correct);
     setChecked(true);
+
     if (correct) {
       setScore(s => s + 1);
       setShowConfetti(true);
@@ -116,7 +143,11 @@ export default function Trivia() {
   };
 
   const handleNext = () => {
-    if (currentQ >= quiz.length - 1) { setFinished(true); return; }
+    if (currentQ >= quiz.length - 1) {
+      setFinished(true);
+      return;
+    }
+
     animateSlide(() => {
       setCurrentQ(p => p + 1);
       setSelected('');
@@ -138,6 +169,7 @@ export default function Trivia() {
 
   const CAT_SIZE    = 36;
   const TRACK_WIDTH = screenWidth - 44;
+
   const catX = catProgress.interpolate({
     inputRange: [0, 1],
     outputRange: [0, TRACK_WIDTH - CAT_SIZE],
@@ -152,6 +184,7 @@ export default function Trivia() {
           <Text style={styles.resultText}>Congrats on finishing the quiz!</Text>
           <Text style={styles.scoreText}>{score} / {quiz.length} correct</Text>
         </View>
+
         <TouchableOpacity style={styles.tryAgainBtn} onPress={reset} activeOpacity={0.85}>
           <Text style={styles.tryAgainText}>Try Again</Text>
         </TouchableOpacity>
@@ -166,7 +199,7 @@ export default function Trivia() {
     { key: 'a', label: currentQ_.answer1 },
     { key: 'b', label: currentQ_.answer2 },
     { key: 'c', label: currentQ_.answer3 },
-  ];
+  ].filter(answer => answer.label);
 
   const isLast = currentQ === quiz.length - 1;
 
@@ -185,23 +218,25 @@ export default function Trivia() {
   };
 
   const isSelected = selected !== '';
+
   const getBottomButtonProps = () => {
     if (!checked) {
       return {
         text: 'Check Answer',
         onPress: handleCheck,
         disabled: !isSelected,
-        style: [styles.nextBtn, !isSelected && styles.nextBtnDisabled]
+        style: [styles.nextBtn, !isSelected && styles.nextBtnDisabled],
       };
     }
+
     return {
       text: isLast ? 'Finish Quiz' : 'Next Question',
       onPress: handleNext,
       disabled: false,
       style: [
         styles.nextBtn,
-        isCorrect ? styles.nextBtnCorrect : styles.nextBtnWrong
-      ]
+        isCorrect ? styles.nextBtnCorrect : styles.nextBtnWrong,
+      ],
     };
   };
 
@@ -212,8 +247,6 @@ export default function Trivia() {
       <Confetti show={showConfetti} />
 
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-
-        {/* Top layer: Cat progress track + Question statement */}
         <View style={styles.topSection}>
           <View style={styles.progressArea}>
             <Animated.Image
@@ -221,14 +254,20 @@ export default function Trivia() {
               style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
               resizeMode="contain"
             />
+
             <View style={styles.progressTrack}>
-              <Animated.View style={[styles.progressFill, {
-                width: catProgress.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0%', '100%'],
-                  extrapolate: 'clamp',
-                }),
-              }]} />
+              <Animated.View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: catProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0%', '100%'],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                ]}
+              />
             </View>
           </View>
 
@@ -237,37 +276,78 @@ export default function Trivia() {
           </Animated.View>
         </View>
 
-        {/* Centered Area: Houses only the choices cleanly centered vertically */}
         <View style={styles.centeredBody}>
           <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
-            {ANSWERS.map((answer) => (
-              <TouchableOpacity
-                key={answer.key}
-                style={[getAnswerStyle(answer.key), styles.answerRow]}
-                onPress={() => handleSelect(answer.key)}
-                activeOpacity={0.85}
-                disabled={checked}
-              >
-                <Text style={[...getAnswerTextStyle(answer.key), { flex: 1 }]}>{answer.label}</Text>
-              </TouchableOpacity>
-            ))}
+            {ANSWERS.map(answer => {
+              const isCorrectAnswer = answer.key === answers[currentQ];
+              const isWrongSelected =
+                checked &&
+                selected === answer.key &&
+                answer.key !== answers[currentQ];
+
+              return (
+                <TouchableOpacity
+                  key={answer.key}
+                  style={[getAnswerStyle(answer.key), styles.answerRow]}
+                  onPress={() => handleSelect(answer.key)}
+                  activeOpacity={0.85}
+                  disabled={checked}
+                >
+                  <Text style={[...getAnswerTextStyle(answer.key), { flex: 1 }]}>
+                    {answer.label}
+                  </Text>
+
+                  {checked && isCorrectAnswer && (
+                    <Text
+                      style={{
+                        color: GREEN,
+                        fontWeight: '900',
+                        fontSize: 18,
+                        marginLeft: 10,
+                      }}
+                    >
+                      ✓
+                    </Text>
+                  )}
+
+                  {isWrongSelected && (
+                    <Text
+                      style={{
+                        color: RED,
+                        fontWeight: '900',
+                        fontSize: 18,
+                        marginLeft: 10,
+                      }}
+                    >
+                      ✕
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
           </Animated.View>
         </View>
-
       </ScrollView>
 
-      {/* Fixed bottom layout layer housing the result banner right above the primary interactive button */}
       <View style={styles.bottomSection}>
-        {/* Banner message container handles visibility transitions without snapping layout shifts */}
-        <View style={styles.resultBannerContainer}>
-          {checked && (
+        {checked && (
+          <View style={styles.resultBannerContainer}>
             <View style={[styles.resultBanner, isCorrect ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
-              <Text style={[styles.resultBannerText, { color: isCorrect ? GREEN : RED, flex: 1, textAlign: 'center' }]}>
+              <Text
+                style={[
+                  styles.resultBannerText,
+                  {
+                    color: isCorrect ? GREEN : RED,
+                    flex: 1,
+                    textAlign: 'center',
+                  },
+                ]}
+              >
                 {isCorrect ? 'Correct!' : 'Not quite!'}
               </Text>
             </View>
-          )}
-        </View>
+          </View>
+        )}
 
         <TouchableOpacity
           style={buttonProps.style}
@@ -302,7 +382,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingBottom: 20,
   },
-  progressArea: { marginBottom: 4 },
+  progressArea: {
+    marginBottom: 4,
+  },
   progressTrack: {
     height: 10,
     backgroundColor: 'rgba(44,26,14,0.1)',
@@ -316,7 +398,8 @@ const styles = StyleSheet.create({
   },
   progressCat: {
     position: 'absolute',
-    width: 36, height: 36,
+    width: 36,
+    height: 36,
     top: -30,
   },
   questionText: {
@@ -376,9 +459,8 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   resultBannerContainer: {
-    height: 60,
     justifyContent: 'center',
-    marginBottom: 12, // Spaces the banner exactly above the button
+    marginBottom: 12,
   },
   resultBanner: {
     width: '100%',
