@@ -103,7 +103,6 @@ export default function Preparation({ navigation }: { navigation: any }) {
     setCurrentIndex(0);
     setShowReviewScreen(false);
 
-    // Reset layout animation parameters
     reviewCardOpacity.setValue(1);
     reviewCardSlide.setValue(0);
 
@@ -122,7 +121,6 @@ export default function Preparation({ navigation }: { navigation: any }) {
     ]).start();
   }, []);
 
-  // Pop intro sequence for the review screen button
   useEffect(() => {
     if (showReviewScreen) {
       reviewBtnScale.setValue(0.5);
@@ -135,14 +133,10 @@ export default function Preparation({ navigation }: { navigation: any }) {
     }
   }, [showReviewScreen]);
 
-  // COMBINED BUTTON CLICK AND DOWNWARD EXIT TRANSITION
   const handleReviewAgainPress = () => {
     Animated.sequence([
-      // 1. Interactive button bounce feedback
       Animated.timing(reviewBtnScale, { toValue: 0.92, duration: 80, useNativeDriver: true }),
       Animated.timing(reviewBtnScale, { toValue: 1, duration: 100, useNativeDriver: true }),
-
-      // 2. Drop the complete review block out of viewport
       Animated.parallel([
         Animated.timing(reviewCardOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
         Animated.timing(reviewCardSlide, { toValue: 40, duration: 280, useNativeDriver: true })
@@ -289,6 +283,13 @@ export default function Preparation({ navigation }: { navigation: any }) {
           )}
         </View>
 
+        {/* Swipe instruction text positioned dynamically under the flashcard stack */}
+        {!showReviewScreen && (
+          <Text style={styles.instructionText}>
+            Swipe left to see the next card!
+          </Text>
+        )}
+
         <View style={styles.bottomNav}>
           <Text style={styles.pageCounter}>
             {showReviewScreen ? prepCards.length : currentIndex + 1} / {prepCards.length}
@@ -310,6 +311,20 @@ const styles = StyleSheet.create({
   headerCenter: { flex: 1, gap: 2 },
   eyebrow: { fontFamily: 'Avenir', fontSize: 10, fontWeight: '800', color: 'rgba(44,26,14,0.4)', letterSpacing: 2 },
   pageTitle: { fontFamily: 'Avenir', fontSize: 28, fontWeight: '900', color: INK, letterSpacing: -0.5 },
+
+  // Clean instruction styling
+  instructionText: {
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontWeight: '600',
+    color: INK_SOFT,
+    textAlign: 'center',
+    marginTop: -4,
+    marginBottom: 2,
+    paddingHorizontal: 16,
+    lineHeight: 18,
+  },
+
   cardArea: { flex: 1, justifyContent: 'center', alignItems: 'center', position: 'relative', width: CARD_WIDTH, alignSelf: 'center' },
   cardWrapper: { position: 'absolute', width: CARD_WIDTH, height: CARD_HEIGHT },
   backgroundCard: { opacity: 1 },

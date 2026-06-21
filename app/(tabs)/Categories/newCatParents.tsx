@@ -112,6 +112,7 @@ export default function NewCatParents({ navigation }: { navigation: any }) {
         onIndexChange={setIndex}
         initialLayout={{ width: screenWidth }}
         renderTabBar={renderTabBar}
+        swipeEnabled={false} // Disables swipe control entirely
         style={{ backgroundColor: 'transparent' }}
       />
     </SafeAreaView>
@@ -164,7 +165,6 @@ const styles = StyleSheet.create({
     color: INK, lineHeight: 22,
   },
 
-  // Cat + bubble — same as AreYou
   mascotArea: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
 
-  // Progress dots
   progressRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -237,7 +236,6 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
   },
 
-  // Tab pills
   tabPillContainer: {
     flexDirection: 'row',
     backgroundColor: 'rgba(44,26,14,0.06)',

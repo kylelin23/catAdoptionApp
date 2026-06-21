@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   cardText: { flex: 1, gap: 3 },
   cardTitle: {
     fontFamily: 'Avenir',
-    fontSize: 17, fontWeight: '900',
+    fontSize: 15, fontWeight: '900',
     color: INK, letterSpacing: -0.2,
   },
   cardSub: {

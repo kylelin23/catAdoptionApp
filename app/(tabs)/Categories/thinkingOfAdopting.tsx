@@ -111,6 +111,7 @@ export default function ThinkingOfAdopting({ navigation }: { navigation: any }) 
         onIndexChange={setIndex}
         initialLayout={{ width: screenWidth }}
         renderTabBar={renderTabBar}
+        swipeEnabled={false} // Disables swipe gestures completely
         style={{ backgroundColor: 'transparent' }}
       />
     </SafeAreaView>
@@ -160,7 +161,6 @@ const styles = StyleSheet.create({
     color: INK, lineHeight: 22,
   },
 
-  // Same as AreYou mascotArea
   mascotArea: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -213,7 +213,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
-  // Progress dots
   progressRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -234,7 +233,6 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
   },
 
-  // Tab pills
   tabPillContainer: {
     flexDirection: 'row',
     backgroundColor: 'rgba(44,26,14,0.06)',

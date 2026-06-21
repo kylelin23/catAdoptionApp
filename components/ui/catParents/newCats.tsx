@@ -118,7 +118,6 @@ function StepItem({
 
   return (
     <View style={styles.itemWrapper}>
-      {/* Main UI Card */}
       <View
         style={[
           styles.card,
@@ -156,7 +155,6 @@ function StepItem({
           />
         </TouchableOpacity>
 
-        {/* Smooth Expandable Content */}
         <Animated.View style={{ maxHeight, opacity: contentOpacity, overflow: 'hidden' }}>
           <View style={styles.bulletsArea}>
             <View style={styles.divider} />
@@ -178,7 +176,7 @@ function StepItem({
 }
 
 export default function NewCats() {
-  const [openIndex, setOpenIndex] = useState(0);
+  const [openIndex, setOpenIndex] = useState(-1);
 
   const toggle = (index: number) => {
     setOpenIndex(openIndex === index ? -1 : index);
@@ -192,7 +190,10 @@ export default function NewCats() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.pageSubtitle}>Follow these steps to safely introduce new feline friends.</Text>
+          {/* Combined instruction text */}
+          <Text style={styles.pageSubtitle}>
+            Follow these steps and tap each card to safely introduce new feline friends.
+          </Text>
 
           {STEPS.map((step, index) => (
             <StepItem
@@ -235,7 +236,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: INK_SOFT,
     lineHeight: 22,
-    marginBottom: 4,
+    marginBottom: 8,
+    textAlign: 'center',
   },
 
   itemWrapper: {

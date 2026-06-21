@@ -51,9 +51,9 @@ const quiz: Trivia[] = [
     },
     {
         question: '6. Which city is known as the City of Cats for its large population of community cats?',
-        answer1: 'A. Japan',
-        answer2: 'B. Malaysia',
-        answer3: 'C. Istanbul'
+        answer1: 'A. Aoshima, Japan',
+        answer2: 'B. Kuching, Malaysia',
+        answer3: 'C. Istanbul, Turkey'
     },
     {
         question: '7. What can cats NOT taste?',

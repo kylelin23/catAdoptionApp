@@ -17,6 +17,8 @@ const CAT = require('../../../assets/images/walkingCat.png');
 
 const CONFETTI_COLORS = ['#D4956A', '#E8C9A0', '#7BAE6E', '#C8D8E8', '#E8C8B8', '#2C1A0E', '#FFFAF5'];
 
+const ALL_CORRECT_QUESTION_INDEX = 5;
+
 function ConfettiPiece({ color, delay }: { color: string; delay: number }) {
   const y       = useRef(new Animated.Value(-20)).current;
   const x       = useRef(new Animated.Value(Math.random() * screenWidth)).current;
@@ -89,6 +91,7 @@ export default function Trivia() {
   const isAnimating = useRef(false);
 
   const progress = currentQ / quiz.length;
+  const isAllCorrectQuestion = currentQ === ALL_CORRECT_QUESTION_INDEX;
 
   useEffect(() => {
     Animated.spring(catProgress, {
@@ -130,7 +133,7 @@ export default function Trivia() {
   const handleCheck = () => {
     if (!selected || checked) return;
 
-    const correct = answers[currentQ] === selected;
+    const correct = isAllCorrectQuestion || answers[currentQ] === selected;
 
     setIsCorrect(correct);
     setChecked(true);
@@ -205,14 +208,14 @@ export default function Trivia() {
 
   const getAnswerStyle = (key: string) => {
     if (!checked) return [styles.answerBtn, selected === key && styles.answerBtnSelected];
-    if (key === answers[currentQ]) return [styles.answerBtn, styles.answerBtnCorrect];
+    if (isAllCorrectQuestion || key === answers[currentQ]) return [styles.answerBtn, styles.answerBtnCorrect];
     if (key === selected && !isCorrect) return [styles.answerBtn, styles.answerBtnWrong];
     return [styles.answerBtn];
   };
 
   const getAnswerTextStyle = (key: string) => {
     if (!checked) return [styles.answerText, selected === key && styles.answerTextSelected];
-    if (key === answers[currentQ]) return [styles.answerText, { color: GREEN, fontWeight: '800' as const }];
+    if (isAllCorrectQuestion || key === answers[currentQ]) return [styles.answerText, { color: GREEN, fontWeight: '800' as const }];
     if (key === selected && !isCorrect) return [styles.answerText, { color: RED, fontWeight: '800' as const }];
     return [styles.answerText];
   };
@@ -279,8 +282,11 @@ export default function Trivia() {
         <View style={styles.centeredBody}>
           <Animated.View style={[styles.answersArea, { transform: [{ translateX: slideAnim }] }]}>
             {ANSWERS.map(answer => {
-              const isCorrectAnswer = answer.key === answers[currentQ];
+              const isCorrectAnswer =
+                isAllCorrectQuestion || answer.key === answers[currentQ];
+
               const isWrongSelected =
+                !isAllCorrectQuestion &&
                 checked &&
                 selected === answer.key &&
                 answer.key !== answers[currentQ];
@@ -298,29 +304,11 @@ export default function Trivia() {
                   </Text>
 
                   {checked && isCorrectAnswer && (
-                    <Text
-                      style={{
-                        color: GREEN,
-                        fontWeight: '900',
-                        fontSize: 18,
-                        marginLeft: 10,
-                      }}
-                    >
-                      ✓
-                    </Text>
+                    <Text style={styles.correctMark}>✓</Text>
                   )}
 
                   {isWrongSelected && (
-                    <Text
-                      style={{
-                        color: RED,
-                        fontWeight: '900',
-                        fontSize: 18,
-                        marginLeft: 10,
-                      }}
-                    >
-                      ✕
-                    </Text>
+                    <Text style={styles.wrongMark}>✕</Text>
                   )}
                 </TouchableOpacity>
               );
@@ -457,6 +445,18 @@ const styles = StyleSheet.create({
   answerTextSelected: {
     color: INK,
     fontWeight: '800',
+  },
+  correctMark: {
+    color: GREEN,
+    fontWeight: '900',
+    fontSize: 18,
+    marginLeft: 10,
+  },
+  wrongMark: {
+    color: RED,
+    fontWeight: '900',
+    fontSize: 18,
+    marginLeft: 10,
   },
   resultBannerContainer: {
     justifyContent: 'center',

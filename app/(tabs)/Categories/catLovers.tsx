@@ -111,6 +111,7 @@ export default function CatLovers({ navigation }: { navigation: any }) {
         onIndexChange={setIndex}
         initialLayout={{ width: screenWidth }}
         renderTabBar={renderTabBar}
+        swipeEnabled={false} // Disables swipe control entirely
         style={{ backgroundColor: 'transparent' }}
       />
     </SafeAreaView>

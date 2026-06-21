@@ -289,6 +289,13 @@ export default function Expect({ navigation }: { navigation: any }) {
           )}
         </View>
 
+        {/* Swipe instruction text elements placed right below the main flashcard layout container */}
+        {!showReviewScreen && (
+          <Text style={styles.instructionText}>
+            Swipe left to see the next card!
+          </Text>
+        )}
+
         <View style={styles.bottomNav}>
           <Text style={styles.pageCounter}>
             {showReviewScreen ? expectCards.length : currentIndex + 1} / {expectCards.length}
@@ -310,6 +317,20 @@ const styles = StyleSheet.create({
   headerCenter: { flex: 1, gap: 2 },
   eyebrow: { fontFamily: 'Avenir', fontSize: 10, fontWeight: '800', color: 'rgba(44,26,14,0.4)', letterSpacing: 2 },
   pageTitle: { fontFamily: 'Avenir', fontSize: 28, fontWeight: '900', color: INK, letterSpacing: -0.5 },
+
+  // Custom Instruction Layout Text Tuning
+  instructionText: {
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontWeight: '600',
+    color: INK_SOFT,
+    textAlign: 'center',
+    marginTop: -4,
+    marginBottom: 2,
+    paddingHorizontal: 16,
+    lineHeight: 18,
+  },
+
   cardArea: { flex: 1, justifyContent: 'center', alignItems: 'center', position: 'relative', width: CARD_WIDTH, alignSelf: 'center' },
   cardWrapper: { position: 'absolute', width: CARD_WIDTH, height: CARD_HEIGHT },
   backgroundCard: { opacity: 1 },

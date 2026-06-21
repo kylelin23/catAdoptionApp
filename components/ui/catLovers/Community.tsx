@@ -8,17 +8,18 @@ import {
   Dimensions,
   SafeAreaView,
   ScrollView,
+  PanResponder,
 } from 'react-native';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
 const WHITE = '#FFFAF5';
 const GREEN = '#7BAE6E';
+const GREEN_DARK = '#5A8F50';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get('window');
 
 const CARD_WIDTH = screenWidth * 0.88;
-const CARD_HEIGHT = screenHeight * 0.42;
 
 const CAT = require('../../../assets/images/walkingCat.png');
 
@@ -160,11 +161,18 @@ function FlipCard({
 
 export default function Community() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showReviewScreen, setShowReviewScreen] = useState(false);
+  const currentIndexRef = useRef(0);
 
+  // Screen Entrance and Completion View Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideScreenAnim = useRef(new Animated.Value(25)).current;
+  const reviewCardOpacity = useRef(new Animated.Value(1)).current;
+  const reviewCardSlide = useRef(new Animated.Value(0)).current;
+  const reviewBtnScale = useRef(new Animated.Value(0)).current;
+
+  // Deck Progressive Tracking Configurations
   const catProgress = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const cardOpacity = useRef(new Animated.Value(1)).current;
-
   const CAT_SIZE = 36;
   const TRACK_WIDTH = screenWidth - 44;
 
@@ -173,6 +181,24 @@ export default function Community() {
     outputRange: [0, TRACK_WIDTH - CAT_SIZE],
     extrapolate: 'clamp',
   });
+
+  // Animated Tracking Array for Swiping Layers
+  const cardAnimations = useRef(
+    WORDS.map(() => ({
+      pan: new Animated.ValueXY({ x: 0, y: 0 }),
+      scale: new Animated.Value(1),
+    }))
+  ).current;
+
+  const SWIPE_THRESHOLD = screenWidth * 0.25;
+  const SWIPE_VELOCITY = 0.4;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(slideScreenAnim, { toValue: 0, duration: 450, useNativeDriver: true }),
+    ]).start();
+  }, []);
 
   useEffect(() => {
     Animated.spring(catProgress, {
@@ -183,48 +209,115 @@ export default function Community() {
     }).start();
   }, [currentIndex]);
 
-  const handleNavigation = (direction: 'next' | 'prev') => {
-    const isNext = direction === 'next';
-    const nextIndex = isNext ? currentIndex + 1 : currentIndex - 1;
+  useEffect(() => {
+    if (showReviewScreen) {
+      reviewBtnScale.setValue(0.5);
+      Animated.spring(reviewBtnScale, {
+        toValue: 1,
+        friction: 6,
+        tension: 50,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [showReviewScreen]);
 
-    if (nextIndex < 0 || nextIndex >= WORDS.length) return;
+  const resetDeck = () => {
+    WORDS.forEach((_, index) => {
+      cardAnimations[index].pan.setValue({ x: 0, y: 0 });
+      cardAnimations[index].scale.setValue(index === 0 ? 1 : 0.95);
+    });
+    currentIndexRef.current = 0;
+    setCurrentIndex(0);
+    setShowReviewScreen(false);
 
+    reviewCardOpacity.setValue(1);
+    reviewCardSlide.setValue(0);
+
+    fadeAnim.setValue(0);
+    slideScreenAnim.setValue(25);
     Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: isNext ? -screenWidth : screenWidth,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(cardOpacity, {
-        toValue: 0,
-        duration: 180,
-        useNativeDriver: true,
-      })
-    ]).start(() => {
-      setCurrentIndex(nextIndex);
-      slideAnim.setValue(isNext ? screenWidth : -screenWidth);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 350, useNativeDriver: true }),
+      Animated.timing(slideScreenAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
+    ]).start();
+  };
 
+  const handleReviewAgainPress = () => {
+    Animated.sequence([
+      Animated.timing(reviewBtnScale, { toValue: 0.92, duration: 80, useNativeDriver: true }),
+      Animated.timing(reviewBtnScale, { toValue: 1, duration: 100, useNativeDriver: true }),
       Animated.parallel([
-        Animated.spring(slideAnim, {
-          toValue: 0,
-          friction: 7,
-          tension: 50,
-          useNativeDriver: true,
-        }),
-        Animated.timing(cardOpacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        })
-      ]).start();
+        Animated.timing(reviewCardOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
+        Animated.timing(reviewCardSlide, { toValue: 40, duration: 280, useNativeDriver: true }),
+      ]),
+    ]).start(() => {
+      resetDeck();
     });
   };
 
+  const goNext = () => {
+    const idx = currentIndexRef.current;
+    const currentCard = cardAnimations[idx];
+    const nextCard = idx < WORDS.length - 1 ? cardAnimations[idx + 1] : null;
+
+    Animated.parallel([
+      Animated.timing(currentCard.pan, {
+        toValue: { x: -screenWidth * 1.3, y: 0 },
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      nextCard
+        ? Animated.spring(nextCard.scale, { toValue: 1, friction: 8, useNativeDriver: true })
+        : Animated.timing(new Animated.Value(0), { toValue: 0, duration: 0, useNativeDriver: true }),
+    ]).start(() => {
+      if (idx >= WORDS.length - 1) {
+        setShowReviewScreen(true);
+      } else {
+        currentIndexRef.current = idx + 1;
+        setCurrentIndex(idx + 1);
+      }
+    });
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 5 && Math.abs(g.dx) > Math.abs(g.dy),
+
+      onPanResponderMove: (_, g) => {
+        const idx = currentIndexRef.current;
+        const dx = g.dx;
+
+        if (dx < 0) {
+          cardAnimations[idx].pan.setValue({ x: dx, y: g.dy * 0.1 });
+          if (idx < WORDS.length - 1) {
+            const progress = Math.min(Math.abs(dx) / (screenWidth * 0.5), 1);
+            cardAnimations[idx + 1].scale.setValue(0.95 + progress * 0.05);
+          }
+        } else if (dx > 0) {
+          cardAnimations[idx].pan.setValue({ x: dx * 0.18, y: g.dy * 0.05 });
+        }
+      },
+
+      onPanResponderRelease: (_, g) => {
+        const idx = currentIndexRef.current;
+        const swipedLeft = g.dx < -SWIPE_THRESHOLD || g.vx < -SWIPE_VELOCITY;
+
+        if (g.dx < 0 && swipedLeft) {
+          goNext();
+        } else {
+          Animated.parallel([
+            Animated.spring(cardAnimations[idx].pan, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 5 }),
+            idx < WORDS.length - 1 ? Animated.spring(cardAnimations[idx + 1].scale, { toValue: 0.95, useNativeDriver: true, friction: 5 }) : null,
+          ].filter(Boolean) as Animated.CompositeAnimation[]).start();
+        }
+      },
+    })
+  ).current;
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, { opacity: fadeAnim, transform: [{ translateY: slideScreenAnim }] }]}>
 
-        {/* Progress */}
+        {/* Progress Tracker */}
         <View style={styles.progressArea}>
           <Animated.Image
             source={CAT}
@@ -251,72 +344,85 @@ export default function Community() {
           </View>
         </View>
 
-        {/* Card */}
+        {/* Swipe Instructions Text */}
+        <Text style={styles.instructionText}>
+          Click the flashcard to learn about community cats, and swipe left for the next card!
+        </Text>
+
+        {/* Interactive Deck Workspace Layer */}
         <View style={styles.cardArea}>
-          <Animated.View
-            style={{
-              transform: [{ translateX: slideAnim }],
-              opacity: cardOpacity,
-            }}
-          >
-            <FlipCard
-              word={WORDS[currentIndex]}
-              color={CARD_COLOR}
-            />
-          </Animated.View>
+          {showReviewScreen ? (
+            <Animated.View style={[
+              styles.reviewContainer,
+              { opacity: reviewCardOpacity, transform: [{ translateY: reviewCardSlide }] },
+            ]}>
+              <Text style={styles.reviewHeading}>Great Job!</Text>
+              <Text style={styles.reviewSubheading}>You've finished! Click below to go through the cards again! </Text>
+
+              <Animated.View style={{ transform: [{ scale: reviewBtnScale }] }}>
+                <TouchableOpacity
+                  style={styles.reviewBtn}
+                  onPress={handleReviewAgainPress}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.reviewBtnText}>Review Again</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </Animated.View>
+          ) : (
+            WORDS.map((word, index) => {
+              if (index < currentIndex || index > currentIndex + 1) {
+                return null;
+              }
+
+              const cardAnim = cardAnimations[index];
+              const rotateCard = cardAnim.pan.x.interpolate({
+                inputRange: [-screenWidth / 2, 0, screenWidth / 2],
+                outputRange: ['-10deg', '0deg', '10deg'],
+                extrapolate: 'clamp',
+              });
+
+              const animatedStyles = {
+                transform: [
+                  { translateX: cardAnim.pan.x },
+                  { translateY: cardAnim.pan.y },
+                  { scale: cardAnim.scale },
+                  { rotate: rotateCard },
+                ],
+                zIndex: WORDS.length - index,
+              };
+
+              const isCurrent = index === currentIndex;
+              const isUnderneath = index === currentIndex + 1;
+
+              return (
+                <Animated.View
+                  key={index}
+                  style={[
+                    styles.cardWrapper,
+                    animatedStyles,
+                    isUnderneath && styles.backgroundCard,
+                  ]}
+                  {...(isCurrent ? panResponder.panHandlers : {})}
+                >
+                  <FlipCard
+                    word={word}
+                    color={CARD_COLOR}
+                  />
+                </Animated.View>
+              );
+            })
+          )}
         </View>
 
-        {/* Navigation */}
-        <View style={styles.navRow}>
-          <TouchableOpacity
-            style={[
-              styles.navBtn,
-              currentIndex === 0 && styles.navBtnDisabled,
-            ]}
-            onPress={() => handleNavigation('prev')}
-            disabled={currentIndex === 0}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.arrowText,
-                currentIndex === 0 &&
-                  styles.arrowDisabled,
-              ]}
-            >
-              ←
-            </Text>
-          </TouchableOpacity>
-
-          <Text style={styles.counterText}>
-            {currentIndex + 1} / {WORDS.length}
+        {/* Counter UI */}
+        <View style={styles.bottomNav}>
+          <Text style={styles.pageCounter}>
+            {showReviewScreen ? WORDS.length : currentIndex + 1} / {WORDS.length}
           </Text>
-
-          <TouchableOpacity
-            style={[
-              styles.navBtn,
-              styles.navBtnNext,
-              currentIndex === WORDS.length - 1 &&
-                styles.navBtnDisabled,
-            ]}
-            onPress={() => handleNavigation('next')}
-            disabled={
-              currentIndex === WORDS.length - 1
-            }
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.arrowText,
-                styles.arrowNext,
-              ]}
-            >
-              →
-            </Text>
-          </TouchableOpacity>
         </View>
 
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -326,34 +432,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
   container: {
     flex: 1,
     paddingHorizontal: 22,
-    paddingTop: 24,
-    paddingBottom: 28,
+    paddingVertical: 16,
     justifyContent: 'space-between',
   },
 
-  // Progress
+  // Progress Tracker
   progressArea: {
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 12,
+    marginBottom: 4,
   },
-
   progressTrack: {
     height: 10,
     backgroundColor: 'rgba(44,26,14,0.1)',
     borderRadius: 5,
     overflow: 'hidden',
   },
-
   progressFill: {
     height: '100%',
     backgroundColor: GREEN,
     borderRadius: 5,
   },
-
   progressCat: {
     position: 'absolute',
     width: 36,
@@ -361,45 +462,58 @@ const styles = StyleSheet.create({
     top: -30,
   },
 
-  // Card Area
+  // Instructions
+  instructionText: {
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontWeight: '600',
+    color: INK_SOFT,
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    paddingHorizontal: 16,
+    lineHeight: 18,
+  },
+
+  // Deck Workspace
   cardArea: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    width: '100%',
   },
-
+  cardWrapper: {
+    position: 'absolute',
+    width: CARD_WIDTH,
+    height: '92%', // Leverages VH-esque constraints safely across small and tall displays
+    maxHeight: 460, // Fallback safety ceiling threshold
+  },
+  backgroundCard: {
+    opacity: 1,
+  },
   flipContainer: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    alignSelf: 'center',
+    width: '100%',
+    height: '100%',
   },
-
   card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
+    width: '100%',
+    height: '100%',
     borderRadius: 24,
     padding: 24,
-
     shadowColor: INK,
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 6,
-
+    shadowRadius: 12,
+    elevation: 4,
     backfaceVisibility: 'hidden',
-
     justifyContent: 'space-between',
     alignItems: 'center',
-
     borderWidth: 2,
     borderColor: 'rgba(44,26,14,0.06)',
-
     borderBottomWidth: 5,
     borderBottomColor: 'rgba(44,26,14,0.12)',
   },
-
   cardBack: {
     position: 'absolute',
     top: 0,
@@ -407,12 +521,10 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-
   backContent: {
     flex: 1,
     width: '100%',
   },
-
   eyebrow: {
     fontFamily: 'Avenir',
     fontSize: 10,
@@ -422,17 +534,15 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginBottom: 4,
   },
-
   cardWord: {
     fontFamily: 'Avenir',
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '900',
     color: INK,
     letterSpacing: -0.5,
-    lineHeight: 38,
+    lineHeight: 36,
     textAlign: 'center',
   },
-
   cardWordSmall: {
     fontFamily: 'Avenir',
     fontSize: 18,
@@ -440,41 +550,36 @@ const styles = StyleSheet.create({
     color: INK,
     letterSpacing: -0.5,
   },
-
   divider: {
     height: 1.5,
     backgroundColor: 'rgba(44,26,14,0.08)',
     borderRadius: 1,
     marginVertical: 4,
   },
-
   scrollTextContainer: {
     flex: 1,
-    marginTop: 10,
+    marginTop: 6,
   },
-
   scrollTextContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingBottom: 8,
+    paddingBottom: 4,
   },
-
   cardDefinition: {
     fontFamily: 'Avenir',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '400',
     color: INK_SOFT,
-    lineHeight: 22,
+    lineHeight: 21,
   },
-
   tapHint: {
     alignSelf: 'center',
     backgroundColor: 'rgba(44,26,14,0.08)',
     borderRadius: 50,
     paddingVertical: 6,
     paddingHorizontal: 16,
+    marginTop: 8,
   },
-
   tapHintText: {
     fontFamily: 'Avenir',
     fontSize: 11,
@@ -483,52 +588,65 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Navigation
-  navRow: {
+  // Completion Screen View
+  reviewContainer: {
+    width: CARD_WIDTH,
+    height: '92%',
+    maxHeight: 460,
+    borderRadius: 24,
+    padding: 32,
+    backgroundColor: WHITE,
+    borderWidth: 2,
+    borderColor: 'rgba(44,26,14,0.06)',
+    borderBottomWidth: 5,
+    borderBottomColor: 'rgba(44,26,14,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  reviewHeading: {
+    fontFamily: 'Avenir',
+    fontSize: 26,
+    fontWeight: '900',
+    color: INK,
+    textAlign: 'center',
+  },
+  reviewSubheading: {
+    fontFamily: 'Avenir',
+    fontSize: 15,
+    fontWeight: '500',
+    color: INK_SOFT,
+    textAlign: 'center',
+    paddingHorizontal: 10,
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  reviewBtn: {
+    backgroundColor: GREEN,
+    paddingVertical: 14,
+    paddingHorizontal: 36,
+    borderRadius: 50,
+    borderBottomWidth: 4,
+    borderBottomColor: GREEN_DARK,
+  },
+  reviewBtnText: {
+    fontFamily: 'Avenir',
+    fontSize: 16,
+    fontWeight: '800',
+    color: WHITE,
+  },
+
+  // Bottom Counter Section
+  bottomNav: {
+    width: CARD_WIDTH,
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 18,
-    marginTop: 4,
+    paddingTop: 8,
+    paddingBottom: 4,
   },
-
-  navBtn: {
-    width: 92,
-    height: 54,
-    borderRadius: 28,
-    backgroundColor: 'rgba(44,26,14,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomWidth: 3,
-    borderBottomColor: 'rgba(44,26,14,0.12)',
-  },
-
-  navBtnNext: {
-    backgroundColor: '#C8D8E8',
-    borderBottomWidth: 4,
-    borderBottomColor: '#7A9BBE',
-  },
-
-  navBtnDisabled: {
-    opacity: 0.35,
-  },
-
-  arrowText: {
-    fontSize: 34,
-    fontWeight: '700',
-    color: INK_SOFT,
-    lineHeight: 38,
-  },
-
-  arrowNext: {
-    color: '#2C1A0E',
-  },
-
-  arrowDisabled: {
-    color: 'rgba(107,76,53,0.35)',
-  },
-
-  counterText: {
+  pageCounter: {
     fontFamily: 'Avenir',
     fontSize: 17,
     fontWeight: '800',

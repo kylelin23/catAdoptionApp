@@ -98,11 +98,9 @@ export default function Pros({ navigation }: { navigation: any }) {
     setCurrentIndex(0);
     setShowReviewScreen(false);
 
-    // Reset structural review animation tracking states
     reviewCardOpacity.setValue(1);
     reviewCardSlide.setValue(0);
 
-    // Re-trigger entrance slide up sequence for the newly reloaded deck
     fadeAnim.setValue(0);
     slideAnim.setValue(25);
     Animated.parallel([
@@ -118,7 +116,6 @@ export default function Pros({ navigation }: { navigation: any }) {
     ]).start();
   }, []);
 
-  // Pop introduction handling for review card buttons
   useEffect(() => {
     if (showReviewScreen) {
       reviewBtnScale.setValue(0.5);
@@ -131,14 +128,10 @@ export default function Pros({ navigation }: { navigation: any }) {
     }
   }, [showReviewScreen]);
 
-  // COMBINED BUTTON CLICK AND EXIT SEQUENCE
   const handleReviewAgainPress = () => {
-    // 1. Button press scale click flash response
     Animated.sequence([
       Animated.timing(reviewBtnScale, { toValue: 0.92, duration: 80, useNativeDriver: true }),
       Animated.timing(reviewBtnScale, { toValue: 1, duration: 100, useNativeDriver: true }),
-
-      // 2. Clear out container completely downward
       Animated.parallel([
         Animated.timing(reviewCardOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
         Animated.timing(reviewCardSlide, { toValue: 40, duration: 280, useNativeDriver: true })
@@ -285,6 +278,13 @@ export default function Pros({ navigation }: { navigation: any }) {
           )}
         </View>
 
+        {/* Dynamic Instruction Text — Repositioned underneath the Flashcard */}
+        {!showReviewScreen && (
+          <Text style={styles.instructionText}>
+            Swipe left to see the next card!
+          </Text>
+        )}
+
         <View style={styles.bottomNav}>
           <Text style={styles.pageCounter}>
             {showReviewScreen ? pros.length : currentIndex + 1} / {pros.length}
@@ -306,6 +306,20 @@ const styles = StyleSheet.create({
   headerCenter: { flex: 1, gap: 2 },
   eyebrow: { fontFamily: 'Avenir', fontSize: 10, fontWeight: '800', color: 'rgba(44,26,14,0.4)', letterSpacing: 2 },
   pageTitle: { fontFamily: 'Avenir', fontSize: 28, fontWeight: '900', color: INK, letterSpacing: -0.5 },
+
+  // Custom Instruction Text Styling
+  instructionText: {
+    fontFamily: 'Avenir',
+    fontSize: 14,
+    fontWeight: '600',
+    color: INK_SOFT,
+    textAlign: 'center',
+    marginTop: -4,  // Tucked slightly under the card block bounds
+    marginBottom: 2,
+    paddingHorizontal: 16,
+    lineHeight: 18,
+  },
+
   cardArea: { flex: 1, justifyContent: 'center', alignItems: 'center', position: 'relative', width: CARD_WIDTH, alignSelf: 'center' },
   cardWrapper: { position: 'absolute', width: CARD_WIDTH, height: CARD_HEIGHT },
   backgroundCard: { opacity: 1 },
@@ -317,11 +331,8 @@ const styles = StyleSheet.create({
   tapHint: { backgroundColor: 'rgba(44,26,14,0.1)', borderRadius: 50, paddingVertical: 6, paddingHorizontal: 14 },
   tapHintText: { fontFamily: 'Avenir', fontSize: 11, fontWeight: '700', color: INK, letterSpacing: 0.3 },
 
-  // FIXED: added paddingTop and expanded lineHeight for multi-line support
   backHeading: { fontFamily: 'Avenir', fontSize: 20, fontWeight: '900', color: INK, letterSpacing: -0.2, lineHeight: 24, alignSelf: 'stretch', paddingTop: 8 },
-  // FIXED: added top margin to separate gracefully from heading
   divider: { height: 1.5, backgroundColor: 'rgba(44,26,14,0.08)', borderRadius: 1, alignSelf: 'stretch', marginTop: 10 },
-  // FIXED: unified spacing with vertical margin to protect layout consistency
   bulletsArea: { gap: 10, flex: 1, justifyContent: 'center', alignSelf: 'stretch', marginVertical: 10 },
 
   bulletRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },

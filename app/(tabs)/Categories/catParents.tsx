@@ -111,6 +111,7 @@ export default function CatParents({ navigation }: { navigation: any }) {
           onIndexChange={setIndex}
           initialLayout={{ width: screenWidth }}
           renderTabBar={renderTabBar}
+          swipeEnabled={false} // Disables swipe control completely
           style={{ backgroundColor: 'transparent' }}
         />
       </SafeAreaView>

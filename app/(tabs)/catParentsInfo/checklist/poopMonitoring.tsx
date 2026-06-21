@@ -24,8 +24,8 @@ const TYPES = [
     border: '#C0392B',
     dark: '#922B21',
     cardColor: '#F2B8B0',
-    ratingColor: '#C0392B',
-    ratingDark: '#922B21',
+    ratingColor: 'rgba(192, 57, 43, 0.12)', // Subtle background tint
+    textColor: '#922B21', // Crisp dark color text matching severity
   },
   {
     type: 2,
@@ -35,8 +35,8 @@ const TYPES = [
     border: '#D4956A',
     dark: '#A86E45',
     cardColor: '#F2D9A0',
-    ratingColor: '#D4956A',
-    ratingDark: '#A86E45',
+    ratingColor: 'rgba(168, 110, 69, 0.15)',
+    textColor: '#A86E45',
   },
   {
     type: 3,
@@ -46,8 +46,8 @@ const TYPES = [
     border: '#7BAE6E',
     dark: '#5A8F50',
     cardColor: '#C4DDB0',
-    ratingColor: '#7BAE6E',
-    ratingDark: '#5A8F50',
+    ratingColor: 'rgba(90, 143, 80, 0.15)',
+    textColor: '#5A8F50',
   },
   {
     type: 4,
@@ -57,8 +57,8 @@ const TYPES = [
     border: '#7BAE6E',
     dark: '#5A8F50',
     cardColor: '#C4DDB0',
-    ratingColor: '#7BAE6E',
-    ratingDark: '#5A8F50',
+    ratingColor: 'rgba(90, 143, 80, 0.15)',
+    textColor: '#5A8F50',
   },
   {
     type: 5,
@@ -68,8 +68,8 @@ const TYPES = [
     border: '#D4956A',
     dark: '#A86E45',
     cardColor: '#F2D9A0',
-    ratingColor: '#D4956A',
-    ratingDark: '#A86E45',
+    ratingColor: 'rgba(168, 110, 69, 0.15)',
+    textColor: '#A86E45',
   },
   {
     type: 6,
@@ -79,8 +79,8 @@ const TYPES = [
     border: '#C47A45',
     dark: '#9E5C2E',
     cardColor: '#F2C9A0',
-    ratingColor: '#C47A45',
-    ratingDark: '#9E5C2E',
+    ratingColor: 'rgba(158, 92, 46, 0.15)',
+    textColor: '#9E5C2E',
   },
   {
     type: 7,
@@ -90,8 +90,8 @@ const TYPES = [
     border: '#C0392B',
     dark: '#922B21',
     cardColor: '#F2B8B0',
-    ratingColor: '#C0392B',
-    ratingDark: '#922B21',
+    ratingColor: 'rgba(192, 57, 43, 0.12)',
+    textColor: '#922B21',
   },
 ];
 
@@ -114,7 +114,6 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* Added delaysContentTouches={false} here to instantly bypass ScrollView responder latency */}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -134,7 +133,7 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
                 <Text style={styles.typeBadgeText}>{item.type}</Text>
               </View>
 
-              {/* Stool Image inside a specialized Pressable container */}
+              {/* Stool Image */}
               <View style={styles.imageWrapper}>
                 <Image
                   source={STOOL_IMAGES[item.type]}
@@ -153,9 +152,9 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
                 <Text style={styles.typeLabel}>{item.label}</Text>
               </View>
 
-              {/* Rating */}
-              <View style={[styles.ratingBadge, { backgroundColor: item.ratingColor, borderBottomColor: item.ratingDark }]}>
-                <Text style={styles.ratingText}>{item.rating}</Text>
+              {/* Redesigned Rating Status Label */}
+              <View style={[styles.ratingBadge, { backgroundColor: item.ratingColor }]}>
+                <Text style={[styles.ratingText, { color: item.textColor }]}>{item.rating}</Text>
               </View>
 
             </View>
@@ -163,7 +162,7 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
           <View style={{ height: 40 }} />
         </ScrollView>
 
-        {/* Lightbox Modal for Previewing Bigger Stool Images */}
+        {/* Lightbox Modal */}
         <Modal
           visible={selectedImage !== null}
           transparent={true}
@@ -300,7 +299,7 @@ const styles = StyleSheet.create({
   },
   typeDescription: {
     fontFamily: 'Avenir',
-    fontSize: 15, fontWeight: '600',
+    fontSize: 13, fontWeight: '600',
     color: INK, lineHeight: 18,
     marginBottom: 2,
   },
@@ -311,22 +310,21 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
+  // Redesigned: Softened structure into a non-button status badge
   ratingBadge: {
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: 76,
     flexShrink: 0,
-    borderBottomWidth: 3,
   },
   ratingText: {
     fontFamily: 'Avenir',
-    fontSize: 11, fontWeight: '900',
-    color: WHITE,
+    fontSize: 11, fontWeight: '800',
     textAlign: 'center',
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
   modalOverlay: {
     flex: 1,
