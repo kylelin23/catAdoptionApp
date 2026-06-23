@@ -15,8 +15,25 @@ const GREEN      = '#7BAE6E';
 const GREEN_DARK = '#5A8F50';
 const WARM       = '#D4956A';
 const WARM_DARK  = '#A86E45';
+const RED        = '#C2584A';
+const RED_DARK   = '#9A4136';
 
 const YOUR_EMAIL = 'catwise78@gmail.com';
+
+// --- Moderator passcode (client-side only — see note in chat about its limits) ---
+const MODERATOR_PASSCODE = 'maggy5';
+
+// --- EmailJS config: sign up free at https://www.emailjs.com, then fill these in ---
+// EmailJS lets the app send an email directly, with no backend of your own.
+const EMAILJS_SERVICE_ID  = 'service_kz9xcfa';
+const EMAILJS_TEMPLATE_ID = 'template_zpr05bs';
+const EMAILJS_PUBLIC_KEY  = 'kha2bU1tDlmvdOBEj';
+const EMAILJS_PRIVATE_KEY = 'vCkONn3hl0RxqzpHDsq60';
+
+// This template's "To Email" is a fixed address set in the EmailJS dashboard
+// (not driven by a variable). Add any extra recipients via the template's
+// "Cc" field in the dashboard rather than here.
+const MODERATOR_EMAIL = 'linkyle0924@gmail.com';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -32,6 +49,7 @@ type Story = {
   best_part: string;
   photos: string | null;
   created_at: string;
+  status: string;
 };
 
 const AVATAR_COLORS = ['#C4DDB0', '#C8D8E8', '#F2C9A0', '#E8C8B8', '#D4DDB0'];
@@ -46,6 +64,38 @@ const FIELDS = [
 ];
 
 const EMPTY_FORM = { name: '', cat_name: '', how_met: '', cat_description: '', memorable_story: '', best_part: '' };
+
+// Fires an email to the moderator inbox whenever a new story is submitted.
+// Failure here is non-blocking — a flaky email send should never stop a submission.
+// Variable names below (name/message/email) match the repurposed "Contact Us"
+// EmailJS template — adjust if you point this at a different template.
+async function notifyModeratorOfNewStory(catName: string, submitterName: string) {
+  try {
+    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id: EMAILJS_SERVICE_ID,
+        template_id: EMAILJS_TEMPLATE_ID,
+        user_id: EMAILJS_PUBLIC_KEY,
+        accessToken: EMAILJS_PRIVATE_KEY,
+        template_params: {
+          name: submitterName || 'Anonymous',
+          message: `A new cat story was submitted for "${catName}". Open the app and tap "Moderator" at the bottom of the Cat Stories page to review it.`,
+          email: MODERATOR_EMAIL, // keeps "Reply To" pointed at a valid address
+        },
+      }),
+    });
+    const responseText = await response.text();
+    if (!response.ok) {
+      console.log('EmailJS request failed:', response.status, responseText);
+    } else {
+      console.log('EmailJS request succeeded:', responseText);
+    }
+  } catch (e) {
+    console.log('moderator notify failed:', e);
+  }
+}
 
 function ConfettiPiece({ color, delay }: { color: string; delay: number }) {
   const y       = useRef(new Animated.Value(-20)).current;
@@ -484,6 +534,242 @@ function StoryModal({
   );
 }
 
+function PendingStoryCard({
+  item, onApprove, onDeny, busy,
+}: {
+  item: Story;
+  onApprove: (id: number) => void;
+  onDeny: (id: number) => void;
+  busy: boolean;
+}) {
+  const photoUrls: string[] = (() => {
+    if (!item.photos) return [];
+    try {
+      const parsed = JSON.parse(item.photos);
+      return Array.isArray(parsed) ? parsed : [item.photos];
+    } catch {
+      return [item.photos];
+    }
+  })();
+
+  return (
+    <View style={styles.storyCard}>
+      <View style={styles.storyHeader}>
+        <View style={styles.storyMeta}>
+          <Text style={styles.storyName}>{item.name || 'Anonymous'}</Text>
+          <Text style={styles.storyCatBadge}>{item.cat_name}</Text>
+        </View>
+        <Text style={styles.pendingTime}>{item.created_at.slice(0, 10)}</Text>
+      </View>
+
+      {photoUrls.length > 0 && (
+        <Image source={{ uri: photoUrls[0] }} style={styles.storyPhoto} resizeMode="cover" />
+      )}
+      {photoUrls.length > 1 && (
+        <Text style={styles.pendingPhotoCount}>
+          +{photoUrls.length - 1} more photo{photoUrls.length > 2 ? 's' : ''}
+        </Text>
+      )}
+
+      <View style={styles.expandedContent}>
+        {item.how_met ? (
+          <View style={styles.storySection}>
+            <Text style={styles.storySectionLabel}>HOW WE MET</Text>
+            <Text style={styles.storySectionText}>{item.how_met}</Text>
+          </View>
+        ) : null}
+        {item.cat_description ? (
+          <View style={styles.storySection}>
+            <Text style={styles.storySectionLabel}>ABOUT {item.cat_name.toUpperCase()}</Text>
+            <Text style={styles.storySectionText}>{item.cat_description}</Text>
+          </View>
+        ) : null}
+        {item.memorable_story ? (
+          <View style={styles.storySection}>
+            <Text style={styles.storySectionLabel}>A MEMORABLE MOMENT</Text>
+            <Text style={styles.storySectionText}>{item.memorable_story}</Text>
+          </View>
+        ) : null}
+        {item.best_part ? (
+          <View style={[styles.storySection, styles.bestPartSection]}>
+            <Text style={styles.storySectionLabel}>BEST PART</Text>
+            <Text style={styles.bestPartText}>"{item.best_part}"</Text>
+          </View>
+        ) : null}
+      </View>
+
+      <View style={styles.moderatorActions}>
+        <TouchableOpacity
+          style={[styles.denyBtn, busy && styles.submitBtnDisabled]}
+          onPress={() => onDeny(item.id)}
+          disabled={busy}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.denyBtnText}>Deny</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.approveBtn, busy && styles.submitBtnDisabled]}
+          onPress={() => onApprove(item.id)}
+          disabled={busy}
+          activeOpacity={0.85}
+        >
+          {busy ? <ActivityIndicator color={WHITE} size="small" /> : <Text style={styles.approveBtnText}>Approve</Text>}
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function ModeratorLoginModal({
+  visible, onClose, onSuccess,
+}: { visible: boolean; onClose: () => void; onSuccess: () => void }) {
+  const [code, setCode]   = useState('');
+  const [error, setError] = useState(false);
+  const slideAnim    = useRef(new Animated.Value(400)).current;
+  const backdropAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setCode('');
+      setError(false);
+      Animated.parallel([
+        Animated.spring(slideAnim,    { toValue: 0, friction: 9, tension: 70, useNativeDriver: true }),
+        Animated.timing(backdropAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(slideAnim,    { toValue: 400, duration: 220, useNativeDriver: true }),
+        Animated.timing(backdropAnim, { toValue: 0,   duration: 200, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [visible]);
+
+  const handleSubmit = () => {
+    if (code.trim() === MODERATOR_PASSCODE) {
+      onSuccess();
+    } else {
+      setError(true);
+    }
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
+      <Animated.View style={[styles.backdrop, { opacity: backdropAnim }]} pointerEvents="none" />
+      <TouchableOpacity style={styles.backdropDismiss} activeOpacity={1} onPress={onClose} />
+      <KeyboardAvoidingView style={styles.modalWrapper} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <Animated.View style={[styles.modalContainer, { transform: [{ translateY: slideAnim }] }]}>
+          <View style={styles.handleBar} />
+          <View style={styles.modalHeader}>
+            <View>
+              <Text style={styles.modalTitle}>Moderator Login</Text>
+              <Text style={styles.modalSub}>Enter the passcode to review submissions</Text>
+            </View>
+            <TouchableOpacity style={styles.closeBtn} onPress={onClose} activeOpacity={0.7}>
+              <Text style={styles.closeBtnText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ paddingHorizontal: 22, paddingBottom: 28, gap: 12 }}>
+            <TextInput
+              style={[styles.input, error && styles.inputError]}
+              placeholder="Passcode"
+              placeholderTextColor="rgba(44,26,14,0.25)"
+              value={code}
+              onChangeText={(v) => { setCode(v); setError(false); }}
+              secureTextEntry
+              autoCapitalize="none"
+              autoFocus
+              onSubmitEditing={handleSubmit}
+              returnKeyType="done"
+            />
+            {error && <Text style={styles.errorText}>Incorrect passcode</Text>}
+            <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} activeOpacity={0.85}>
+              <Text style={styles.submitBtnText}>Enter</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+function ModeratorPanel({
+  visible, onClose,
+}: { visible: boolean; onClose: () => void }) {
+  const [pending, setPending] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId]   = useState<number | null>(null);
+
+  const fetchPending = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('cat_stories')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: true });
+    if (!error && data) setPending(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (visible) fetchPending();
+  }, [visible]);
+
+  const handleApprove = async (id: number) => {
+    setBusyId(id);
+    const { error } = await supabase.from('cat_stories').update({ status: 'approved' }).eq('id', id);
+    if (!error) setPending(prev => prev.filter(s => s.id !== id));
+    setBusyId(null);
+  };
+
+  const handleDeny = async (id: number) => {
+    setBusyId(id);
+    const { error } = await supabase.from('cat_stories').update({ status: 'denied' }).eq('id', id);
+    if (!error) setPending(prev => prev.filter(s => s.id !== id));
+    setBusyId(null);
+  };
+
+  if (!visible) return null;
+
+  return (
+    <View style={styles.moderatorOverlay}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.moderatorHeader}>
+          <View>
+            <Text style={styles.modalTitle}>Review Queue</Text>
+            <Text style={styles.modalSub}>{pending.length} pending {pending.length === 1 ? 'story' : 'stories'}</Text>
+          </View>
+          <TouchableOpacity style={styles.closeBtn} onPress={onClose} activeOpacity={0.7}>
+            <Text style={styles.closeBtnText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {loading ? (
+            <ActivityIndicator color={GREEN} style={{ marginTop: 20 }} />
+          ) : pending.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>All caught up</Text>
+              <Text style={styles.emptyText}>No stories waiting for review.</Text>
+            </View>
+          ) : (
+            pending.map(item => (
+              <PendingStoryCard
+                key={item.id}
+                item={item}
+                onApprove={handleApprove}
+                onDeny={handleDeny}
+                busy={busyId === item.id}
+              />
+            ))
+          )}
+          <View style={{ height: 40 }} />
+        </ScrollView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
 export default function CatStories({ navigation }: { navigation: any }) {
   const [stories, setStories]           = useState<Story[]>([]);
   const [fetching, setFetching]         = useState(true);
@@ -491,6 +777,14 @@ export default function CatStories({ navigation }: { navigation: any }) {
   const [submitted, setSubmitted]       = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showModal, setShowModal]       = useState(false);
+
+  const [moderatorLoginVisible, setModeratorLoginVisible] = useState(false);
+  const [moderatorPanelVisible, setModeratorPanelVisible] = useState(false);
+  // Forces a full remount of the screen below after the full-screen
+  // ModeratorPanel modal closes — works around an RN/iOS layout bug where
+  // the screen behind a dismissed full-screen Modal doesn't re-measure
+  // its height correctly, leaving blank space at the bottom.
+  const [screenKey, setScreenKey] = useState(0);
 
   const promptY   = useRef(new Animated.Value(20)).current;
   const promptOp  = useRef(new Animated.Value(0)).current;
@@ -530,6 +824,7 @@ export default function CatStories({ navigation }: { navigation: any }) {
     const { data, error } = await supabase
       .from('cat_stories')
       .select('*')
+      .eq('status', 'approved')
       .order('created_at', { ascending: false });
     if (!error && data) setStories(data);
     setFetching(false);
@@ -547,6 +842,7 @@ export default function CatStories({ navigation }: { navigation: any }) {
       memorable_story: form.memorable_story.trim(),
       best_part:       form.best_part.trim(),
       photos:          photoUrls.length > 0 ? JSON.stringify(photoUrls) : null,
+      status:          'pending',
     }]);
     setLoading(false);
     if (!error) {
@@ -554,19 +850,21 @@ export default function CatStories({ navigation }: { navigation: any }) {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3500);
       showSuccessBanner();
-      fetchStories();
+      notifyModeratorOfNewStory(form.cat_name.trim(), form.name.trim());
+      // No fetchStories() here — the new story is pending and won't show
+      // on the public page until it's approved in the moderator panel.
     }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView key={screenKey} style={styles.safeArea}>
       <Confetti show={showConfetti} />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
         {submitted && (
           <Animated.View style={[styles.successBanner, { opacity: bannerOp, transform: [{ translateY: bannerY }] }]}>
-            <Text style={styles.successText}>Your story was shared with the community!</Text>
+            <Text style={styles.successText}>Thanks! Your story was submitted for review.</Text>
           </Animated.View>
         )}
 
@@ -600,7 +898,13 @@ export default function CatStories({ navigation }: { navigation: any }) {
           )}
         </Animated.View>
 
-        <View style={{ height: 40 }} />
+        <TouchableOpacity
+          style={styles.moderatorLink}
+          onPress={() => setModeratorLoginVisible(true)}
+          activeOpacity={0.6}
+        >
+          <Text style={styles.moderatorLinkText}>Moderator</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <StoryModal
@@ -608,6 +912,24 @@ export default function CatStories({ navigation }: { navigation: any }) {
         onClose={() => setShowModal(false)}
         onSubmit={handleSubmit}
         loading={loading}
+      />
+
+      <ModeratorLoginModal
+        visible={moderatorLoginVisible}
+        onClose={() => setModeratorLoginVisible(false)}
+        onSuccess={() => {
+          setModeratorLoginVisible(false);
+          setModeratorPanelVisible(true);
+        }}
+      />
+
+      <ModeratorPanel
+        visible={moderatorPanelVisible}
+        onClose={() => {
+          setModeratorPanelVisible(false);
+          setScreenKey(k => k + 1);
+          fetchStories(); // refresh the public list in case anything was just approved
+        }}
       />
     </SafeAreaView>
   );
@@ -677,6 +999,8 @@ const styles = StyleSheet.create({
   inputLabel: { fontFamily: 'Avenir', fontSize: 12, fontWeight: '800', color: 'rgba(44,26,14,0.45)', letterSpacing: 1.5, textTransform: 'uppercase' },
   input: { fontFamily: 'Avenir', fontSize: 15, fontWeight: '500', color: INK, backgroundColor: 'rgba(44,26,14,0.04)', borderRadius: 12, padding: 12, borderWidth: 1.5, borderColor: 'rgba(44,26,14,0.1)' },
   inputMultiline: { height: 80, paddingTop: 12 },
+  inputError: { borderColor: RED },
+  errorText: { fontFamily: 'Avenir', fontSize: 13, fontWeight: '600', color: RED },
 
   photoPicker: { height: 120, borderRadius: 16, borderWidth: 1.5, borderColor: 'rgba(44,26,14,0.12)', borderStyle: 'dashed', backgroundColor: 'rgba(44,26,14,0.03)', overflow: 'hidden' },
   photoPickerLoading: { opacity: 0.6 },
@@ -697,4 +1021,18 @@ const styles = StyleSheet.create({
   submitBtn: { backgroundColor: GREEN, borderRadius: 14, paddingVertical: 16, alignItems: 'center', borderBottomWidth: 4, borderBottomColor: GREEN_DARK },
   submitBtnDisabled: { opacity: 0.4 },
   submitBtnText: { fontFamily: 'Avenir', color: WHITE, fontSize: 15, fontWeight: '900', letterSpacing: 0.5 },
+
+  moderatorLink: { alignSelf: 'center', marginTop: 30, paddingVertical: 10, paddingHorizontal: 16 },
+  moderatorLinkText: { fontFamily: 'Avenir', fontSize: 12, fontWeight: '600', color: 'rgba(44,26,14,0.25)', letterSpacing: 0.5 },
+  moderatorOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: WHITE, zIndex: 50, elevation: 50 },
+
+  moderatorHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', paddingHorizontal: 22, paddingTop: 16, paddingBottom: 8 },
+  pendingTime: { fontFamily: 'Avenir', fontSize: 11, fontWeight: '600', color: INK_SOFT },
+  pendingPhotoCount: { fontFamily: 'Avenir', fontSize: 11, fontWeight: '600', color: INK_SOFT, marginTop: 4 },
+
+  moderatorActions: { flexDirection: 'row', gap: 10, marginTop: 6 },
+  denyBtn: { flex: 1, backgroundColor: 'rgba(194,88,74,0.1)', borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderWidth: 1.5, borderColor: RED, borderBottomWidth: 3, borderBottomColor: RED_DARK },
+  denyBtnText: { fontFamily: 'Avenir', fontSize: 14, fontWeight: '800', color: RED_DARK },
+  approveBtn: { flex: 1, backgroundColor: GREEN, borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 3, borderBottomColor: GREEN_DARK },
+  approveBtnText: { fontFamily: 'Avenir', fontSize: 14, fontWeight: '800', color: WHITE },
 });
