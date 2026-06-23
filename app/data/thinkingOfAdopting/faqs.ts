@@ -46,7 +46,7 @@ const faqs: FAQ[] = [
 
     {
         question: 'How much does it cost?',
-        answer: 'Providing cat food, water and litter are a necessity. Cats are family and deserve quality food. Do not just buy the cheapest brand! Flea medicine is also a monthly expense that is important to budget for. On average, expect to pay a minimum of $80-100 each month.'
+        answer: 'Providing cat food, water, litter, and toys are a necessity. Cats are family and deserve quality food. Do not just buy the cheapest brand! Other expenses include flea medicine, annual vet checks ups, vaccinations, and cat sitters! On average, expect to pay a minimum of $80-100 each month for basic expenses. Be prepared for unexpected vet visits to easily run into the thousands.'
     },
 
     {
