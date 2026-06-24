@@ -42,13 +42,15 @@ This app was made using React Native, and the goal of this app is to let new cat
 - **Interactive Quizzes**: Trivia with instant answer checking, confetti feedback, and animated progress bars
 - **Flip Card Flashcards**: Swipeable cards with cat illustrations and detailed back content
 - **Gamification**: Game-style UI to learn which foods, plants, and household items are dangerous to cats
-- **FAQ Accordions**: Expandable questions with a peeking cat animation
+- **Cat Stories**: User-submitted stories that connect cat lovers through shared experiences
+- **Cat Shelter Finder**: Location-based shelter finder that displays nearby cat shelters using the user’s real-time location
 - **Animations** — Spring transitions, walking cat progress bars, slide animations, and entrance effects throughout
 
 ## Tech Stack
 - React Native
 - Expo
 - TypeScript
+- Supabase
 
 ## How to Start
 ### Prerequisites
