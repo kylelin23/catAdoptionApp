@@ -15,24 +15,28 @@ This app was made using React Native, and the goal of this app is to let new cat
 
 ### App Screenshots
 
+
+
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/374964ca-393b-4e84-bc75-01ad1e5facdf" width="220"/>
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/1b32342e-ed6b-4220-9b18-13c7c862793e" />
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/66cccab3-c6b2-4d30-ad60-fa45c375a16e" width="220"/>
+  <img width="220" alt="Simulator Screenshot - iPhone 15 Plus - 2026-06-23 at 14 25 58" src="https://github.com/user-attachments/assets/ccded081-d08d-4ff5-8dc6-2bba3e609b2c" />
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/8e4dfd90-198c-4412-8e4c-df9760f27109" width="220"/>
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/d001cf62-4332-4d0d-bab2-93df62188b69" />
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/79343050-eeda-4e0a-ac29-122337cafd1d" width="220"/>
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/865438be-177a-45c8-adcc-fbb9c00efbd0" />
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/04258b53-1a97-4edf-b1c7-78b51726a1b1" width="220"/>
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/8536336b-66ef-4344-ab6c-3f3ab5113bc4" />
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/47a98fad-00d6-4f5b-bedc-507c018a8800" width="220"/>
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/1fe21ca6-a09e-46fe-ab5a-b2780d878526" />
 </p>
+
 
 ## Features
 - **Interactive Quizzes**: Trivia with instant answer checking, confetti feedback, and animated progress bars
