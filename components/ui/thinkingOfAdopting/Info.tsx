@@ -8,6 +8,7 @@ import {
   Image,
 } from "react-native";
 
+
 const { height: H } = Dimensions.get("window");
 
 const PROS = require("../../../assets/images/pros.png");

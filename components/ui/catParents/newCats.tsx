@@ -9,6 +9,7 @@ import {
   Image,
   SafeAreaView,
 } from 'react-native';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -179,6 +180,14 @@ export default function NewCats() {
   const [openIndex, setOpenIndex] = useState(-1);
 
   const toggle = (index: number) => {
+    const isOpening = openIndex !== index;
+    if (isOpening) {
+      mixpanel.track('New Cats Step Opened', {
+        'Screen Name': 'New Cats',
+        'Step Title': STEPS[index].title,
+        'Step Number': STEPS[index].number,
+      });
+    }
     setOpenIndex(openIndex === index ? -1 : index);
   };
 

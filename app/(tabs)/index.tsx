@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, View, StyleSheet, StatusBar, Image, Animated, Easing, Dimensions, SafeAreaView } from 'react-native';
+import { mixpanel } from '../../lib/mixpanel';
 
 const { width: W, height: H } = Dimensions.get('window');
 
@@ -143,6 +144,13 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
       startIdleAnimations();
     });
   };
+
+  useEffect(() => {
+    // This fires every time the user lands on this screen
+    mixpanel.track('App Opened', {
+      'Screen Name': 'Home'
+    });
+  }, []);
 
   useEffect(() => {
     // Select a random fact when the screen is mounted

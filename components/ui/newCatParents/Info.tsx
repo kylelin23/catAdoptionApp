@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 
+
 const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
 const WHITE    = '#FFFAF5';

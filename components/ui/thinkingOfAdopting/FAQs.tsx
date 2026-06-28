@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet, ScrollView, Animated, Image } from 'react-native';
 import faqs from '../../../app/data/thinkingOfAdopting/faqs';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -89,6 +90,14 @@ export default function FAQs() {
   const [openIndex, setOpenIndex] = useState(-1);
 
   const showAnswer = (index: number) => {
+    const isOpening = openIndex !== index;
+
+    if (isOpening) {
+      mixpanel.track('FAQ Opened (Thinking of Adopting)', {
+        'Screen Name': 'Thinking of Adopting FAQs',
+        'Question': faqs[index].question,
+      });
+    }
     setOpenIndex(openIndex === index ? -1 : index);
   };
 

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Text, ScrollView, SafeAreaView, Image, Modal, Pressable } from "react-native";
+import { mixpanel } from '../../../../lib/mixpanel';
 
 const INK      = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -97,6 +98,12 @@ const TYPES = [
 
 export default function PoopMonitoring({ navigation }: { navigation: any }) {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+
+  useEffect(() => {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Poop Monitoring'
+    });
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView, ScrollView } from 'react-native';
 import expectCards from '../../data/newCatParents/expect';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK        = '#2C1A0E';
 const INK_SOFT   = '#6B4C35';
@@ -116,6 +117,12 @@ export default function Expect({ navigation }: { navigation: any }) {
   };
 
   useEffect(() => {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Expected'
+    });
+  }, []);
+
+  useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 450, useNativeDriver: true }),
@@ -156,6 +163,12 @@ export default function Expect({ navigation }: { navigation: any }) {
     const idx = currentIndexRef.current;
     const currentCard = cardAnimations[idx];
     const nextCard = idx < expectCards.length - 1 ? cardAnimations[idx + 1] : null;
+
+    mixpanel.track('Expectation Card Swiped', {
+      'Screen Name': 'Expectation',
+      'Card Index': idx,
+      'Is Last Card': idx === expectCards.length - 1,
+    });
 
     Animated.parallel([
       Animated.timing(currentCard.pan, {

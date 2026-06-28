@@ -4,6 +4,7 @@ import { TabView } from 'react-native-tab-view';
 import FAQs from '@/components/ui/newCatParents/FAQs';
 import Trivia from '../../../components/ui/newCatParents/Trivia';
 import Info from '../../../components/ui/newCatParents/Info';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const screenWidth = Dimensions.get('window').width;
 const { height: H } = Dimensions.get('window');
@@ -24,6 +25,30 @@ export default function NewCatParents({ navigation }: { navigation: any }) {
   const headerY     = useRef(new Animated.Value(-20)).current;
   const headerOp    = useRef(new Animated.Value(0)).current;
   const bubbleScale = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (index === 0) {
+      mixpanel.track('Screen Opened', {
+        'Screen Name': 'New Cat Parents Info'
+      });
+    }
+  }, [index]);
+
+  useEffect(() => {
+    if (index === 1) {
+      mixpanel.track('Screen Opened', {
+        'Screen Name': 'New Cat Parents Trivia'
+      });
+    }
+  }, [index]);
+
+  useEffect(() => {
+    if (index === 2) {
+      mixpanel.track('Screen Opened', {
+        'Screen Name': 'New Cat Parents FAQs'
+      });
+    }
+  }, [index]);
 
   useEffect(() => {
     Animated.sequence([

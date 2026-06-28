@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   PanResponder,
 } from 'react-native';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -241,6 +242,13 @@ export default function Cationary() {
     const idx = currentIndexRef.current;
     const currentCard = cardAnimations[idx];
     const nextCard = idx < WORDS.length - 1 ? cardAnimations[idx + 1] : null;
+
+    mixpanel.track('Cationary Card Swiped', {
+      'Screen Name': 'Cationary',
+      'Card Index': idx,
+      'Word': WORDS[idx].word,
+      'Is Last Card': idx === WORDS.length - 1,
+    });
 
     Animated.parallel([
       Animated.timing(currentCard.pan, {

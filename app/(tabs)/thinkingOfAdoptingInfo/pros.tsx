@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView } from 'react-native';
 import pros from '../../../app/data/thinkingOfAdopting/pros';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -110,6 +111,12 @@ export default function Pros({ navigation }: { navigation: any }) {
   };
 
   useEffect(() => {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Pros'
+    });
+  }, []);
+
+  useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 450, useNativeDriver: true }),
@@ -145,6 +152,12 @@ export default function Pros({ navigation }: { navigation: any }) {
     const idx = currentIndexRef.current;
     const currentCard = cardAnimations[idx];
     const nextCard = idx < pros.length - 1 ? cardAnimations[idx + 1] : null;
+
+    mixpanel.track('Pros Card Swiped', {
+      'Screen Name': 'Pros',
+      'Card Index': idx,
+      'Is Last Card': idx === pros.length - 1,
+    });
 
     Animated.parallel([
       Animated.timing(currentCard.pan, {

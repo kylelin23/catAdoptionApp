@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView, ScrollView } from 'react-native';
 import prepCards from '../../data/newCatParents/preperation';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK        = '#2C1A0E';
 const INK_SOFT   = '#6B4C35';
@@ -115,6 +116,12 @@ export default function Preparation({ navigation }: { navigation: any }) {
   };
 
   useEffect(() => {
+      mixpanel.track('Screen Opened', {
+        'Screen Name': 'Preparation'
+      });
+    }, []);
+
+  useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 450, useNativeDriver: true }),
@@ -150,6 +157,13 @@ export default function Preparation({ navigation }: { navigation: any }) {
     const idx = currentIndexRef.current;
     const currentCard = cardAnimations[idx];
     const nextCard = idx < prepCards.length - 1 ? cardAnimations[idx + 1] : null;
+
+    mixpanel.track('Preparation Card Swiped', {
+      'Screen Name': 'Preparation',
+      'Card Index': idx,
+      'Is Last Card': idx === prepCards.length - 1,
+    });
+
 
     Animated.parallel([
       Animated.timing(currentCard.pan, {

@@ -4,6 +4,7 @@ import {
   Animated, Dimensions, Image, StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { mixpanel } from '../../lib/mixpanel';
 
 const { width: W, height: H } = Dimensions.get('window');
 
@@ -25,7 +26,7 @@ const CATEGORIES = [
   { key: 'thinking', route: 'Thinking of Adopting', title: 'Thinking of Adopting', subtitle: 'Considering getting a cat', color: '#C4DDB0', border: '#7BAE6E', dark: '#5A8F50' },
   { key: 'new',      route: 'New Cat Parents',       title: 'New Cat Parents',       subtitle: 'Just brought a cat home',    color: '#C8D8E8', border: '#7A9BBE', dark: '#5C7A9A' },
   { key: 'parents',  route: 'Cat Parents',            title: 'Cat Parents',            subtitle: 'Already a cat parent',       color: '#F2C9A0', border: '#D4956A', dark: '#A86E45' },
-  { key: 'lovers',   route: 'Cat Lovers',            title: 'Cat Lovers',            subtitle: 'Just obsessed with cats!',   color: '#F9D5D5', border: '#E29A9A', dark: '#B56B6B' },
+  // { key: 'lovers',   route: 'Cat Lovers',            title: 'Cat Lovers',            subtitle: 'Just obsessed with cats!',   color: '#F9D5D5', border: '#E29A9A', dark: '#B56B6B' },
 ];
 
 function CategoryCard({ cat, index, onPress }: { cat: typeof CATEGORIES[0]; index: number; onPress: () => void }) {
@@ -89,6 +90,13 @@ export default function AreYou({ navigation }: { navigation: any }) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    // This fires every time the user lands on this screen
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Are You'
+    });
+  }, []);
+
+  useEffect(() => {
     Animated.parallel([
       Animated.spring(headerY,  { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
       Animated.timing(headerOp, { toValue: 1, duration: 300, useNativeDriver: true }),
@@ -129,8 +137,6 @@ export default function AreYou({ navigation }: { navigation: any }) {
 
       {/* Sand section */}
       <View style={[styles.sandSection, { paddingTop: insets.top }]}>
-
-        {/* Top spacer container to replace the removed topRow button area */}
         <View style={styles.topSpacer} />
 
         <Animated.View style={[styles.headerArea, { opacity: headerOp, transform: [{ translateY: headerY }] }]}>
@@ -160,6 +166,9 @@ export default function AreYou({ navigation }: { navigation: any }) {
 
       {/* White section */}
       <View style={[styles.whiteSection, { paddingBottom: insets.bottom + 16 }]}>
+        {/* Top Spacer - Takes half an item's worth of space */}
+        <View style={styles.flexSpacer} />
+
         {CATEGORIES.map((cat, i) => (
           <CategoryCard
             key={cat.key}
@@ -168,6 +177,9 @@ export default function AreYou({ navigation }: { navigation: any }) {
             onPress={() => navigation.navigate(cat.route)}
           />
         ))}
+
+        {/* Bottom Spacer - Takes half an item's worth of space */}
+        <View style={styles.flexSpacer} />
       </View>
     </View>
   );
@@ -234,9 +246,15 @@ const styles = StyleSheet.create({
   whiteSection: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 16,
-    gap: 12,
+    // Reduced top padding slightly to let the flex layout handle the balancing beautifully
+    paddingTop: 5,
+    gap: 15,
     backgroundColor: WHITE,
+  },
+
+  // Added to split the missing 4th item space perfectly across top and bottom
+  flexSpacer: {
+    flex: 0.3,
   },
 
   cardWrapper: {

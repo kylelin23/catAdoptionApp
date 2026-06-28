@@ -4,6 +4,7 @@ import { TabView } from 'react-native-tab-view';
 import Checklist from '../../../components/ui/catParents/checklist';
 import NewCats from '../../../components/ui/catParents/newCats';
 import Cationary from '../../../components/ui/catParents/cationary';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const screenWidth = Dimensions.get('window').width;
 const { height: H } = Dimensions.get('window');
@@ -39,6 +40,30 @@ export default function CatParents({ navigation }: { navigation: any }) {
       Animated.spring(bubbleScale, { toValue: 1, friction: 5, tension: 100, useNativeDriver: true }),
     ]).start();
   }, []);
+
+  useEffect(() => {
+    if (index === 0) {
+      mixpanel.track('Screen Opened', {
+        'Screen Name': 'Cat Parents Essentials'
+      });
+    }
+  }, [index]);
+
+  useEffect(() => {
+    if (index === 1) {
+      mixpanel.track('Screen Opened', {
+        'Screen Name': 'Cat Parents New Cats'
+      });
+    }
+  }, [index]);
+
+  useEffect(() => {
+    if (index === 2) {
+      mixpanel.track('Screen Opened', {
+        'Screen Name': 'Cat Parents Cationary'
+      });
+    }
+  }, [index]);
 
   const [routes] = React.useState([
     { key: 'checklist', title: 'Essentials' },

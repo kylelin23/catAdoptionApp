@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import cards from '../../../data/catParents/catLang';
+import { mixpanel } from '../../../../lib/mixpanel';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -104,6 +105,12 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
   });
 
   useEffect(() => {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Cat Language'
+    });
+  }, []);
+
+  useEffect(() => {
     Animated.spring(catProgress, {
       toValue: currentIndex / (cards.length - 1),
       friction: 6,
@@ -113,6 +120,14 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
   }, [currentIndex]);
 
   const goToIndex = (index: number) => {
+    if (cards[index]) {
+      mixpanel.track('Card Swiped', {
+        'Screen Name': 'Cat Language',
+        'Card Title': cards[index].title,
+        'Direction': index > currentIndexRef.current ? 'Next' : 'Previous'
+      });
+    }
+
     currentIndexRef.current = index;
     setCurrentIndex(index);
     setOpenMoodKey(null);

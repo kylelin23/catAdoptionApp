@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Text, Dimensions, View, StyleSheet, TouchableOpacity, Animated, SafeAreaView, ScrollView } from 'react-native';
 import quiz, { answers } from '../../../app/data/newCatParents/trivia';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK        = '#2C1A0E';
 const INK_SOFT   = '#6B4C35';
@@ -137,6 +138,10 @@ export default function Trivia() {
 
     setIsCorrect(correct);
     setChecked(true);
+    mixpanel.track('Trivia Question Answered', {
+      'Question Number': currentQ + 1,
+      'Correct?': correct,
+    });
 
     if (correct) {
       setScore(s => s + 1);
@@ -147,6 +152,10 @@ export default function Trivia() {
 
   const handleNext = () => {
     if (currentQ >= quiz.length - 1) {
+      mixpanel.track('Trivia Completed', {
+        'Final Score': score + "/10",
+        'Total Questions': quiz.length,
+      });
       setFinished(true);
       return;
     }

@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, Image, SafeAreaView } from "react-native";
 import food, { plants, householdItems, others } from '../../../data/catParents/catList1';
 import { useState, useRef, useEffect } from "react";
+import { mixpanel } from '../../../../lib/mixpanel';
 
 const INK        = '#2C1A0E';
 const INK_SOFT   = '#6B4C35';
@@ -89,6 +90,12 @@ export default function CatList1({ navigation }: { navigation: any }) {
   });
 
   useEffect(() => {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Toxic Game'
+    });
+  }, []);
+
+  useEffect(() => {
     Animated.spring(catProgress, {
       toValue: currentItemIndex / currentList.length,
       friction: 6, tension: 80,
@@ -118,6 +125,13 @@ export default function CatList1({ navigation }: { navigation: any }) {
   const handleAnswer = (answer: 'yes' | 'no') => {
     if (answered) return;
     const correct = answer === currentItem.answer;
+
+    mixpanel.track('Toxic Game Question Answered', {
+      'List': LIST_LABELS[listIndex],
+      'Item': currentItem.item,
+      'Correct?': correct,
+    });
+
     setAnswered(correct ? 'correct' : 'incorrect');
     if (correct) {
       setShowConfetti(true);

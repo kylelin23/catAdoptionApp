@@ -4,6 +4,9 @@ import { TabView } from 'react-native-tab-view';
 import Info from '../../../components/ui/thinkingOfAdopting/Info';
 import FAQs from '../../../components/ui/thinkingOfAdopting/FAQs';
 import Trivia from '../../../components/ui/thinkingOfAdopting/trivia';
+import { mixpanel } from '../../../lib/mixpanel';
+
+
 
 const screenWidth = Dimensions.get('window').width;
 const { height: H } = Dimensions.get('window');
@@ -30,6 +33,8 @@ export default function ThinkingOfAdopting({ navigation }: { navigation: any }) 
   const headerOp    = useRef(new Animated.Value(0)).current;
   const bubbleScale = useRef(new Animated.Value(0)).current;
 
+
+
   useEffect(() => {
     Animated.sequence([
       Animated.parallel([
@@ -39,6 +44,29 @@ export default function ThinkingOfAdopting({ navigation }: { navigation: any }) 
       Animated.spring(bubbleScale, { toValue: 1, friction: 5, tension: 100, useNativeDriver: true }),
     ]).start();
   }, []);
+  useEffect(() => {
+  if (index === 0) {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Thinking of Adopting Info'
+    });
+  }
+  }, [index]);
+
+  useEffect(() => {
+  if (index === 1) {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Thinking of Adopting Checklist'
+    });
+  }
+}, [index]);
+
+useEffect(() => {
+  if (index === 2) {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Thinking of Adopting FAQs'
+    });
+  }
+  }, [index]);
 
   React.useEffect(() => {
     if (index !== 1) setTriviaKey(prev => prev + 1);

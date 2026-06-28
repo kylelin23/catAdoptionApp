@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Text, Dimensions, View, StyleSheet, TouchableOpacity, Animated, Image, SafeAreaView, ScrollView } from 'react-native';
 import quiz from '../../../app/data/thinkingOfAdopting/trivia';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK        = '#2C1A0E';
 const INK_SOFT   = '#6B4C35';
@@ -48,9 +49,17 @@ export default function Trivia() {
 
   const selectAnswer = (points: number) => {
     const newQuestions = [...questions];
+    const isSelecting = newQuestions[currentQ] !== points;
     newQuestions[currentQ] = newQuestions[currentQ] === points ? 0 : points;
     setQuestions(newQuestions);
     setTotal(newQuestions.reduce((a, b) => a + b, 0));
+    if (isSelecting) {
+      mixpanel.track('Trivia Question Answered', {
+        'Question Number': currentQ + 1,
+        'Question Text': question.question,
+        'Answer Choice Type': points === 3 ? 'Option 1' : points === 2 ? 'Option 2' : 'Option 3'
+      });
+    }
   };
 
   const handleCheck = () => {
@@ -70,6 +79,12 @@ export default function Trivia() {
       if (finalTotal < 16)      resultText = 'Not Yet Ready. Nothing is ever a complete "no" but we want you to feel ready and be ready.';
       else if (finalTotal < 22) resultText = 'Almost There. Go cat sit or hang out at a shelter before taking the plunge.';
       else                      resultText = 'Ready to Adopt! You probably already have a name ready!';
+
+      mixpanel.track('Checklist Completed', {
+        'Final Score': finalTotal + '/24',
+        'Result Category': resultText,
+      });
+
       setResult(resultText);
       setShowResult(true);
     }

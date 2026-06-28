@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Text, Dimensions, View, StyleSheet, Image, TouchableOpacity, Animated, PanResponder, SafeAreaView } from 'react-native';
 import cons from '../../../app/data/thinkingOfAdopting/cons';
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK = '#2C1A0E';
 const INK_SOFT = '#6B4C35';
@@ -128,6 +129,12 @@ export default function Cons({ navigation }: { navigation: any }) {
     }
   }, [showReviewScreen]);
 
+  useEffect(() => {
+    mixpanel.track('Screen Opened', {
+      'Screen Name': 'Cons'
+    });
+  }, []);
+
   const handleReviewAgainPress = () => {
     Animated.sequence([
       Animated.timing(reviewBtnScale, { toValue: 0.92, duration: 80, useNativeDriver: true }),
@@ -145,6 +152,12 @@ export default function Cons({ navigation }: { navigation: any }) {
     const idx = currentIndexRef.current;
     const currentCard = cardAnimations[idx];
     const nextCard = idx < cons.length - 1 ? cardAnimations[idx + 1] : null;
+
+    mixpanel.track('Cons Card Swiped', {
+      'Screen Name': 'Cons',
+      'Card Index': idx,
+      'Is Last Card': idx === cons.length - 1,
+    });
 
     Animated.parallel([
       Animated.timing(currentCard.pan, {
