@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -8,48 +8,84 @@ import {
   Dimensions,
   SafeAreaView,
   PanResponder,
-} from 'react-native';
-import { mixpanel } from '../../../lib/mixpanel';
+} from "react-native";
+import { mixpanel } from "../../../lib/mixpanel";
 
-const INK = '#2C1A0E';
-const INK_SOFT = '#6B4C35';
-const WHITE = '#FFFAF5';
-const GREEN = '#7BAE6E';
-const GREEN_DARK = '#5A8F50';
+const INK = "#2C1A0E";
+const INK_SOFT = "#6B4C35";
+const WHITE = "#FFFAF5";
+const GREEN = "#7BAE6E";
+const GREEN_DARK = "#5A8F50";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
 const CARD_WIDTH = screenWidth * 0.88;
 
-const CAT = require('../../../assets/images/walkingCat.png');
+const CAT = require("../../../assets/images/walkingCat.png");
 
 const WORDS = [
-  { word: 'Allogrooming', definition: 'Cats grooming each other, a sign of bonding and trust' },
-  { word: 'Bunting', definition: 'When a cat rubs their head or cheeks on you or objects to mark their scent' },
-  { word: 'Chirping', definition: 'The noise cats make when watching birds or prey' },
-  { word: 'Clowder', definition: 'A group of cats living together' },
-  { word: 'Flehmen Response', definition: 'Slight open-mouth expression when a cat is analyzing a scent' },
-  { word: 'Grooming', definition: 'Cat licking to clean themselves' },
-  { word: 'Hissing', definition: 'Defensive warning to strangers or other cats to "back off"' },
-  { word: 'Loaf Position', definition: 'Cat position with paws tucked under, indicates a relaxed cat' },
-  { word: 'Marking', definition: 'Using scent (rubbing or spraying) to mark territory' },
-  { word: 'Overstimulation', definition: 'When petting or playing becomes too much, leads to cat biting or swatting' },
-  { word: 'Pheromones', definition: 'Chemical signals cats use to communicate safety' },
-  { word: 'Scent Swapping', definition: 'Exchanging bedding or items to introduce cats through smell first' },
-  { word: 'Slow Blink', definition: 'A sign of trust and affection, often called a cat kiss' },
-  { word: 'Toe Beans', definition: "The soft squishy paw pads on a cat's feet" },
-  { word: 'Zoomies', definition: 'Sudden bursts of energy when cats run wildly, common at night' },
+  {
+    word: "Allogrooming",
+    definition: "Cats grooming each other, a sign of bonding and trust",
+  },
+  {
+    word: "Bunting",
+    definition:
+      "When a cat rubs their head or cheeks on you or objects to mark their scent",
+  },
+  {
+    word: "Chirping",
+    definition: "The noise cats make when watching birds or prey",
+  },
+  { word: "Clowder", definition: "A group of cats living together" },
+  {
+    word: "Flehmen Response",
+    definition: "Slight open-mouth expression when a cat is analyzing a scent",
+  },
+  { word: "Grooming", definition: "Cat licking to clean themselves" },
+  {
+    word: "Hissing",
+    definition: 'Defensive warning to strangers or other cats to "back off"',
+  },
+  {
+    word: "Loaf Position",
+    definition: "Cat position with paws tucked under, indicates a relaxed cat",
+  },
+  {
+    word: "Marking",
+    definition: "Using scent (rubbing or spraying) to mark territory",
+  },
+  {
+    word: "Overstimulation",
+    definition:
+      "When petting or playing becomes too much, leads to cat biting or swatting",
+  },
+  {
+    word: "Pheromones",
+    definition: "Chemical signals cats use to communicate safety",
+  },
+  {
+    word: "Scent Swapping",
+    definition:
+      "Exchanging bedding or items to introduce cats through smell first",
+  },
+  {
+    word: "Slow Blink",
+    definition: "A sign of trust and affection, often called a cat kiss",
+  },
+  {
+    word: "Toe Beans",
+    definition: "The soft squishy paw pads on a cat's feet",
+  },
+  {
+    word: "Zoomies",
+    definition: "Sudden bursts of energy when cats run wildly, common at night",
+  },
 ];
 
-const CARD_COLOR = '#C8D8E8';
+const CARD_COLOR = "#C8D8E8";
 
-function FlipCard({
-  word,
-  color,
-}: {
-  word: typeof WORDS[0];
-  color: string;
-}) {
+function FlipCard({ word, color }: { word: (typeof WORDS)[0]; color: string }) {
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
 
@@ -60,12 +96,12 @@ function FlipCard({
 
   const frontInterpolate = flipAnim.interpolate({
     inputRange: [0, 180],
-    outputRange: ['0deg', '180deg'],
+    outputRange: ["0deg", "180deg"],
   });
 
   const backInterpolate = flipAnim.interpolate({
     inputRange: [0, 180],
-    outputRange: ['180deg', '360deg'],
+    outputRange: ["180deg", "360deg"],
   });
 
   const frontOpacity = flipAnim.interpolate({
@@ -95,7 +131,6 @@ function FlipCard({
       activeOpacity={1}
       style={styles.flipContainer}
     >
-      {/* Front */}
       <Animated.View
         style={[
           styles.card,
@@ -115,7 +150,6 @@ function FlipCard({
         </View>
       </Animated.View>
 
-      {/* Back */}
       <Animated.View
         style={[
           styles.card,
@@ -135,8 +169,12 @@ function FlipCard({
           <Text style={styles.cardDefinition}>{word.definition}</Text>
         </View>
 
-        <View style={[styles.tapHint, { backgroundColor: 'rgba(44,26,14,0.06)' }]}>
-          <Text style={[styles.tapHintText, { color: INK_SOFT }]}>Tap to flip back</Text>
+        <View
+          style={[styles.tapHint, { backgroundColor: "rgba(44,26,14,0.06)" }]}
+        >
+          <Text style={[styles.tapHintText, { color: INK_SOFT }]}>
+            Tap to flip back
+          </Text>
         </View>
       </Animated.View>
     </TouchableOpacity>
@@ -148,14 +186,12 @@ export default function Cationary() {
   const [showReviewScreen, setShowReviewScreen] = useState(false);
   const currentIndexRef = useRef(0);
 
-  // Layout Sequence Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideScreenAnim = useRef(new Animated.Value(25)).current;
   const reviewCardOpacity = useRef(new Animated.Value(1)).current;
   const reviewCardSlide = useRef(new Animated.Value(0)).current;
   const reviewBtnScale = useRef(new Animated.Value(0)).current;
 
-  // Header Cat Track Configuration
   const catProgress = useRef(new Animated.Value(0)).current;
   const CAT_SIZE = 36;
   const TRACK_WIDTH = screenWidth - 44;
@@ -163,15 +199,14 @@ export default function Cationary() {
   const catX = catProgress.interpolate({
     inputRange: [0, 1],
     outputRange: [0, TRACK_WIDTH - CAT_SIZE],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
-  // Structural Animated Value Mappings for Swiping
   const cardAnimations = useRef(
     WORDS.map(() => ({
       pan: new Animated.ValueXY({ x: 0, y: 0 }),
       scale: new Animated.Value(1),
-    }))
+    })),
   ).current;
 
   const SWIPE_THRESHOLD = screenWidth * 0.25;
@@ -179,8 +214,16 @@ export default function Cationary() {
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
-      Animated.timing(slideScreenAnim, { toValue: 0, duration: 450, useNativeDriver: true }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideScreenAnim, {
+        toValue: 0,
+        duration: 450,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, []);
 
@@ -220,18 +263,42 @@ export default function Cationary() {
     fadeAnim.setValue(0);
     slideScreenAnim.setValue(25);
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 350, useNativeDriver: true }),
-      Animated.timing(slideScreenAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 350,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideScreenAnim, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
     ]).start();
   };
 
   const handleReviewAgainPress = () => {
     Animated.sequence([
-      Animated.timing(reviewBtnScale, { toValue: 0.92, duration: 80, useNativeDriver: true }),
-      Animated.timing(reviewBtnScale, { toValue: 1, duration: 100, useNativeDriver: true }),
+      Animated.timing(reviewBtnScale, {
+        toValue: 0.92,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+      Animated.timing(reviewBtnScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
       Animated.parallel([
-        Animated.timing(reviewCardOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
-        Animated.timing(reviewCardSlide, { toValue: 40, duration: 280, useNativeDriver: true }),
+        Animated.timing(reviewCardOpacity, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(reviewCardSlide, {
+          toValue: 40,
+          duration: 280,
+          useNativeDriver: true,
+        }),
       ]),
     ]).start(() => {
       resetDeck();
@@ -243,11 +310,11 @@ export default function Cationary() {
     const currentCard = cardAnimations[idx];
     const nextCard = idx < WORDS.length - 1 ? cardAnimations[idx + 1] : null;
 
-    mixpanel.track('Cationary Card Swiped', {
-      'Screen Name': 'Cationary',
-      'Card Index': idx,
-      'Word': WORDS[idx].word,
-      'Is Last Card': idx === WORDS.length - 1,
+    mixpanel.track("Cationary Card Swiped", {
+      "Screen Name": "Cationary",
+      "Card Index": idx,
+      Word: WORDS[idx].word,
+      "Is Last Card": idx === WORDS.length - 1,
     });
 
     Animated.parallel([
@@ -257,8 +324,16 @@ export default function Cationary() {
         useNativeDriver: true,
       }),
       nextCard
-        ? Animated.spring(nextCard.scale, { toValue: 1, friction: 8, useNativeDriver: true })
-        : Animated.timing(new Animated.Value(0), { toValue: 0, duration: 0, useNativeDriver: true }),
+        ? Animated.spring(nextCard.scale, {
+            toValue: 1,
+            friction: 8,
+            useNativeDriver: true,
+          })
+        : Animated.timing(new Animated.Value(0), {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
     ]).start(() => {
       if (idx >= WORDS.length - 1) {
         setShowReviewScreen(true);
@@ -271,7 +346,8 @@ export default function Cationary() {
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 5 && Math.abs(g.dx) > Math.abs(g.dy),
+      onMoveShouldSetPanResponder: (_, g) =>
+        Math.abs(g.dx) > 5 && Math.abs(g.dx) > Math.abs(g.dy),
 
       onPanResponderMove: (_, g) => {
         const idx = currentIndexRef.current;
@@ -295,27 +371,39 @@ export default function Cationary() {
         if (g.dx < 0 && swipedLeft) {
           goNext();
         } else {
-          Animated.parallel([
-            Animated.spring(cardAnimations[idx].pan, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 5 }),
-            idx < WORDS.length - 1 ? Animated.spring(cardAnimations[idx + 1].scale, { toValue: 0.95, useNativeDriver: true, friction: 5 }) : null,
-          ].filter(Boolean) as Animated.CompositeAnimation[]).start();
+          Animated.parallel(
+            [
+              Animated.spring(cardAnimations[idx].pan, {
+                toValue: { x: 0, y: 0 },
+                useNativeDriver: true,
+                friction: 5,
+              }),
+              idx < WORDS.length - 1
+                ? Animated.spring(cardAnimations[idx + 1].scale, {
+                    toValue: 0.95,
+                    useNativeDriver: true,
+                    friction: 5,
+                  })
+                : null,
+            ].filter(Boolean) as Animated.CompositeAnimation[],
+          ).start();
         }
       },
-    })
+    }),
   ).current;
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Animated.View style={[styles.container, { opacity: fadeAnim, transform: [{ translateY: slideScreenAnim }] }]}>
-
-        {/* Progress */}
+      <Animated.View
+        style={[
+          styles.container,
+          { opacity: fadeAnim, transform: [{ translateY: slideScreenAnim }] },
+        ]}
+      >
         <View style={styles.progressArea}>
           <Animated.Image
             source={CAT}
-            style={[
-              styles.progressCat,
-              { transform: [{ translateX: catX }] },
-            ]}
+            style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
             resizeMode="contain"
           />
 
@@ -326,8 +414,8 @@ export default function Cationary() {
                 {
                   width: catProgress.interpolate({
                     inputRange: [0, 1],
-                    outputRange: ['0%', '100%'],
-                    extrapolate: 'clamp',
+                    outputRange: ["0%", "100%"],
+                    extrapolate: "clamp",
                   }),
                 },
               ]}
@@ -335,20 +423,26 @@ export default function Cationary() {
           </View>
         </View>
 
-        {/* Swipe Instruction Banner */}
         <Text style={styles.instructionText}>
-           Click the flashcard to learn about cat vocabulary, and swipe left for the next card!
+          Click the flashcard to learn about cat vocabulary, and swipe left for
+          the next card!
         </Text>
 
-        {/* Card Interaction Stack */}
         <View style={styles.cardArea}>
           {showReviewScreen ? (
-            <Animated.View style={[
-              styles.reviewContainer,
-              { opacity: reviewCardOpacity, transform: [{ translateY: reviewCardSlide }] },
-            ]}>
+            <Animated.View
+              style={[
+                styles.reviewContainer,
+                {
+                  opacity: reviewCardOpacity,
+                  transform: [{ translateY: reviewCardSlide }],
+                },
+              ]}
+            >
               <Text style={styles.reviewHeading}>Great Job!</Text>
-              <Text style={styles.reviewSubheading}>You've finished! Click below to go through the cards again! </Text>
+              <Text style={styles.reviewSubheading}>
+                You've finished! Click below to go through the cards again!{" "}
+              </Text>
 
               <Animated.View style={{ transform: [{ scale: reviewBtnScale }] }}>
                 <TouchableOpacity
@@ -369,8 +463,8 @@ export default function Cationary() {
               const cardAnim = cardAnimations[index];
               const rotateCard = cardAnim.pan.x.interpolate({
                 inputRange: [-screenWidth / 2, 0, screenWidth / 2],
-                outputRange: ['-10deg', '0deg', '10deg'],
-                extrapolate: 'clamp',
+                outputRange: ["-10deg", "0deg", "10deg"],
+                extrapolate: "clamp",
               });
 
               const animatedStyles = {
@@ -396,23 +490,19 @@ export default function Cationary() {
                   ]}
                   {...(isCurrent ? panResponder.panHandlers : {})}
                 >
-                  <FlipCard
-                    word={word}
-                    color={CARD_COLOR}
-                  />
+                  <FlipCard word={word} color={CARD_COLOR} />
                 </Animated.View>
               );
             })
           )}
         </View>
 
-        {/* Counter UI Section */}
         <View style={styles.bottomNav}>
           <Text style={styles.pageCounter}>
-            {showReviewScreen ? WORDS.length : currentIndex + 1} / {WORDS.length}
+            {showReviewScreen ? WORDS.length : currentIndex + 1} /{" "}
+            {WORDS.length}
           </Text>
         </View>
-
       </Animated.View>
     </SafeAreaView>
   );
@@ -421,75 +511,69 @@ export default function Cationary() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   container: {
     flex: 1,
     paddingHorizontal: 22,
     paddingVertical: 16,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
-
-  // Progress Tracker Layout
   progressArea: {
     marginTop: 12,
     marginBottom: 4,
   },
   progressTrack: {
     height: 10,
-    backgroundColor: 'rgba(44,26,14,0.1)',
+    backgroundColor: "rgba(44,26,14,0.1)",
     borderRadius: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     backgroundColor: GREEN,
     borderRadius: 5,
   },
   progressCat: {
-    position: 'absolute',
+    position: "absolute",
     width: 36,
     height: 36,
     top: -30,
   },
-
-  // Guidelines Banner Text Style
   instructionText: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: INK_SOFT,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 10,
     marginBottom: 10,
     paddingHorizontal: 16,
     lineHeight: 18,
   },
-
-  // Card Space Context Constraints
   cardArea: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    width: "100%",
   },
   cardWrapper: {
-    position: 'absolute',
+    position: "absolute",
     width: CARD_WIDTH,
-    height: '92%',
+    height: "92%",
     maxHeight: 460,
   },
   backgroundCard: {
     opacity: 1,
   },
   flipContainer: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   card: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 24,
     padding: 24,
     shadowColor: INK,
@@ -497,109 +581,107 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 4,
-    backfaceVisibility: 'hidden',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    backfaceVisibility: "hidden",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: 'rgba(44,26,14,0.06)',
+    borderColor: "rgba(44,26,14,0.06)",
     borderBottomWidth: 5,
-    borderBottomColor: 'rgba(44,26,14,0.12)',
+    borderBottomColor: "rgba(44,26,14,0.12)",
   },
   cardBack: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
   },
   eyebrow: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 10,
-    fontWeight: '800',
-    color: 'rgba(44,26,14,0.35)',
+    fontWeight: "800",
+    color: "rgba(44,26,14,0.35)",
     letterSpacing: 2,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   cardWord: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 34,
-    fontWeight: '900',
+    fontWeight: "900",
     color: INK,
     letterSpacing: -1,
     lineHeight: 40,
-    textAlign: 'center',
+    textAlign: "center",
   },
   backContent: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     gap: 12,
     marginVertical: 8,
-    width: '100%',
+    width: "100%",
   },
   cardWordSmall: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 20,
-    fontWeight: '900',
+    fontWeight: "900",
     color: INK,
     letterSpacing: -0.5,
   },
   divider: {
     height: 1.5,
-    backgroundColor: 'rgba(44,26,14,0.08)',
+    backgroundColor: "rgba(44,26,14,0.08)",
     borderRadius: 1,
   },
   cardDefinition: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 16,
-    fontWeight: '400',
+    fontWeight: "400",
     color: INK_SOFT,
     lineHeight: 24,
   },
   tapHint: {
-    alignSelf: 'center',
-    backgroundColor: 'rgba(44,26,14,0.08)',
+    alignSelf: "center",
+    backgroundColor: "rgba(44,26,14,0.08)",
     borderRadius: 50,
     paddingVertical: 6,
     paddingHorizontal: 16,
     marginTop: 8,
   },
   tapHintText: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: "700",
     color: INK,
     letterSpacing: 0.3,
   },
-
-  // Completion Screen Deck Elements
   reviewContainer: {
     width: CARD_WIDTH,
-    height: '92%',
+    height: "92%",
     maxHeight: 460,
     borderRadius: 24,
     padding: 32,
     backgroundColor: WHITE,
     borderWidth: 2,
-    borderColor: 'rgba(44,26,14,0.06)',
+    borderColor: "rgba(44,26,14,0.06)",
     borderBottomWidth: 5,
-    borderBottomColor: 'rgba(44,26,14,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderBottomColor: "rgba(44,26,14,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 12,
   },
   reviewHeading: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 26,
-    fontWeight: '900',
+    fontWeight: "900",
     color: INK,
-    textAlign: 'center',
+    textAlign: "center",
   },
   reviewSubheading: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
     color: INK_SOFT,
-    textAlign: 'center',
+    textAlign: "center",
     paddingHorizontal: 10,
     lineHeight: 20,
     marginBottom: 12,
@@ -613,26 +695,24 @@ const styles = StyleSheet.create({
     borderBottomColor: GREEN_DARK,
   },
   reviewBtnText: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: "800",
     color: WHITE,
   },
-
-  // Bottom Counter Track Layout
   bottomNav: {
     width: CARD_WIDTH,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingTop: 8,
     paddingBottom: 4,
   },
   pageCounter: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 17,
-    fontWeight: '800',
+    fontWeight: "800",
     color: INK_SOFT,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -8,69 +8,69 @@ import {
   Animated,
   Image,
   SafeAreaView,
-} from 'react-native';
-import { mixpanel } from '../../../lib/mixpanel';
+} from "react-native";
+import { mixpanel } from "../../../lib/mixpanel";
 
-const INK = '#2C1A0E';
-const INK_SOFT = '#6B4C35';
-const WHITE = '#FFFAF5';
+const INK = "#2C1A0E";
+const INK_SOFT = "#6B4C35";
+const WHITE = "#FFFAF5";
 
-const PAW = require('../../../assets/images/paw.png');
+const PAW = require("../../../assets/images/paw.png");
 
 const STEPS = [
   {
-    key: 'separate',
-    number: '01',
-    title: 'Separate Spaces',
-    tagline: 'Keep them apart at first',
-    accent: '#7A9BBE',
-    dark: '#5C7A9A',
+    key: "separate",
+    number: "01",
+    title: "Separate Spaces",
+    tagline: "Keep them apart at first",
+    accent: "#7A9BBE",
+    dark: "#5C7A9A",
     bullets: [
-      'Keep the cats in separate spaces.',
-      'Set up the new cat in a quiet room with a litter box, food, water, a hiding spot, and a scratching post.',
-      'Keep the door closed.',
-      'Do not allow face-to-face contact for the first 3–5 days.',
+      "Keep the cats in separate spaces.",
+      "Set up the new cat in a quiet room with a litter box, food, water, a hiding spot, and a scratching post.",
+      "Keep the door closed.",
+      "Do not allow face-to-face contact for the first 3–5 days.",
     ],
   },
   {
-    key: 'scent',
-    number: '02',
-    title: 'Exchange Scents',
-    tagline: 'Cats recognize by scent before sight',
-    accent: '#D4956A',
-    dark: '#A86E45',
+    key: "scent",
+    number: "02",
+    title: "Exchange Scents",
+    tagline: "Cats recognize by scent before sight",
+    accent: "#D4956A",
+    dark: "#A86E45",
     bullets: [
-      'Exchange bedding or blankets between cats.',
-      'Feed cats on opposite sides of the closed door.',
+      "Exchange bedding or blankets between cats.",
+      "Feed cats on opposite sides of the closed door.",
       "Provide treats so cats associate each other's scents with positive outcomes.",
     ],
   },
   {
-    key: 'supervised',
-    number: '03',
-    title: 'Supervised Meetings',
-    tagline: 'Short and sweet visits',
-    accent: '#7BAE6E',
-    dark: '#5A8F50',
+    key: "supervised",
+    number: "03",
+    title: "Supervised Meetings",
+    tagline: "Short and sweet visits",
+    accent: "#7BAE6E",
+    dark: "#5A8F50",
     bullets: [
-      'Cats are ready when they show curious sniffing at the door baseline.',
-      'After several days, crack open the door slightly.',
-      'Let the cats meet briefly under close watch.',
-      'Continue to provide treats and keep sessions deliberately short.',
+      "Cats are ready when they show curious sniffing at the door baseline.",
+      "After several days, crack open the door slightly.",
+      "Let the cats meet briefly under close watch.",
+      "Continue to provide treats and keep sessions deliberately short.",
     ],
   },
   {
-    key: 'slow',
-    number: '04',
-    title: 'Slow and Gradual',
-    tagline: 'Patience is key',
-    accent: '#C47A45',
-    dark: '#9E5C2E',
+    key: "slow",
+    number: "04",
+    title: "Slow and Gradual",
+    tagline: "Patience is key",
+    accent: "#C47A45",
+    dark: "#9E5C2E",
     bullets: [
-      'Maintain the same gradual structure over days or weeks.',
-      'Keep your daily routines entirely consistent.',
-      'Do not force interactive spaces if either cat pulls away.',
-      'Remember: Hissing is safe communication and is totally common!',
+      "Maintain the same gradual structure over days or weeks.",
+      "Keep your daily routines entirely consistent.",
+      "Do not force interactive spaces if either cat pulls away.",
+      "Remember: Hissing is safe communication and is totally common!",
     ],
   },
 ];
@@ -80,7 +80,7 @@ function StepItem({
   isOpen,
   onPress,
 }: {
-  step: typeof STEPS[0];
+  step: (typeof STEPS)[0];
   isOpen: boolean;
   onPress: () => void;
 }) {
@@ -104,7 +104,7 @@ function StepItem({
 
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '180deg'],
+    outputRange: ["0deg", "180deg"],
   });
 
   const contentOpacity = contentHeightAnim.interpolate({
@@ -122,7 +122,10 @@ function StepItem({
       <View
         style={[
           styles.card,
-          { borderColor: 'rgba(44,26,14,0.06)', borderBottomColor: 'rgba(44,26,14,0.12)' },
+          {
+            borderColor: "rgba(44,26,14,0.06)",
+            borderBottomColor: "rgba(44,26,14,0.12)",
+          },
           isOpen && { borderLeftColor: step.accent },
         ]}
       >
@@ -156,7 +159,9 @@ function StepItem({
           />
         </TouchableOpacity>
 
-        <Animated.View style={{ maxHeight, opacity: contentOpacity, overflow: 'hidden' }}>
+        <Animated.View
+          style={{ maxHeight, opacity: contentOpacity, overflow: "hidden" }}
+        >
           <View style={styles.bulletsArea}>
             <View style={styles.divider} />
             {step.bullets.map((bullet, i) => (
@@ -182,10 +187,10 @@ export default function NewCats() {
   const toggle = (index: number) => {
     const isOpening = openIndex !== index;
     if (isOpening) {
-      mixpanel.track('New Cats Step Opened', {
-        'Screen Name': 'New Cats',
-        'Step Title': STEPS[index].title,
-        'Step Number': STEPS[index].number,
+      mixpanel.track("New Cats Step Opened", {
+        "Screen Name": "New Cats",
+        "Step Title": STEPS[index].title,
+        "Step Number": STEPS[index].number,
       });
     }
     setOpenIndex(openIndex === index ? -1 : index);
@@ -199,9 +204,9 @@ export default function NewCats() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Combined instruction text */}
           <Text style={styles.pageSubtitle}>
-            Follow these steps and tap each card to safely introduce new feline friends.
+            Follow these steps and tap each card to safely introduce new feline
+            friends.
           </Text>
 
           {STEPS.map((step, index) => (
@@ -222,38 +227,32 @@ export default function NewCats() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
-
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
-
   scroll: {
     flex: 1,
   },
-
   scrollContent: {
     paddingHorizontal: 22,
     paddingTop: 24,
     gap: 16,
   },
-
   pageSubtitle: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 15,
     color: INK_SOFT,
     lineHeight: 22,
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
-
   itemWrapper: {
-    position: 'relative',
+    position: "relative",
     marginVertical: 2,
   },
-
   card: {
     backgroundColor: WHITE,
     borderRadius: 24,
@@ -268,97 +267,84 @@ const styles = StyleSheet.create({
     borderBottomWidth: 5,
     borderLeftWidth: 6,
   },
-
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 14,
   },
-
   numberBadge: {
     width: 38,
     height: 38,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     flexShrink: 0,
     borderBottomWidth: 3,
   },
-
   numberText: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 14,
-    fontWeight: '900',
+    fontWeight: "900",
     color: WHITE,
   },
-
   titleArea: {
     flex: 1,
     gap: 1,
   },
-
   eyebrow: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 10,
-    fontWeight: '800',
-    color: 'rgba(44,26,14,0.35)',
+    fontWeight: "800",
+    color: "rgba(44,26,14,0.35)",
     letterSpacing: 1.5,
   },
-
   cardTitle: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 18,
-    fontWeight: '900',
+    fontWeight: "900",
     color: INK,
     letterSpacing: -0.3,
   },
-
   cardTagline: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
     color: INK_SOFT,
     lineHeight: 16,
     marginTop: 2,
   },
-
   pawChevron: {
     width: 22,
     height: 22,
     flexShrink: 0,
   },
-
   bulletsArea: {
     gap: 12,
     marginTop: 16,
     paddingBottom: 4,
   },
-
   divider: {
     height: 1.5,
-    backgroundColor: 'rgba(44,26,14,0.06)',
+    backgroundColor: "rgba(44,26,14,0.06)",
     borderRadius: 1,
     marginBottom: 4,
   },
-
   bulletRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: 12,
   },
-
   bulletPaw: {
     width: 14,
     height: 14,
     marginTop: 3,
     flexShrink: 0,
   },
-
   bulletText: {
     flex: 1,
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
     color: INK,
     lineHeight: 21,
   },

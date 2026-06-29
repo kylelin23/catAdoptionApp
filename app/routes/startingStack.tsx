@@ -4,16 +4,14 @@ import Home from "../(tabs)/areYou";
 import ThinkingOfAdopting from "../(tabs)/Categories/thinkingOfAdopting";
 import NewCatParents from "../(tabs)/Categories/newCatParents";
 import CatParents from "../(tabs)/Categories/catParents";
-import CatLovers from "../(tabs)/Categories/catLovers";
-import CatStories from "../../components/ui/catLovers/Stories";
 import Pros from "../(tabs)/thinkingOfAdoptingInfo/pros";
 import Cons from "../(tabs)/thinkingOfAdoptingInfo/cons";
-import Preparation from '../(tabs)/newCatParentsInfo/preparation';
-import Expect from '../(tabs)/newCatParentsInfo/expect';
+import Preparation from "../(tabs)/newCatParentsInfo/preparation";
+import Expect from "../(tabs)/newCatParentsInfo/expect";
 import Checklist from "../../components/ui/catParents/checklist";
-import CatList1 from '../(tabs)/catParentsInfo/checklist/catList1'
-import CatLanguage from '../(tabs)/catParentsInfo/checklist/catLanguage'
-import PoopMonitoring from '../(tabs)/catParentsInfo/checklist/poopMonitoring'
+import CatList1 from "../(tabs)/catParentsInfo/catList1";
+import CatLanguage from "../(tabs)/catParentsInfo/catLanguage";
+import PoopMonitoring from "../(tabs)/catParentsInfo/poopMonitoring";
 
 const StartingStack = createStackNavigator();
 
@@ -54,16 +52,6 @@ export default function App() {
         name="Cat Parents"
         component={CatParents}
         options={{ headerShown: false }}
-      />
-      <StartingStack.Screen
-        name="Cat Lovers"
-        component={CatLovers}
-        options={{ headerShown: false }}
-      />
-      <StartingStack.Screen
-        name="Cat Stories"
-        component={CatStories}
-        options = {{headerShown: false}}
       />
       <StartingStack.Screen
         name="Pros"

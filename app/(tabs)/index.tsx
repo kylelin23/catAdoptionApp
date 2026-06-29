@@ -1,19 +1,28 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, StatusBar, Image, Animated, Easing, Dimensions, SafeAreaView } from 'react-native';
-import { mixpanel } from '../../lib/mixpanel';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  StatusBar,
+  Image,
+  Animated,
+  Easing,
+  Dimensions,
+  SafeAreaView,
+} from "react-native";
+import { mixpanel } from "../../lib/mixpanel";
 
-const { width: W, height: H } = Dimensions.get('window');
+const { width: W, height: H } = Dimensions.get("window");
 
-const INK = '#2C1A0E';
-const SAND = '#E8C9A0';
-const WHITE = '#FFFAF5';
-const GREEN = '#7BAE6E';
+const INK = "#2C1A0E";
+const SAND = "#E8C9A0";
+const WHITE = "#FFFAF5";
+const GREEN = "#7BAE6E";
 
-const CAT_IMG     = require('../../assets/images/catWave.png');
-const PAW         = require('../../assets/images/paw.png');
-const WALKING_CAT = require('../../assets/images/walkingCat.png');
+const CAT_IMG = require("../../assets/images/catWave.png");
+const PAW = require("../../assets/images/paw.png");
+const WALKING_CAT = require("../../assets/images/walkingCat.png");
 
-// A selection of fun facts extracted from your spreadsheet image
 const CAT_FACTS = [
   "About 80% of orange (ginger) cats are male.",
   "Calico cats are almost always female — roughly 99.9%.",
@@ -23,30 +32,40 @@ const CAT_FACTS = [
   "Kittens are born blind and deaf, with eyes and ears opening around 10–14 days after birth.",
   "Kittens can't regulate body temperature until about 4 weeks old, relying on mom and littermates for warmth.",
   "The optimal window for socializing kittens is between 2–7 weeks of age.",
-  "Cats \"slow blink\" as a sign of trust and affection.",
+  'Cats "slow blink" as a sign of trust and affection.',
   "A cat shows you its belly as a sign of trust.",
-  "Cats bring their owners \"gifts\" like prey or toys when they treat you as family.",
+  'Cats bring their owners "gifts" like prey or toys when they treat you as family.',
   "Cats chirp and chatter at birds and squirrels through windows.",
   "Cats rub their faces on people to mark them as safe and familiar.",
-  "Cats always land on their feet thanks to a \"righting reflex\".",
+  'Cats always land on their feet thanks to a "righting reflex".',
   "A cat's purr vibrates at 25–150 Hz, known to promote healing.",
   "Cats have 32 muscles in each ear and can rotate them 180 degrees independently.",
   "Cats can squeeze through any opening their head fits through, thanks to a highly flexible collarbone.",
   "All domestic cats share about 95.6% of their DNA with tigers.",
   "A cat's nose print is as unique as a human fingerprint.",
   "Cats sleep 12–16 hours a day on average.",
-  "Adult cats almost never meow at other cats."
+  "Adult cats almost never meow at other cats.",
 ];
 
 let hasVisited = false;
 
-const CAT_SIZE    = 36;
+const CAT_SIZE = 36;
 const TRACK_WIDTH = W - 80;
 
-function FloatingPaw({ x, delay, duration, size, opacity }: {
-  x: number, delay: number, duration: number, size: number, opacity: number
+function FloatingPaw({
+  x,
+  delay,
+  duration,
+  size,
+  opacity,
+}: {
+  x: number;
+  delay: number;
+  duration: number;
+  size: number;
+  opacity: number;
 }) {
-  const y    = useRef(new Animated.Value(H + 40)).current;
+  const y = useRef(new Animated.Value(H + 40)).current;
   const fade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -58,9 +77,17 @@ function FloatingPaw({ x, delay, duration, size, opacity }: {
         Animated.parallel([
           Animated.timing(y, { toValue: -60, duration, useNativeDriver: true }),
           Animated.sequence([
-            Animated.timing(fade, { toValue: opacity, duration: 500, useNativeDriver: true }),
+            Animated.timing(fade, {
+              toValue: opacity,
+              duration: 500,
+              useNativeDriver: true,
+            }),
             Animated.delay(duration - 1000),
-            Animated.timing(fade, { toValue: 0, duration: 500, useNativeDriver: true }),
+            Animated.timing(fade, {
+              toValue: 0,
+              duration: 500,
+              useNativeDriver: true,
+            }),
           ]),
         ]),
       ]).start(() => run());
@@ -72,9 +99,10 @@ function FloatingPaw({ x, delay, duration, size, opacity }: {
     <Animated.Image
       source={PAW}
       style={{
-        position: 'absolute',
+        position: "absolute",
         left: W * x,
-        width: size, height: size,
+        width: size,
+        height: size,
         tintColor: INK,
         opacity: fade,
         transform: [{ translateY: y }],
@@ -85,7 +113,7 @@ function FloatingPaw({ x, delay, duration, size, opacity }: {
 }
 
 const PAWS = [
-  { x: 0.08, delay: 0,    duration: 5000, size: 18, opacity: 0.08 },
+  { x: 0.08, delay: 0, duration: 5000, size: 18, opacity: 0.08 },
   { x: 0.75, delay: 1200, duration: 6000, size: 14, opacity: 0.06 },
   { x: 0.45, delay: 2400, duration: 5500, size: 16, opacity: 0.07 },
 ];
@@ -93,23 +121,23 @@ const PAWS = [
 const BAR_TOTAL_DURATION = 5000;
 
 export default function HomeScreen({ navigation }: { navigation: any }) {
-  const timeoutRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const loadedRef    = useRef(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadedRef = useRef(false);
   const hasNavigated = useRef(false);
 
-  const [currentFact, setCurrentFact] = useState('');
+  const [currentFact, setCurrentFact] = useState("");
 
-  const catScale    = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
-  const catOpacity  = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const catScale = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const catOpacity = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
   const circlePulse = useRef(new Animated.Value(1)).current;
-  const logoOp      = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
-  const logoY       = useRef(new Animated.Value(hasVisited ? 0 : -20)).current;
+  const logoOp = useRef(new Animated.Value(hasVisited ? 1 : 0)).current;
+  const logoY = useRef(new Animated.Value(hasVisited ? 0 : -20)).current;
   const barProgress = useRef(new Animated.Value(0)).current;
 
   const navigateNow = () => {
     if (hasNavigated.current) return;
     hasNavigated.current = true;
-    navigation.replace('Home');
+    navigation.replace("Home");
   };
 
   const startBar = (duration: number) => {
@@ -126,9 +154,17 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
   const startIdleAnimations = () => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(circlePulse, { toValue: 1.05, duration: 1200, useNativeDriver: true }),
-        Animated.timing(circlePulse, { toValue: 1,    duration: 1200, useNativeDriver: true }),
-      ])
+        Animated.timing(circlePulse, {
+          toValue: 1.05,
+          duration: 1200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(circlePulse, {
+          toValue: 1,
+          duration: 1200,
+          useNativeDriver: true,
+        }),
+      ]),
     ).start();
   };
 
@@ -138,22 +174,29 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     Animated.parallel([
-      Animated.spring(logoY, { toValue: 0, friction: 10, tension: 200, useNativeDriver: true }),
-      Animated.timing(logoOp, { toValue: 1, duration: 200, useNativeDriver: true }),
+      Animated.spring(logoY, {
+        toValue: 0,
+        friction: 10,
+        tension: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(logoOp, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
     ]).start(() => {
       startIdleAnimations();
     });
   };
 
   useEffect(() => {
-    // This fires every time the user lands on this screen
-    mixpanel.track('App Opened', {
-      'Screen Name': 'Home'
+    mixpanel.track("App Opened", {
+      "Screen Name": "Home",
     });
   }, []);
 
   useEffect(() => {
-    // Select a random fact when the screen is mounted
     const randomIndex = Math.floor(Math.random() * CAT_FACTS.length);
     setCurrentFact(CAT_FACTS[randomIndex]);
 
@@ -169,8 +212,17 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
     Animated.sequence([
       Animated.delay(10),
       Animated.parallel([
-        Animated.spring(catScale, { toValue: 1, friction: 6, tension: 180, useNativeDriver: true }),
-        Animated.timing(catOpacity, { toValue: 1, duration: 100, useNativeDriver: true }),
+        Animated.spring(catScale, {
+          toValue: 1,
+          friction: 6,
+          tension: 180,
+          useNativeDriver: true,
+        }),
+        Animated.timing(catOpacity, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
       ]),
     ]).start(() => {
       hasVisited = true;
@@ -185,12 +237,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
   const catX = barProgress.interpolate({
     inputRange: [0, 1],
     outputRange: [0, TRACK_WIDTH - CAT_SIZE],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   const barWidth = barProgress.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0%', '100%'],
+    outputRange: ["0%", "100%"],
   });
 
   return (
@@ -200,21 +252,32 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
       <View style={styles.bgTop} />
       <View style={styles.bgBottom} />
 
-      {PAWS.map((p, i) => <FloatingPaw key={i} {...p} />)}
+      {PAWS.map((p, i) => (
+        <FloatingPaw key={i} {...p} />
+      ))}
 
-      <Animated.View style={[styles.logoArea, { opacity: logoOp, transform: [{ translateY: logoY }] }]}>
+      <Animated.View
+        style={[
+          styles.logoArea,
+          { opacity: logoOp, transform: [{ translateY: logoY }] },
+        ]}
+      >
         <Text style={styles.logoText}>catwise</Text>
       </Animated.View>
 
       <View style={styles.mascotArea}>
-        <Animated.View style={[styles.shadowRing, { transform: [{ scale: circlePulse }] }]} />
-        <Animated.View style={[
-          styles.catWrapper,
-          {
-            opacity: catOpacity,
-            transform: [{ scale: catScale }],
-          },
-        ]}>
+        <Animated.View
+          style={[styles.shadowRing, { transform: [{ scale: circlePulse }] }]}
+        />
+        <Animated.View
+          style={[
+            styles.catWrapper,
+            {
+              opacity: catOpacity,
+              transform: [{ scale: catScale }],
+            },
+          ]}
+        >
           <View style={styles.catCircle}>
             <Image
               source={CAT_IMG}
@@ -226,7 +289,6 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
       </View>
 
       <View style={styles.whiteContent}>
-        {/* Dynamic fact container placed right above the loading bar */}
         <View style={styles.factContainer}>
           <Text style={styles.factLabel}>Did you know?</Text>
           <Text style={styles.factText}>{currentFact}</Text>
@@ -243,7 +305,6 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
       </View>
-
     </SafeAreaView>
   );
 }
@@ -252,89 +313,106 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: WHITE,
-    alignItems: 'center',
-    overflow: 'hidden',
+    alignItems: "center",
+    overflow: "hidden",
   },
   bgTop: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
     height: H * 0.55,
     backgroundColor: SAND,
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
   },
   bgBottom: {
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     height: H * 0.48,
     backgroundColor: WHITE,
   },
   logoArea: {
     marginTop: H * 0.08,
-    alignItems: 'center',
+    alignItems: "center",
   },
   logoText: {
-    fontFamily: 'Avenir',
-    fontSize: 28, fontWeight: '900',
-    color: INK, letterSpacing: -0.5,
+    fontFamily: "Avenir",
+    fontSize: 28,
+    fontWeight: "900",
+    color: INK,
+    letterSpacing: -0.5,
   },
   mascotArea: {
-    position: 'absolute',
+    position: "absolute",
     top: H * 0.22,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   shadowRing: {
-    position: 'absolute',
-    width: 170, height: 170, borderRadius: 85,  // was 220
-    backgroundColor: 'rgba(44,26,14,0.06)',
+    position: "absolute",
+    width: 170,
+    height: 170,
+    borderRadius: 85,
+    backgroundColor: "rgba(44,26,14,0.06)",
   },
   catWrapper: {
-    width: 154, height: 154, borderRadius: 77,  // was 200
-    shadowColor: '#A0622A',
+    width: 154,
+    height: 154,
+    borderRadius: 77,
+    shadowColor: "#A0622A",
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25, shadowRadius: 24, elevation: 12,
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 12,
   },
   catCircle: {
-    width: 154, height: 154, borderRadius: 77,  // was 200
-    overflow: 'hidden',
+    width: 154,
+    height: 154,
+    borderRadius: 77,
+    overflow: "hidden",
     borderWidth: 4,
-    borderColor: 'rgba(255,250,245,0.8)',
-    backgroundColor: 'rgba(255,250,245,0.3)',
+    borderColor: "rgba(255,250,245,0.8)",
+    backgroundColor: "rgba(255,250,245,0.3)",
   },
-  catImage: { width: '100%', height: '100%' },
+  catImage: {
+    width: "100%",
+    height: "100%",
+  },
   whiteContent: {
-    position: 'absolute',
+    position: "absolute",
     bottom: H * 0.12,
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 40,
   },
   factContainer: {
     marginBottom: 30,
-    alignItems: 'center',
+    alignItems: "center",
   },
   factLabel: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: GREEN,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: 6,
   },
   factText: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 15,
     color: INK,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   progressArea: {
-    width: '100%',
+    width: "100%",
   },
   progressCat: {
-    position: 'absolute',
+    position: "absolute",
     width: CAT_SIZE,
     height: CAT_SIZE,
     top: -CAT_SIZE + 6,
@@ -342,12 +420,12 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 10,
-    backgroundColor: 'rgba(44,26,14,0.1)',
+    backgroundColor: "rgba(44,26,14,0.1)",
     borderRadius: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     backgroundColor: GREEN,
     borderRadius: 5,
   },

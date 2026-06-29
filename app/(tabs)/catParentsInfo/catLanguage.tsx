@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   Text,
   Dimensions,
@@ -6,30 +6,53 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Image,
   PanResponder,
   SafeAreaView,
   ScrollView,
-} from 'react-native';
-import cards from '../../../data/catParents/catLang';
-import { mixpanel } from '../../../../lib/mixpanel';
+} from "react-native";
+import cards from "../../data/catParents/catLang";
+import { mixpanel } from "../../../lib/mixpanel";
 
-const INK = '#2C1A0E';
-const INK_SOFT = '#6B4C35';
-const WHITE = '#FFFAF5';
-const GREEN = '#7BAE6E';
-const GREEN_DARK = '#5A8F50';
+const INK = "#2C1A0E";
+const INK_SOFT = "#6B4C35";
+const WHITE = "#FFFAF5";
+const GREEN = "#7BAE6E";
+const GREEN_DARK = "#5A8F50";
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get("window").width;
 
-const PAW = require('../../../../assets/images/paw.png');
-const CAT = require('../../../../assets/images/walkingCat.png');
+const PAW = require("../../../assets/images/paw.png");
+const CAT = require("../../../assets/images/walkingCat.png");
 
 const MOODS = [
-  { key: 'happy', label: 'Happy and Relaxed', color: '#C4DDB0', border: '#7BAE6E', dark: '#5A8F50' },
-  { key: 'loving', label: 'Loving Cat', color: '#F2C9A0', border: '#D4956A', dark: '#A86E45' },
-  { key: 'excited', label: 'Excited and Playful', color: '#C8D8E8', border: '#7A9BBE', dark: '#5C7A9A' },
-  { key: 'angry', label: 'Angry, Fearful and Anxious', color: '#E8C8B8', border: '#C47A45', dark: '#9E5C2E' },
+  {
+    key: "happy",
+    label: "Happy and Relaxed",
+    color: "#C4DDB0",
+    border: "#7BAE6E",
+    dark: "#5A8F50",
+  },
+  {
+    key: "loving",
+    label: "Loving Cat",
+    color: "#F2C9A0",
+    border: "#D4956A",
+    dark: "#A86E45",
+  },
+  {
+    key: "excited",
+    label: "Excited and Playful",
+    color: "#C8D8E8",
+    border: "#7A9BBE",
+    dark: "#5C7A9A",
+  },
+  {
+    key: "angry",
+    label: "Angry, Fearful and Anxious",
+    color: "#E8C8B8",
+    border: "#C47A45",
+    dark: "#9E5C2E",
+  },
 ];
 
 function MoodRow({
@@ -61,17 +84,33 @@ function MoodRow({
 
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '180deg'],
+    outputRange: ["0deg", "180deg"],
   });
 
   return (
-    <View style={[styles.moodRow, { backgroundColor: color, borderColor: border, borderBottomColor: dark }]}>
-      <TouchableOpacity style={styles.moodHeader} onPress={onToggle} activeOpacity={0.8}>
+    <View
+      style={[
+        styles.moodRow,
+        {
+          backgroundColor: color,
+          borderColor: border,
+          borderBottomColor: dark,
+        },
+      ]}
+    >
+      <TouchableOpacity
+        style={styles.moodHeader}
+        onPress={onToggle}
+        activeOpacity={0.8}
+      >
         <View style={[styles.moodDot, { backgroundColor: border }]} />
         <Text style={styles.moodLabel}>{label}</Text>
         <Animated.Image
           source={PAW}
-          style={[styles.moodPaw, { tintColor: border, transform: [{ rotate }] }]}
+          style={[
+            styles.moodPaw,
+            { tintColor: border, transform: [{ rotate }] },
+          ]}
           resizeMode="contain"
         />
       </TouchableOpacity>
@@ -101,12 +140,12 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
   const catX = catProgress.interpolate({
     inputRange: [0, 1],
     outputRange: [0, TRACK_WIDTH - CAT_SIZE],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   useEffect(() => {
-    mixpanel.track('Screen Opened', {
-      'Screen Name': 'Cat Language'
+    mixpanel.track("Screen Opened", {
+      "Screen Name": "Cat Language",
     });
   }, []);
 
@@ -121,10 +160,10 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
 
   const goToIndex = (index: number) => {
     if (cards[index]) {
-      mixpanel.track('Card Swiped', {
-        'Screen Name': 'Cat Language',
-        'Card Title': cards[index].title,
-        'Direction': index > currentIndexRef.current ? 'Next' : 'Previous'
+      mixpanel.track("Card Swiped", {
+        "Screen Name": "Cat Language",
+        "Card Title": cards[index].title,
+        Direction: index > currentIndexRef.current ? "Next" : "Previous",
       });
     }
 
@@ -168,14 +207,14 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
           }).start();
         }
       },
-    })
+    }),
   ).current;
 
   const currentCardTranslateX = swipeAnim;
 
   const currentCardRotate = swipeAnim.interpolate({
     inputRange: [-screenWidth, 0, screenWidth],
-    outputRange: ['-6deg', '0deg', '6deg'],
+    outputRange: ["-6deg", "0deg", "6deg"],
   });
 
   const nextCardTranslateX = swipeAnim.interpolate({
@@ -188,9 +227,12 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
     outputRange: [-screenWidth * 2, -screenWidth + 28, 0],
   });
 
-  const triggerButtonNav = (targetIndex: number, direction: 'forward' | 'backward') => {
+  const triggerButtonNav = (
+    targetIndex: number,
+    direction: "forward" | "backward",
+  ) => {
     Animated.timing(swipeAnim, {
-      toValue: direction === 'forward' ? -screenWidth : screenWidth,
+      toValue: direction === "forward" ? -screenWidth : screenWidth,
       duration: 220,
       useNativeDriver: true,
     }).start(() => {
@@ -202,7 +244,11 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
             <Text style={styles.backBtnText}>{"<"}</Text>
           </TouchableOpacity>
 
@@ -230,8 +276,8 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
                 {
                   width: catProgress.interpolate({
                     inputRange: [0, 1],
-                    outputRange: ['0%', '100%'],
-                    extrapolate: 'clamp',
+                    outputRange: ["0%", "100%"],
+                    extrapolate: "clamp",
                   }),
                 },
               ]}
@@ -248,7 +294,9 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
               ]}
             >
               <View style={styles.card}>
-                <Text style={styles.cardTitle}>{cards[currentIndex - 1].title}</Text>
+                <Text style={styles.cardTitle}>
+                  {cards[currentIndex - 1].title}
+                </Text>
               </View>
             </Animated.View>
           )}
@@ -270,7 +318,9 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.cardScrollContent}
               >
-                <Text style={styles.cardTitle}>{cards[currentIndex].title}</Text>
+                <Text style={styles.cardTitle}>
+                  {cards[currentIndex].title}
+                </Text>
 
                 <View style={styles.moodsArea}>
                   {MOODS.map((mood) => (
@@ -283,7 +333,9 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
                       dark={mood.dark}
                       isOpen={openMoodKey === mood.key}
                       onToggle={() =>
-                        setOpenMoodKey(openMoodKey === mood.key ? null : mood.key)
+                        setOpenMoodKey(
+                          openMoodKey === mood.key ? null : mood.key,
+                        )
                       }
                     />
                   ))}
@@ -299,9 +351,7 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
                 { transform: [{ translateX: nextCardTranslateX }] },
               ]}
             >
-              <View style={styles.card}>
-                {/* <Text style={styles.cardTitle}>{cards[currentIndex + 1].title}</Text> */}
-              </View>
+              <View style={styles.card}></View>
             </Animated.View>
           )}
         </View>
@@ -312,7 +362,10 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
               key={i}
               onPress={() => {
                 if (i !== currentIndex) {
-                  triggerButtonNav(i, i > currentIndex ? 'forward' : 'backward');
+                  triggerButtonNav(
+                    i,
+                    i > currentIndex ? "forward" : "backward",
+                  );
                 }
               }}
             >
@@ -330,11 +383,20 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
         <View style={styles.navRow}>
           <TouchableOpacity
             style={[styles.navBtn, currentIndex === 0 && styles.navBtnDisabled]}
-            onPress={() => currentIndex > 0 && triggerButtonNav(currentIndex - 1, 'backward')}
+            onPress={() =>
+              currentIndex > 0 && triggerButtonNav(currentIndex - 1, "backward")
+            }
             disabled={currentIndex === 0}
             activeOpacity={0.8}
           >
-            <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowDisabled]}>←</Text>
+            <Text
+              style={[
+                styles.arrowText,
+                currentIndex === 0 && styles.arrowDisabled,
+              ]}
+            >
+              ←
+            </Text>
           </TouchableOpacity>
 
           <Text style={styles.counterText}>
@@ -347,7 +409,10 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
               styles.navBtnNext,
               currentIndex === cards.length - 1 && styles.navBtnDisabled,
             ]}
-            onPress={() => currentIndex < cards.length - 1 && triggerButtonNav(currentIndex + 1, 'forward')}
+            onPress={() =>
+              currentIndex < cards.length - 1 &&
+              triggerButtonNav(currentIndex + 1, "forward")
+            }
             disabled={currentIndex === cards.length - 1}
             activeOpacity={0.8}
           >
@@ -372,22 +437,22 @@ const styles = StyleSheet.create({
     gap: 18,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   backBtn: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: 'rgba(44,26,14,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(44,26,14,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
     flexShrink: 0,
   },
   backBtnText: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: INK,
     lineHeight: 22,
   },
@@ -396,16 +461,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   eyebrow: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 10,
-    fontWeight: '800',
-    color: 'rgba(44,26,14,0.4)',
+    fontWeight: "800",
+    color: "rgba(44,26,14,0.4)",
     letterSpacing: 2,
   },
   pageTitle: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: "900",
     color: INK,
     letterSpacing: -0.5,
   },
@@ -414,24 +479,24 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 7,
-    flexDirection: 'row',
-    alignItems: 'baseline',
+    flexDirection: "row",
+    alignItems: "baseline",
     gap: 2,
     borderBottomWidth: 3,
     borderBottomColor: GREEN_DARK,
     flexShrink: 0,
   },
   counterNum: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 16,
-    fontWeight: '900',
+    fontWeight: "900",
     color: WHITE,
   },
   counterDenom: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,250,245,0.7)',
+    fontWeight: "600",
+    color: "rgba(255,250,245,0.7)",
   },
   progressArea: {
     marginTop: 18,
@@ -439,28 +504,28 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 10,
-    backgroundColor: 'rgba(44,26,14,0.1)',
+    backgroundColor: "rgba(44,26,14,0.1)",
     borderRadius: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     backgroundColor: GREEN,
     borderRadius: 5,
   },
   progressCat: {
-    position: 'absolute',
+    position: "absolute",
     width: 36,
     height: 36,
     top: -28,
   },
   cardContainerArea: {
     flex: 1,
-    position: 'relative',
+    position: "relative",
     marginHorizontal: -12,
   },
   peekCardOuter: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 12,
     right: 12,
@@ -473,9 +538,9 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 16,
     borderWidth: 2,
-    borderColor: 'rgba(44,26,14,0.06)',
+    borderColor: "rgba(44,26,14,0.06)",
     borderBottomWidth: 5,
-    borderBottomColor: 'rgba(44,26,14,0.1)',
+    borderBottomColor: "rgba(44,26,14,0.1)",
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -486,9 +551,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   cardTitle: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 20,
-    fontWeight: '900',
+    fontWeight: "900",
     color: INK,
     letterSpacing: -0.5,
     lineHeight: 26,
@@ -499,13 +564,13 @@ const styles = StyleSheet.create({
   },
   moodRow: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 2,
     borderBottomWidth: 4,
   },
   moodHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -519,9 +584,9 @@ const styles = StyleSheet.create({
   },
   moodLabel: {
     flex: 1,
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     color: INK,
     lineHeight: 24,
   },
@@ -542,15 +607,15 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   moodAnswerText: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 16,
-    fontWeight: '400',
+    fontWeight: "400",
     color: INK_SOFT,
     lineHeight: 25,
   },
   dotsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 8,
     marginTop: 8,
   },
@@ -558,7 +623,7 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: 'rgba(44,26,14,0.15)',
+    backgroundColor: "rgba(44,26,14,0.15)",
   },
   dotActive: {
     backgroundColor: INK,
@@ -568,9 +633,9 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
   },
   navRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 20,
     marginTop: 4,
   },
@@ -578,11 +643,11 @@ const styles = StyleSheet.create({
     width: 92,
     height: 54,
     borderRadius: 28,
-    backgroundColor: 'rgba(44,26,14,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(44,26,14,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
     borderBottomWidth: 3,
-    borderBottomColor: 'rgba(44,26,14,0.12)',
+    borderBottomColor: "rgba(44,26,14,0.12)",
   },
   navBtnNext: {
     backgroundColor: GREEN,
@@ -594,7 +659,7 @@ const styles = StyleSheet.create({
   },
   arrowText: {
     fontSize: 34,
-    fontWeight: '700',
+    fontWeight: "700",
     color: INK_SOFT,
     lineHeight: 38,
   },
@@ -602,12 +667,12 @@ const styles = StyleSheet.create({
     color: WHITE,
   },
   arrowDisabled: {
-    color: 'rgba(107,76,53,0.35)',
+    color: "rgba(107,76,53,0.35)",
   },
   counterText: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 17,
-    fontWeight: '800',
+    fontWeight: "800",
     color: INK_SOFT,
   },
 });

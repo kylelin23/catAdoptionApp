@@ -1,40 +1,46 @@
-import React, { useRef, useEffect } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
-import { mixpanel } from '../../../lib/mixpanel';
+import React, { useRef, useEffect } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Image,
+} from "react-native";
 
-const INK = '#2C1A0E';
-const INK_SOFT = '#6B4C35';
-const WHITE = '#FFFAF5';
+const INK = "#2C1A0E";
+const INK_SOFT = "#6B4C35";
+const WHITE = "#FFFAF5";
 
-const PAW = require('../../../assets/images/paw.png');
+const PAW = require("../../../assets/images/paw.png");
 
 const ITEMS = [
   {
-    route: 'Toxic Foods, Plants and Items',
-    title: 'Toxic Foods, Plants, Items',
-    subtitle: 'Keep your cat safe',
-    border: '#C47A45',
-    dark: '#9E5C2E',
-    paw: '#C47A45',
-    bg: '#FAF0E8',
+    route: "Toxic Foods, Plants and Items",
+    title: "Toxic Foods, Plants, Items",
+    subtitle: "Keep your cat safe",
+    border: "#C47A45",
+    dark: "#9E5C2E",
+    paw: "#C47A45",
+    bg: "#FAF0E8",
   },
   {
-    route: 'Cat Language',
-    title: 'Cat Language',
-    subtitle: 'Understand what they are saying',
-    border: '#7A9BBE',
-    dark: '#5C7A9A',
-    paw: '#7A9BBE',
-    bg: '#EEF4F9',
+    route: "Cat Language",
+    title: "Cat Language",
+    subtitle: "Understand what they are saying",
+    border: "#7A9BBE",
+    dark: "#5C7A9A",
+    paw: "#7A9BBE",
+    bg: "#EEF4F9",
   },
   {
-    route: 'Poop Monitoring Scores',
-    title: 'Poop Monitoring Scores',
+    route: "Poop Monitoring Scores",
+    title: "Poop Monitoring Scores",
     subtitle: "Track your cat's health",
-    border: '#7BAE6E',
-    dark: '#5A8F50',
-    paw: '#7BAE6E',
-    bg: '#EEF5EC',
+    border: "#7BAE6E",
+    dark: "#5A8F50",
+    paw: "#7BAE6E",
+    bg: "#EEF5EC",
   },
 ];
 
@@ -43,7 +49,7 @@ function InfoCard({
   index,
   onPress,
 }: {
-  item: typeof ITEMS[0];
+  item: (typeof ITEMS)[0];
   index: number;
   onPress: () => void;
 }) {
@@ -142,12 +148,11 @@ export default function CheckList({ navigation }: { navigation: any }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 20,
     paddingVertical: 28,
     gap: 16,
   },
-
   cardWrapper: {
     flex: 1,
     shadowColor: INK,
@@ -156,7 +161,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 4,
   },
-
   card: {
     flex: 1,
     borderRadius: 24,
@@ -164,61 +168,53 @@ const styles = StyleSheet.create({
     borderBottomWidth: 5,
     paddingVertical: 17,
     paddingHorizontal: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
-
   cardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     flex: 1,
   },
-
   leftRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     flex: 1,
   },
-
   pawCircle: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
-
   paw: {
     width: 22,
     height: 22,
     tintColor: WHITE,
   },
-
   arrow: {
     fontSize: 30,
-    fontWeight: '800',
+    fontWeight: "800",
     marginLeft: 8,
   },
-
   cardBottom: {
     marginTop: 20,
   },
-
   cardTitle: {
     flex: 1,
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 18,
-    fontWeight: '900',
+    fontWeight: "900",
     color: INK,
     letterSpacing: -0.3,
     lineHeight: 24,
   },
-
   cardSubtitle: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 12,
-    fontWeight: '400',
+    fontWeight: "400",
     color: INK_SOFT,
   },
 });

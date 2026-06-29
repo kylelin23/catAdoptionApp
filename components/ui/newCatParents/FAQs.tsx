@@ -1,18 +1,30 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Text, View, TouchableOpacity, StyleSheet, ScrollView, Animated, Image } from 'react-native';
-import faqs from '../../../app/data/newCatParents/faqs';
-import { mixpanel } from '../../../lib/mixpanel';
+import React, { useState, useRef } from "react";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Animated,
+} from "react-native";
+import faqs from "../../../app/data/newCatParents/faqs";
+import { mixpanel } from "../../../lib/mixpanel";
 
-const INK      = '#2C1A0E';
-const INK_SOFT = '#6B4C35';
-const WHITE    = '#FFFAF5';
-const GREEN    = '#7BAE6E';
-const GREEN_DARK = '#5A8F50';
+const INK = "#2C1A0E";
+const INK_SOFT = "#6B4C35";
+const WHITE = "#FFFAF5";
+const GREEN = "#7BAE6E";
 
-const PAW      = require('../../../assets/images/paw.png');
-const CAT_PEEK = require('../../../assets/images/catWave.png');
+const PAW = require("../../../assets/images/paw.png");
+const CAT_PEEK = require("../../../assets/images/catWave.png");
 
-function FAQItem({ question, answer, isOpen, onPress, index }: {
+function FAQItem({
+  question,
+  answer,
+  isOpen,
+  onPress,
+  index,
+}: {
   question: string;
   answer: string;
   isOpen: boolean;
@@ -20,18 +32,27 @@ function FAQItem({ question, answer, isOpen, onPress, index }: {
   index: number;
 }) {
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  const peekAnim   = useRef(new Animated.Value(0)).current;
+  const peekAnim = useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
     Animated.parallel([
-      Animated.timing(rotateAnim, { toValue: isOpen ? 1 : 0, duration: 200, useNativeDriver: true }),
-      Animated.spring(peekAnim,   { toValue: isOpen ? 1 : 0, friction: 5, tension: 70, useNativeDriver: true }),
+      Animated.timing(rotateAnim, {
+        toValue: isOpen ? 1 : 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(peekAnim, {
+        toValue: isOpen ? 1 : 0,
+        friction: 5,
+        tension: 70,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, [isOpen]);
 
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '180deg'],
+    outputRange: ["0deg", "180deg"],
   });
 
   const catTranslateX = peekAnim.interpolate({
@@ -41,23 +62,24 @@ function FAQItem({ question, answer, isOpen, onPress, index }: {
 
   return (
     <View style={styles.faqWrapper}>
-
       <Animated.Image
         source={CAT_PEEK}
         style={[
           styles.peekingCat,
           {
             opacity: peekAnim,
-            transform: [{ translateX: catTranslateX }, { rotate: '-45deg' }],
+            transform: [{ translateX: catTranslateX }, { rotate: "-45deg" }],
           },
         ]}
         resizeMode="contain"
       />
 
-      <View style={[
-        styles.faqCard,
-        isOpen && { borderLeftWidth: 3, borderLeftColor: GREEN },
-      ]}>
+      <View
+        style={[
+          styles.faqCard,
+          isOpen && { borderLeftWidth: 3, borderLeftColor: GREEN },
+        ]}
+      >
         <TouchableOpacity
           style={styles.questionRow}
           onPress={onPress}
@@ -78,7 +100,6 @@ function FAQItem({ question, answer, isOpen, onPress, index }: {
           </View>
         )}
       </View>
-
     </View>
   );
 }
@@ -90,9 +111,9 @@ export default function FAQs() {
     const isOpening = openIndex !== index;
 
     if (isOpening) {
-      mixpanel.track('FAQ Opened (New Cat Parents)', {
-        'Screen Name': 'New Cat Parents FAQs',
-        'Question': faqs[index].question,
+      mixpanel.track("FAQ Opened (New Cat Parents)", {
+        "Screen Name": "New Cat Parents FAQs",
+        Question: faqs[index].question,
       });
     }
     setOpenIndex(openIndex === index ? -1 : index);
@@ -120,33 +141,28 @@ export default function FAQs() {
 }
 
 const styles = StyleSheet.create({
-
   scroll: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
-
   scrollContent: {
     paddingLeft: 0,
     paddingRight: 20,
     paddingTop: 24,
     gap: 16,
   },
-
   faqWrapper: {
-    position: 'relative',
+    position: "relative",
   },
-
   peekingCat: {
-    position: 'absolute',
+    position: "absolute",
     width: 120,
     height: 120,
     left: 0,
-    top: '50%',
+    top: "50%",
     marginTop: -60,
     zIndex: 0,
   },
-
   faqCard: {
     backgroundColor: WHITE,
     borderRadius: 20,
@@ -160,27 +176,24 @@ const styles = StyleSheet.create({
     zIndex: 2,
     marginLeft: 55,
     borderWidth: 2,
-    borderColor: 'rgba(44,26,14,0.06)',
+    borderColor: "rgba(44,26,14,0.06)",
     borderBottomWidth: 4,
-    borderBottomColor: 'rgba(44,26,14,0.1)',
+    borderBottomColor: "rgba(44,26,14,0.1)",
   },
-
   questionRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
     gap: 14,
   },
-
   questionText: {
     flex: 1,
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: "700",
     color: INK,
     lineHeight: 24,
   },
-
   pawChevron: {
     width: 26,
     height: 26,
@@ -188,22 +201,19 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     marginTop: 1,
   },
-
   answerWrapper: {
     gap: 12,
     marginTop: 12,
   },
-
   answerDivider: {
     height: 1.5,
-    backgroundColor: 'rgba(44,26,14,0.08)',
+    backgroundColor: "rgba(44,26,14,0.08)",
     borderRadius: 1,
   },
-
   answerText: {
-    fontFamily: 'Avenir',
+    fontFamily: "Avenir",
     fontSize: 16,
-    fontWeight: '400',
+    fontWeight: "400",
     color: INK_SOFT,
     lineHeight: 24,
   },
