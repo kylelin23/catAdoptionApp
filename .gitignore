@@ -2,3 +2,5 @@ expo-env.d.ts
 node_modules
 .env
 .expo
+credentials.json
+credentials/
