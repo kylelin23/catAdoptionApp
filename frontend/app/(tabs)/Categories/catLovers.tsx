@@ -10,10 +10,11 @@ import {
   Image,
 } from "react-native";
 import { TabView } from "react-native-tab-view";
-import Info from "../../../components/ui/thinkingOfAdopting/Info";
-import FAQs from "../../../components/ui/thinkingOfAdopting/FAQs";
-import Trivia from "../../../components/ui/thinkingOfAdopting/trivia";
 import { mixpanel } from "../../../../frontend/lib/mixpanel";
+
+import Stories from "@/components/ui/catLovers/Stories";
+import Community from "@/components/ui/catLovers/Community";
+import Shelters from "@/components/ui/catLovers/Shelters";
 
 const screenWidth = Dimensions.get("window").width;
 const { height: H } = Dimensions.get("window");
@@ -22,22 +23,11 @@ const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
 const SAND = "#E8C9A0";
 const WHITE = "#FFFAF5";
-const GREEN = "#7BAE6E";
 
 const CAT_IMG = require("../../../assets/images/catWave.png");
 
-export default function ThinkingOfAdopting({
-  navigation,
-}: {
-  navigation: any;
-}) {
+export default function CatLovers({ navigation }: { navigation: any }) {
   const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: "info", title: "Info" },
-    { key: "trivia", title: "Checklist" },
-    { key: "faqs", title: "FAQs" },
-  ]);
-  const [triviaKey, setTriviaKey] = React.useState(0);
 
   const headerY = useRef(new Animated.Value(-20)).current;
   const headerOp = useRef(new Animated.Value(0)).current;
@@ -66,10 +56,11 @@ export default function ThinkingOfAdopting({
       }),
     ]).start();
   }, []);
+
   useEffect(() => {
     if (index === 0) {
       mixpanel.track("Screen Opened", {
-        "Screen Name": "Thinking of Adopting Info",
+        "Screen Name": "Cat Stories",
       });
     }
   }, [index]);
@@ -77,7 +68,7 @@ export default function ThinkingOfAdopting({
   useEffect(() => {
     if (index === 1) {
       mixpanel.track("Screen Opened", {
-        "Screen Name": "Thinking of Adopting Checklist",
+        "Screen Name": "Community Cats",
       });
     }
   }, [index]);
@@ -85,23 +76,25 @@ export default function ThinkingOfAdopting({
   useEffect(() => {
     if (index === 2) {
       mixpanel.track("Screen Opened", {
-        "Screen Name": "Thinking of Adopting FAQs",
+        "Screen Name": "Cat Shelters",
       });
     }
   }, [index]);
 
-  React.useEffect(() => {
-    if (index !== 1) setTriviaKey((prev) => prev + 1);
-  }, [index]);
+  const [routes] = React.useState([
+    { key: "stories", title: "Stories" },
+    { key: "community", title: "Community" },
+    { key: "shelters", title: "Shelters" },
+  ]);
 
   const renderScene = ({ route }: { route: any }) => {
     switch (route.key) {
-      case "info":
-        return <Info navigation={navigation} />;
-      case "trivia":
-        return <Trivia key={triviaKey} />;
-      case "faqs":
-        return <FAQs />;
+      case "stories":
+        return <Stories navigation={navigation} />;
+      case "community":
+        return <Community navigation={navigation} />;
+      case "shelters":
+        return <Shelters navigation={navigation} />;
       default:
         return null;
     }
@@ -134,7 +127,7 @@ export default function ThinkingOfAdopting({
           <View style={styles.bubbleRow}>
             <View style={styles.tail} />
             <View style={styles.bubble}>
-              <Text style={styles.bubbleText}>Thinking of Adopting?</Text>
+              <Text style={styles.bubbleText}>Cat Lovers</Text>
             </View>
           </View>
         </Animated.View>
@@ -174,7 +167,7 @@ export default function ThinkingOfAdopting({
         initialLayout={{ width: screenWidth }}
         renderTabBar={renderTabBar}
         swipeEnabled={false}
-        style={{ backgroundColor: "transparent" }}
+        style={styles.tabView}
       />
     </SafeAreaView>
   );
@@ -186,12 +179,17 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE,
     overflow: "hidden",
   },
+
+  tabView: {
+    backgroundColor: "transparent",
+  },
+
   bgTop: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    height: H * 0.4,
+    height: H * 0.46,
     backgroundColor: SAND,
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
@@ -202,13 +200,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: H * 0.55,
-    backgroundColor: "white",
+    backgroundColor: "#FFFFFF",
   },
+
   tabBarWrapper: {
     paddingTop: 10,
     paddingHorizontal: 12,
     paddingBottom: 10,
   },
+
   backBtn: {
     width: 34,
     height: 34,
@@ -226,17 +226,20 @@ const styles = StyleSheet.create({
     color: INK,
     lineHeight: 22,
   },
+
   mascotArea: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 0,
   },
+
   catImg: {
-    width: 120,
-    height: 120,
+    width: 110,
+    height: 110,
     flexShrink: 0,
     marginRight: -24,
   },
+
   bubbleWrapper: {
     flex: 1,
     shadowColor: INK,
@@ -245,54 +248,37 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
+
   bubbleRow: {
     flexDirection: "row",
     alignItems: "center",
   },
+
   tail: {
     width: 0,
     height: 0,
-    borderTopWidth: 12,
-    borderBottomWidth: 12,
-    borderRightWidth: 14,
+    borderTopWidth: 11,
+    borderBottomWidth: 11,
+    borderRightWidth: 13,
     borderTopColor: "transparent",
     borderBottomColor: "transparent",
     borderRightColor: WHITE,
   },
+
   bubble: {
     backgroundColor: WHITE,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
   bubbleText: {
     fontFamily: "Avenir",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "900",
     color: INK,
     letterSpacing: -0.3,
-    lineHeight: 24,
   },
-  progressRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 6,
-    marginTop: 12,
-    marginBottom: 12,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "rgba(44,26,14,0.12)",
-  },
-  progressDotActive: {
-    backgroundColor: INK,
-    width: 22,
-  },
-  progressDotDone: {
-    backgroundColor: GREEN,
-  },
+
   tabPillContainer: {
     flexDirection: "row",
     backgroundColor: "rgba(44,26,14,0.06)",

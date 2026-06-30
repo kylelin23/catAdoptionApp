@@ -9,7 +9,7 @@ import {
   Image,
   SafeAreaView,
 } from "react-native";
-import { mixpanel } from "../../../frontend/lib/mixpanel";
+import { mixpanel } from "../../../../frontend/lib/mixpanel";
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";

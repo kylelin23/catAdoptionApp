@@ -10,7 +10,7 @@ import {
   Dimensions,
   SafeAreaView,
 } from "react-native";
-import { mixpanel } from "../../frontend/lib/mixpanel";
+import { mixpanel } from "../../../frontend/lib/mixpanel";
 
 const { width: W, height: H } = Dimensions.get("window");
 

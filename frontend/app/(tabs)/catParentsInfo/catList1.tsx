@@ -14,7 +14,7 @@ import food, {
   others,
 } from "../../data/catParents/catList1";
 import { useState, useRef, useEffect } from "react";
-import { mixpanel } from "../../../frontend/lib/mixpanel";
+import { mixpanel } from "../../../../frontend/lib/mixpanel";
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";

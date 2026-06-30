@@ -8,7 +8,7 @@ import {
   Animated,
 } from "react-native";
 import faqs from "../../../app/data/newCatParents/faqs";
-import { mixpanel } from "../../../frontend/lib/mixpanel";
+import { mixpanel } from "../../../../frontend/lib/mixpanel";
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";

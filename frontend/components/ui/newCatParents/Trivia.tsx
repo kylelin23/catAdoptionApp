@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from "react-native";
 import quiz, { answers } from "../../../app/data/newCatParents/trivia";
-import { mixpanel } from "../../../frontend/lib/mixpanel";
+import { mixpanel } from "../../../../frontend/lib/mixpanel";
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";

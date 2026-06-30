@@ -10,7 +10,7 @@ import {
   StatusBar,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { mixpanel } from "../../frontend/lib/mixpanel";
+import { mixpanel } from "../../../frontend/lib/mixpanel";
 
 const { width: W, height: H } = Dimensions.get("window");
 
@@ -18,7 +18,6 @@ const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
 const SAND = "#E8C9A0";
 const WHITE = "#FFFAF5";
-const GREEN = "#7BAE6E";
 
 const PAW = require("../../assets/images/paw.png");
 
@@ -55,6 +54,15 @@ const CATEGORIES = [
     color: "#F2C9A0",
     border: "#D4956A",
     dark: "#A86E45",
+  },
+  {
+    key: "lovers",
+    route: "Cat Lovers",
+    title: "Cat Lovers",
+    subtitle: "Just obsessed with cats!",
+    color: "#F9D5D5",
+    border: "#E29A9A",
+    dark: "#B56B6B",
   },
 ];
 

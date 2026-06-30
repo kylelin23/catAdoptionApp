@@ -13,7 +13,7 @@ import { TabView } from "react-native-tab-view";
 import FAQs from "@/components/ui/newCatParents/FAQs";
 import Trivia from "../../../components/ui/newCatParents/Trivia";
 import Info from "../../../components/ui/newCatParents/Info";
-import { mixpanel } from "../../../frontend/lib/mixpanel";
+import { mixpanel } from "../../../../frontend/lib/mixpanel";
 
 const screenWidth = Dimensions.get("window").width;
 const { height: H } = Dimensions.get("window");

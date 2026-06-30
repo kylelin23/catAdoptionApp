@@ -7,9 +7,9 @@ import {
   Animated,
   Dimensions,
   SafeAreaView,
+  ScrollView,
   PanResponder,
 } from "react-native";
-import { mixpanel } from "../../../../frontend/lib/mixpanel";
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
@@ -25,61 +25,24 @@ const CAT = require("../../../assets/images/walkingCat.png");
 
 const WORDS = [
   {
-    word: "Allogrooming",
-    definition: "Cats grooming each other, a sign of bonding and trust",
-  },
-  {
-    word: "Bunting",
+    word: "Community Cats",
     definition:
-      "When a cat rubs their head or cheeks on you or objects to mark their scent",
+      "• Could be feral cats who were never socialized to humans\n• Also known as stray cats who were once pets but got lost or were abandoned\n• Live in colonies\n• Survive by hunting and relying on neighbors or colony feeders",
   },
   {
-    word: "Chirping",
-    definition: "The noise cats make when watching birds or prey",
-  },
-  { word: "Clowder", definition: "A group of cats living together" },
-  {
-    word: "Flehmen Response",
-    definition: "Slight open-mouth expression when a cat is analyzing a scent",
-  },
-  { word: "Grooming", definition: "Cat licking to clean themselves" },
-  {
-    word: "Hissing",
-    definition: 'Defensive warning to strangers or other cats to "back off"',
-  },
-  {
-    word: "Loaf Position",
-    definition: "Cat position with paws tucked under, indicates a relaxed cat",
-  },
-  {
-    word: "Marking",
-    definition: "Using scent (rubbing or spraying) to mark territory",
-  },
-  {
-    word: "Overstimulation",
+    word: "Trap-Neuter-Return (TNR)",
     definition:
-      "When petting or playing becomes too much, leads to cat biting or swatting",
+      "• Is a humane and effective approach to controlling populations of community cats\n• Involves trapping cats/kittens and taking them to a shelter to be spayed or neutered\n• At the vet, they are also vaccinated and microchipped\n• During surgery, the cat's ear is tipped, signaling that they have already been spayed or neutered\n• After recovery (a few days), cats that are not socialized are returned to the colony where they were trapped\n• Cats who are friendly and socialized to people may be adopted into homes\n• Kittens under 8 weeks can often be socialized and adopted",
   },
   {
-    word: "Pheromones",
-    definition: "Chemical signals cats use to communicate safety",
-  },
-  {
-    word: "Scent Swapping",
+    word: "Caring for Colonies",
     definition:
-      "Exchanging bedding or items to introduce cats through smell first",
+      "• Colony caretakers look after community cats\n• Provide fresh water and food daily\n• Keep feeding area clean to avoid complaints from neighborhood\n• Monitor cats for illness or injury\n• Build or provide weatherproof shelters\n• TNR to make sure all cats are spayed and neutered",
   },
   {
-    word: "Slow Blink",
-    definition: "A sign of trust and affection, often called a cat kiss",
-  },
-  {
-    word: "Toe Beans",
-    definition: "The soft squishy paw pads on a cat's feet",
-  },
-  {
-    word: "Zoomies",
-    definition: "Sudden bursts of energy when cats run wildly, common at night",
+    word: "Barn Cats",
+    definition:
+      "• Community cats who live in farms, barns or warehouses\n• Help to catch mice and control rodents\n• Lower maintenance than house cats\n• Should also be vaccinated and provided food daily\n• May never become indoor pets but some have become affectionate over time",
   },
 ];
 
@@ -126,31 +89,35 @@ function FlipCard({ word, color }: { word: (typeof WORDS)[0]; color: string }) {
   };
 
   return (
-    <TouchableOpacity
-      onPress={flip}
-      activeOpacity={1}
-      style={styles.flipContainer}
-    >
-      <Animated.View
-        style={[
-          styles.card,
-          {
-            backgroundColor: color,
-            transform: [{ rotateY: frontInterpolate }],
-            opacity: frontOpacity,
-          },
-        ]}
+    <View style={styles.flipContainer}>
+      <TouchableOpacity
+        onPress={flip}
+        disabled={flipped}
+        activeOpacity={1}
+        style={StyleSheet.absoluteFill}
       >
-        <Text style={styles.eyebrow}>CATIONARY</Text>
+        <Animated.View
+          style={[
+            styles.card,
+            {
+              backgroundColor: color,
+              transform: [{ rotateY: frontInterpolate }],
+              opacity: frontOpacity,
+            },
+          ]}
+        >
+          <Text style={styles.eyebrow}>COMMUNITY RESOURCES</Text>
 
-        <Text style={styles.cardWord}>{word.word}</Text>
+          <Text style={styles.cardWord}>{word.word}</Text>
 
-        <View style={styles.tapHint}>
-          <Text style={styles.tapHintText}>Tap to reveal</Text>
-        </View>
-      </Animated.View>
+          <View style={styles.tapHint}>
+            <Text style={styles.tapHintText}>Tap to learn more</Text>
+          </View>
+        </Animated.View>
+      </TouchableOpacity>
 
       <Animated.View
+        pointerEvents={flipped ? "auto" : "none"}
         style={[
           styles.card,
           styles.cardBack,
@@ -161,27 +128,31 @@ function FlipCard({ word, color }: { word: (typeof WORDS)[0]; color: string }) {
           },
         ]}
       >
-        <Text style={styles.eyebrow}>DEFINITION</Text>
+        <TouchableOpacity
+          onPress={flip}
+          activeOpacity={1}
+          style={StyleSheet.absoluteFill}
+        />
 
-        <View style={styles.backContent}>
+        <View style={styles.backContent} pointerEvents="box-none">
+          <Text style={styles.eyebrow}>OVERVIEW</Text>
           <Text style={styles.cardWordSmall}>{word.word}</Text>
           <View style={styles.divider} />
-          <Text style={styles.cardDefinition}>{word.definition}</Text>
-        </View>
 
-        <View
-          style={[styles.tapHint, { backgroundColor: "rgba(44,26,14,0.06)" }]}
-        >
-          <Text style={[styles.tapHintText, { color: INK_SOFT }]}>
-            Tap to flip back
-          </Text>
+          <ScrollView
+            style={styles.scrollTextContainer}
+            showsVerticalScrollIndicator={true}
+            contentContainerStyle={styles.scrollTextContent}
+          >
+            <Text style={styles.cardDefinition}>{word.definition}</Text>
+          </ScrollView>
         </View>
       </Animated.View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
-export default function Cationary() {
+export default function Community() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
   const currentIndexRef = useRef(0);
@@ -310,13 +281,6 @@ export default function Cationary() {
     const currentCard = cardAnimations[idx];
     const nextCard = idx < WORDS.length - 1 ? cardAnimations[idx + 1] : null;
 
-    mixpanel.track("Cationary Card Swiped", {
-      "Screen Name": "Cationary",
-      "Card Index": idx,
-      Word: WORDS[idx].word,
-      "Is Last Card": idx === WORDS.length - 1,
-    });
-
     Animated.parallel([
       Animated.timing(currentCard.pan, {
         toValue: { x: -screenWidth * 1.3, y: 0 },
@@ -424,7 +388,7 @@ export default function Cationary() {
         </View>
 
         <Text style={styles.instructionText}>
-          Click the flashcard to learn about cat vocabulary, and swipe left for
+          Click the flashcard to learn about community cats, and swipe left for
           the next card!
         </Text>
 
@@ -519,6 +483,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     justifyContent: "space-between",
   },
+
   progressArea: {
     marginTop: 12,
     marginBottom: 4,
@@ -540,6 +505,7 @@ const styles = StyleSheet.create({
     height: 36,
     top: -30,
   },
+
   instructionText: {
     fontFamily: "Avenir",
     fontSize: 14,
@@ -551,6 +517,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     lineHeight: 18,
   },
+
   cardArea: {
     flex: 1,
     justifyContent: "center",
@@ -596,6 +563,10 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  backContent: {
+    flex: 1,
+    width: "100%",
+  },
   eyebrow: {
     fontFamily: "Avenir",
     fontSize: 10,
@@ -603,26 +574,20 @@ const styles = StyleSheet.create({
     color: "rgba(44,26,14,0.35)",
     letterSpacing: 2,
     alignSelf: "flex-start",
+    marginBottom: 4,
   },
   cardWord: {
     fontFamily: "Avenir",
-    fontSize: 34,
+    fontSize: 30,
     fontWeight: "900",
     color: INK,
-    letterSpacing: -1,
-    lineHeight: 40,
+    letterSpacing: -0.5,
+    lineHeight: 36,
     textAlign: "center",
-  },
-  backContent: {
-    flex: 1,
-    justifyContent: "center",
-    gap: 12,
-    marginVertical: 8,
-    width: "100%",
   },
   cardWordSmall: {
     fontFamily: "Avenir",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "900",
     color: INK,
     letterSpacing: -0.5,
@@ -631,13 +596,23 @@ const styles = StyleSheet.create({
     height: 1.5,
     backgroundColor: "rgba(44,26,14,0.08)",
     borderRadius: 1,
+    marginVertical: 4,
+  },
+  scrollTextContainer: {
+    flex: 1,
+    marginTop: 6,
+  },
+  scrollTextContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 4,
   },
   cardDefinition: {
     fontFamily: "Avenir",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "400",
     color: INK_SOFT,
-    lineHeight: 24,
+    lineHeight: 21,
   },
   tapHint: {
     alignSelf: "center",
@@ -654,6 +629,7 @@ const styles = StyleSheet.create({
     color: INK,
     letterSpacing: 0.3,
   },
+
   reviewContainer: {
     width: CARD_WIDTH,
     height: "92%",
@@ -700,6 +676,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: WHITE,
   },
+
   bottomNav: {
     width: CARD_WIDTH,
     alignSelf: "center",
