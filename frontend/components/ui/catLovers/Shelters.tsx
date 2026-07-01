@@ -19,83 +19,8 @@ const SAND = "#E8C9A0";
 const GREEN = "#7BAE6E";
 const GREEN_DARK = "#5A8F50";
 
-// Google Places API (New) — Text Search. The key is read from an Expo public
-// env var. Anything prefixed EXPO_PUBLIC_ is bundled into the app, so restrict
-// this key in the Google Cloud console (iOS bundle id + Places API only).
-const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
-const PLACES_ENDPOINT = "https://places.googleapis.com/v1/places:searchText";
-const GEOCODE_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json";
-const SEARCH_RADIUS_METERS = 40000; // ~25 miles
-// More cat-specific than "cat shelter" — skews results away from dog rescues.
-const SEARCH_TERM = "cat rescue";
-
-// Fields to return from Places. nextPageToken must be in the mask for the API
-// to hand back a token, which is what lets us page past the first 20 results.
-const PLACES_FIELD_MASK =
-  "places.id,places.displayName,places.formattedAddress,places.location,places.websiteUri,places.editorialSummary,nextPageToken";
-
-// Google has no cat-only place type, so "cat shelter" can still return dog
-// rescues. Drop results whose name clearly signals dogs and never cats.
-const DOG_TERMS = ["dog", "dogs", "canine", "puppy", "puppies", "k9", "k-9"];
-const CAT_TERMS = ["cat", "cats", "kitten", "kittens", "feline", "kitty"];
-
-// When true, only keep places whose name mentions cats. Stricter — filters out
-// most dog results, but also drops general shelters that don't say "cat".
-const STRICT_CAT_ONLY = false;
-
-function textHasWord(text: string, terms: string[]) {
-  const lower = text.toLowerCase();
-  return terms.some((term) =>
-    new RegExp(`(^|[^a-z])${term}([^a-z]|$)`).test(lower),
-  );
-}
-
-function isLikelyDogOnly(text: string) {
-  return textHasWord(text, DOG_TERMS) && !textHasWord(text, CAT_TERMS);
-}
-
-function shouldKeepShelter(text: string) {
-  if (isLikelyDogOnly(text)) return false;
-  if (STRICT_CAT_ONLY && !textHasWord(text, CAT_TERMS)) return false;
-  return true;
-}
-
-// Geocode result types that mean "this is a place" (city, zip, region) rather
-// than a business name. Used to decide whether to bias the search to it.
-const LOCALITY_TYPES = [
-  "locality",
-  "postal_code",
-  "postal_town",
-  "sublocality",
-  "neighborhood",
-  "administrative_area_level_1",
-  "administrative_area_level_2",
-  "administrative_area_level_3",
-];
-
-// Turn typed text into coordinates so we can bias the search around it. Also
-// reports whether the match is a locality (city/zip) vs. something else like a
-// shelter name. Returns null on any failure so the caller can fall back.
-async function geocodePlace(query: string) {
-  try {
-    const url = `${GEOCODE_ENDPOINT}?address=${encodeURIComponent(query)}&components=country:US&key=${GOOGLE_API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data.status === "OK" && data.results?.[0]) {
-      const result = data.results[0];
-      const types: string[] = result.types ?? [];
-      const isLocality = types.some((t) => LOCALITY_TYPES.includes(t));
-      const loc = result.geometry.location;
-      return { latitude: loc.lat, longitude: loc.lng, isLocality };
-    }
-    console.log("Geocode returned no result:", data.status);
-    return null;
-  } catch (error) {
-    console.log("Geocode error:", error);
-    return null;
-  }
-}
+const BACKEND_URL =
+  process.env.EXPO_PUBLIC_BACKEND_URL || "http://localhost:5001";
 
 type Shelter = {
   id: string;
@@ -107,14 +32,13 @@ type Shelter = {
   longitude: number;
 };
 
-// Haversine formula to compute distance over the Earth's surface in miles
 function getHaversineDistance(
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number,
 ) {
-  const R = 3958.8; // Earth radius in miles
+  const R = 3958.8;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
 
@@ -129,9 +53,6 @@ function getHaversineDistance(
   return R * c;
 }
 
-// Pull the 5-digit zip from a formatted address. Google formats US addresses
-// like "..., CA 95112, USA", so the zip is the last 5-digit group — taking the
-// last one avoids grabbing a 5-digit street number earlier in the string.
 function getZip(address: string) {
   const matches = address.match(/\b\d{5}(?:-\d{4})?\b/g);
   if (!matches) return null;
@@ -146,12 +67,10 @@ export default function Shelters({ navigation }: { navigation: any }) {
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [loadingShelters, setLoadingShelters] = useState(true);
   const [fetchError, setFetchError] = useState(false);
-  // Distances are always measured from this point — the user's own location.
   const [distanceOrigin, setDistanceOrigin] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
-  // The typed city/zip when the last search was a locality search, else null.
   const [searchedLocality, setSearchedLocality] = useState<string | null>(null);
 
   useEffect(() => {
@@ -163,7 +82,6 @@ export default function Shelters({ navigation }: { navigation: any }) {
       const { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== "granted") {
-        // Still try to load shelters without a location bias
         fetchShelters(null);
         return;
       }
@@ -179,11 +97,6 @@ export default function Shelters({ navigation }: { navigation: any }) {
     }
   };
 
-  // Query Google Places for cat shelters. The search is biased toward a point
-  // when we have one: the user's location for an empty box, or the geocoded
-  // center of a typed city/zip. For a city or zip the query stays the bare
-  // search term (we narrow to the place client-side); only a shelter name is
-  // folded into the query so Google name-matches it.
   const fetchShelters = async (
     coords: Location.LocationObjectCoords | null,
     query: string = "",
@@ -192,120 +105,31 @@ export default function Shelters({ navigation }: { navigation: any }) {
       setLoadingShelters(true);
       setFetchError(false);
 
-      if (!GOOGLE_API_KEY) {
-        console.log("Missing EXPO_PUBLIC_GOOGLE_MAPS_API_KEY");
+      const trimmed = query.trim();
+
+      setDistanceOrigin(coords);
+
+      const params = new URLSearchParams();
+      if (trimmed) params.set("query", trimmed);
+      if (coords) {
+        params.set("lat", coords.latitude.toString());
+        params.set("lng", coords.longitude.toString());
+      }
+
+      const res = await fetch(
+        `${BACKEND_URL}/api/shelters?${params.toString()}`,
+      );
+
+      if (!res.ok) {
+        console.log("Shelter fetch failed:", res.status);
         setFetchError(true);
         setShelters([]);
         return;
       }
 
-      const trimmed = query.trim();
-
-      let textQuery = SEARCH_TERM;
-      let biasCoords: { latitude: number; longitude: number } | null = null;
-      // The locality string to match against result addresses, if any.
-      let locality: string | null = null;
-
-      if (!trimmed) {
-        // Empty box: search around the user
-        biasCoords = coords;
-      } else {
-        // Resolve what they typed. A city or zip geocodes to a locality; a
-        // shelter/rescue name does not.
-        const place = await geocodePlace(trimmed);
-        if (place && place.isLocality) {
-          // Keep the query as the bare search term and bias to the place's
-          // center. Folding the zip into the query (e.g. "cat rescue 95112")
-          // makes Google run a category search that drops cat-adjacent places
-          // like cat cafes; a biased "cat rescue" returns a broader set that we
-          // then narrow to the exact zip client-side (see displayShelters), so
-          // a place like The Dancing Cat can survive instead of being dropped
-          // before we ever see it.
-          biasCoords = { latitude: place.latitude, longitude: place.longitude };
-          locality = trimmed;
-        } else {
-          // A name: fold it into the query so Google name-matches it. This lets
-          // the search find a specific shelter even when it isn't near the user.
-          textQuery = `${SEARCH_TERM} ${trimmed}`;
-        }
-      }
-
-      // Distances are always measured from the user's own location, so a
-      // result's "X miles away" badge means distance from you no matter what was
-      // searched. (With no location permission, coords is null and no distance
-      // is shown.)
-      setDistanceOrigin(coords);
-      setSearchedLocality(locality);
-
-      const body: any = { textQuery };
-      if (biasCoords) {
-        body.locationBias = {
-          circle: {
-            center: {
-              latitude: biasCoords.latitude,
-              longitude: biasCoords.longitude,
-            },
-            radius: SEARCH_RADIUS_METERS,
-          },
-        };
-      }
-
-      // The Places API (New) returns at most 20 results per page. In a dense
-      // metro that cap can hide smaller cat places, so page through up to 3
-      // times (~60 results) using the nextPageToken from each response.
-      const allPlaces: any[] = [];
-      let pageToken: string | null = null;
-      let pagesFetched = 0;
-
-      do {
-        const requestBody = pageToken ? { ...body, pageToken } : body;
-        const response = await fetch(PLACES_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Goog-Api-Key": GOOGLE_API_KEY,
-            "X-Goog-FieldMask": PLACES_FIELD_MASK,
-          },
-          body: JSON.stringify(requestBody),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          console.log("Places API error:", data);
-          // Hard-fail only if we have nothing yet. A later page failing should
-          // not discard the results we already have in hand.
-          if (allPlaces.length === 0) {
-            setFetchError(true);
-            setShelters([]);
-            return;
-          }
-          break;
-        }
-
-        if (data.places) {
-          allPlaces.push(...data.places);
-        }
-        pageToken = data.nextPageToken ?? null;
-        pagesFetched += 1;
-      } while (pageToken && pagesFetched < 3);
-
-      const mapped: Shelter[] = allPlaces
-        .filter((place: any) => {
-          // Scan both the name and the short description, if present
-          const text = `${place.displayName?.text ?? ""} ${place.editorialSummary?.text ?? ""}`;
-          return shouldKeepShelter(text);
-        })
-        .map((place: any) => ({
-          id: place.id,
-          name: place.displayName?.text ?? "Unknown shelter",
-          address: place.formattedAddress ?? "",
-          phone: "",
-          website: place.websiteUri ?? "",
-          latitude: place.location?.latitude ?? 0,
-          longitude: place.location?.longitude ?? 0,
-        }));
-      setShelters(mapped);
+      const data = await res.json();
+      setShelters(data.shelters);
+      setSearchedLocality(data.searchedLocality);
     } catch (error) {
       console.log("Shelter fetch error:", error);
       setFetchError(true);
@@ -319,7 +143,6 @@ export default function Shelters({ navigation }: { navigation: any }) {
     fetchShelters(userLocation, searchQuery);
   };
 
-  // Build shelter cards containing calculated real-time distances
   const processedShelters = shelters.map((shelter) => {
     if (distanceOrigin) {
       const miles = getHaversineDistance(
@@ -337,10 +160,6 @@ export default function Shelters({ navigation }: { navigation: any }) {
     return { ...shelter, distanceVal: 0, distanceStr: "" };
   });
 
-  // For a zip search, show only the shelters whose own address has that exact
-  // zip, closest first. For a city search, float results in that place to the
-  // top and keep the rest below. With no place searched (initial load, an empty
-  // box, or a name search), order everything by distance from the user.
   let displayShelters = processedShelters;
   if (searchedLocality) {
     const searchedZip = searchedLocality.match(/\b\d{5}\b/)?.[0] ?? null;
@@ -376,7 +195,6 @@ export default function Shelters({ navigation }: { navigation: any }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Search Bar Input */}
       <View style={styles.searchContainer}>
         <Text style={styles.searchInstructions}>
           Search for your nearest cat shelter/rescue by city, zip code, or name!
@@ -478,16 +296,23 @@ export default function Shelters({ navigation }: { navigation: any }) {
             ))}
           </>
         )}
-        <View style={{ height: 40 }} />
+        <View style={styles.scrollBottomSpacer} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: WHITE },
+  safeArea: {
+    flex: 1,
+    backgroundColor: WHITE,
+  },
 
-  searchContainer: { paddingHorizontal: 22, paddingTop: 16, marginBottom: 6 },
+  searchContainer: {
+    paddingHorizontal: 22,
+    paddingTop: 16,
+    marginBottom: 6,
+  },
   searchInstructions: {
     fontFamily: "Avenir",
     fontSize: 15,
@@ -517,7 +342,13 @@ const styles = StyleSheet.create({
     borderColor: "rgba(44,26,14,0.1)",
   },
 
-  scrollContent: { paddingHorizontal: 22, paddingTop: 10 },
+  scrollContent: {
+    paddingHorizontal: 22,
+    paddingTop: 10,
+  },
+  scrollBottomSpacer: {
+    height: 40,
+  },
   resultsCount: {
     fontFamily: "Avenir",
     fontSize: 12,
@@ -612,7 +443,11 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  actionRow: { flexDirection: "row", gap: 10, marginTop: 12 },
+  actionRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 12,
+  },
   actionBtn: {
     flex: 1,
     paddingVertical: 10,
@@ -621,7 +456,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  routeBtn: { backgroundColor: SAND, borderWidth: 1.5, borderColor: "#D4956A" },
+  routeBtn: {
+    backgroundColor: SAND,
+    borderWidth: 1.5,
+    borderColor: "#D4956A",
+  },
   routeBtnText: {
     fontFamily: "Avenir",
     fontSize: 13,
