@@ -180,6 +180,25 @@ async function uploadPhotoToBackend(uri: string): Promise<string | null> {
   }
 }
 
+// Notifies moderator via email after story submission
+async function notifyModerator(
+  catName: string,
+  submitterName: string,
+): Promise<void> {
+  try {
+    await fetch(`${BACKEND_URL}/api/stories/notify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cat_name: catName,
+        name: submitterName,
+      }),
+    });
+  } catch (e) {
+    console.log("notifyModerator failed:", e);
+  }
+}
+
 function ConfettiPiece({ color, delay }: { color: string; delay: number }) {
   const y = useRef(new Animated.Value(-20)).current;
   const x = useRef(new Animated.Value(Math.random() * screenWidth)).current;
@@ -871,6 +890,7 @@ export default function CatStories({ navigation }: { navigation: any }) {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3500);
       showSuccessBanner();
+      notifyModerator(form.cat_name.trim(), form.name.trim());
     }
   };
 

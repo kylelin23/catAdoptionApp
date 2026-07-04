@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createStory } from "../apis/createStory";
 import { getApprovedStories } from "../apis/getApprovedStories";
 import { uploadPhoto } from "../apis/uploadPhoto";
+import { notifyModerator } from "../apis/notifyModerator";
 
 export const storiesRouter = Router();
 
@@ -19,7 +20,6 @@ const CreateStorySchema = z.object({
   photos: z.array(z.string().url()).max(10).optional(),
 });
 
-// Validate story before adding it to database
 function validateCreateStory(req: Request, res: Response, next: NextFunction) {
   const result = CreateStorySchema.safeParse(req.body);
   if (!result.success) {
@@ -32,3 +32,4 @@ function validateCreateStory(req: Request, res: Response, next: NextFunction) {
 storiesRouter.get("/", getApprovedStories);
 storiesRouter.post("/", validateCreateStory, createStory);
 storiesRouter.post("/photos", upload.single("file"), uploadPhoto);
+storiesRouter.post("/notify", notifyModerator);
