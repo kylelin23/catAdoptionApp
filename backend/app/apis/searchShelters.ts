@@ -72,7 +72,6 @@ export type ShelterResult = {
   website: string;
   latitude: number;
   longitude: number;
-  searchedLocality: string | null;
 };
 
 // Uses geocodePlace function to find out what data type user inputted (city, zip, or shelter name)
@@ -128,8 +127,8 @@ export async function searchShelters(req: Request, res: Response) {
   // Get shelters from Google API
   try {
     do {
-      const requestBody = pageToken ? { ...body, pageToken } : body;
-      const response = await fetch(PLACES_ENDPOINT, {
+      const requestBody: Record<string, unknown> = pageToken ? { ...body, pageToken } : body;
+      const response: globalThis.Response = await fetch(PLACES_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -139,7 +138,7 @@ export async function searchShelters(req: Request, res: Response) {
         body: JSON.stringify(requestBody),
       });
 
-      const data = await response.json();
+      const data: any = await response.json();
 
       if (!response.ok) {
         console.log("Places API error:", data);
