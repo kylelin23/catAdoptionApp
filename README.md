@@ -48,6 +48,7 @@ CatWise is your all-in-one resource for cat adoption, created with React Native.
 - React Native
 - Expo
 - TypeScript
+- Express
 - Supabase
 
 ## Support
