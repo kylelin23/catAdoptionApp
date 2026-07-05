@@ -17,6 +17,7 @@ import {
   Linking,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
@@ -920,7 +921,10 @@ export default function CatStories({ navigation }: { navigation: any }) {
         >
           <TouchableOpacity
             style={styles.sharePromptBtn}
-            onPress={() => setShowModal(true)}
+            onPress={() => {
+              mixpanel.track('Share Story Button Pressed');
+              setShowModal(true);
+            }}
             activeOpacity={0.85}
           >
             <View style={styles.sharePromptInner}>

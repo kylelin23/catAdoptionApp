@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as Location from "expo-location";
+import { mixpanel } from '../../../lib/mixpanel';
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
@@ -140,6 +141,9 @@ export default function Shelters({ navigation }: { navigation: any }) {
   };
 
   const handleSearchSubmit = () => {
+    mixpanel.track('Shelter Searched', {
+      'Query': searchQuery.trim(),
+    });
     fetchShelters(userLocation, searchQuery);
   };
 
