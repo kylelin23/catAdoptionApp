@@ -40,6 +40,10 @@ function FlipCard({ card, index }: { card: any; index: number }) {
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
 
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [containerHeight, setContainerHeight] = useState(1);
+  const [contentHeight, setContentHeight] = useState(1);
+
   const frontInterpolate = flipAnim.interpolate({
     inputRange: [0, 180],
     outputRange: ["0deg", "180deg"],
@@ -69,6 +73,10 @@ function FlipCard({ card, index }: { card: any; index: number }) {
     }
   };
 
+  const handleScroll = (e: any) => {
+    scrollY.setValue(e.nativeEvent.contentOffset.y);
+  };
+
   const bullets = [
     card.bullet1,
     card.bullet2,
@@ -76,6 +84,16 @@ function FlipCard({ card, index }: { card: any; index: number }) {
     card.bullet4,
     card.bullet5,
   ].filter((b) => b && b !== "");
+
+  const needsScrollbar = contentHeight > containerHeight + 1;
+  const thumbHeight = needsScrollbar
+    ? Math.max(24, (containerHeight / contentHeight) * containerHeight)
+    : containerHeight;
+  const thumbTranslateY = scrollY.interpolate({
+    inputRange: [0, Math.max(contentHeight - containerHeight, 1)],
+    outputRange: [0, Math.max(containerHeight - thumbHeight, 0)],
+    extrapolate: "clamp",
+  });
 
   return (
     <View style={styles.flipContainer}>
@@ -118,23 +136,45 @@ function FlipCard({ card, index }: { card: any; index: number }) {
       >
         <Text style={styles.backHeading}>{card.category}</Text>
         <View style={styles.divider} />
-        <ScrollView
-          style={styles.bulletsScroll}
-          contentContainerStyle={styles.bulletsContent}
-          showsVerticalScrollIndicator={false}
-          bounces={true}
+        <View
+          style={styles.scrollWrapper}
+          onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}
         >
-          {bullets.map((bullet, i) => (
-            <View key={i} style={styles.bulletRow}>
-              <Image
-                source={PAW}
-                style={styles.bulletPaw}
-                resizeMode="contain"
+          <ScrollView
+            style={styles.bulletsScroll}
+            contentContainerStyle={styles.bulletsContent}
+            showsVerticalScrollIndicator={false}
+            bounces={true}
+            scrollEventThrottle={16}
+            onContentSizeChange={(_, h) => setContentHeight(h)}
+            onScroll={handleScroll}
+          >
+            {bullets.map((bullet, i) => (
+              <View key={i} style={styles.bulletRow}>
+                <Image
+                  source={PAW}
+                  style={styles.bulletPaw}
+                  resizeMode="contain"
+                />
+                <Text style={styles.bulletText}>{bullet}</Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          {needsScrollbar && (
+            <View style={styles.scrollTrack}>
+              <Animated.View
+                style={[
+                  styles.scrollThumb,
+                  {
+                    height: thumbHeight,
+                    transform: [{ translateY: thumbTranslateY }],
+                  },
+                ]}
               />
-              <Text style={styles.bulletText}>{bullet}</Text>
             </View>
-          ))}
-        </ScrollView>
+          )}
+        </View>
       </Animated.View>
     </View>
   );
@@ -607,15 +647,32 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     marginBottom: 4,
   },
+  scrollWrapper: {
+    flex: 1,
+    flexDirection: "row",
+    alignSelf: "stretch",
+  },
   bulletsScroll: {
     flex: 1,
-    alignSelf: "stretch",
   },
   bulletsContent: {
     flexGrow: 1,
     justifyContent: "center",
     gap: 10,
     paddingVertical: 10,
+    paddingRight: 10,
+  },
+  scrollTrack: {
+    width: 4,
+    marginLeft: 6,
+    borderRadius: 2,
+    backgroundColor: "rgba(44,26,14,0.08)",
+    overflow: "hidden",
+  },
+  scrollThumb: {
+    width: 4,
+    borderRadius: 2,
+    backgroundColor: GREEN,
   },
   bulletRow: {
     flexDirection: "row",

@@ -40,6 +40,10 @@ function FlipCard({ con, index }: { con: any; index: number }) {
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
 
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [containerHeight, setContainerHeight] = useState(1);
+  const [contentHeight, setContentHeight] = useState(1);
+
   const frontInterpolate = flipAnim.interpolate({
     inputRange: [0, 180],
     outputRange: ["0deg", "180deg"],
@@ -67,6 +71,20 @@ function FlipCard({ con, index }: { con: any; index: number }) {
     setFlipped(!flipped);
   };
 
+  const handleScroll = (e: any) => {
+    scrollY.setValue(e.nativeEvent.contentOffset.y);
+  };
+
+  const needsScrollbar = contentHeight > containerHeight + 1;
+  const thumbHeight = needsScrollbar
+    ? Math.max(24, (containerHeight / contentHeight) * containerHeight)
+    : containerHeight;
+  const thumbTranslateY = scrollY.interpolate({
+    inputRange: [0, Math.max(contentHeight - containerHeight, 1)],
+    outputRange: [0, Math.max(containerHeight - thumbHeight, 0)],
+    extrapolate: "clamp",
+  });
+
   return (
     <View style={styles.flipContainer}>
       <TouchableOpacity
@@ -79,7 +97,10 @@ function FlipCard({ con, index }: { con: any; index: number }) {
           style={[
             styles.card,
             { backgroundColor: ORANGE_LIGHT },
-            { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
+            {
+              transform: [{ rotateY: frontInterpolate }],
+              opacity: frontOpacity,
+            },
           ]}
         >
           <Text style={styles.frontTitle}>{con.category}</Text>
@@ -105,25 +126,47 @@ function FlipCard({ con, index }: { con: any; index: number }) {
       >
         <Text style={styles.backHeading}>{con.category}</Text>
         <View style={styles.divider} />
-        <ScrollView
-          style={styles.bulletsScroll}
-          contentContainerStyle={styles.bulletsContent}
-          showsVerticalScrollIndicator={false}
-          bounces={true}
+        <View
+          style={styles.scrollWrapper}
+          onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}
         >
-          {[con.support1, con.support2, con.support3, con.support4]
-            .filter((s) => s && s !== "")
-            .map((support, i) => (
-              <View key={i} style={styles.bulletRow}>
-                <Image
-                  source={PAW}
-                  style={styles.bulletPaw}
-                  resizeMode="contain"
-                />
-                <Text style={styles.bulletText}>{support}</Text>
-              </View>
-            ))}
-        </ScrollView>
+          <ScrollView
+            style={styles.bulletsScroll}
+            contentContainerStyle={styles.bulletsContent}
+            showsVerticalScrollIndicator={false}
+            bounces={true}
+            scrollEventThrottle={16}
+            onContentSizeChange={(_, h) => setContentHeight(h)}
+            onScroll={handleScroll}
+          >
+            {[con.support1, con.support2, con.support3, con.support4]
+              .filter((s) => s && s !== "")
+              .map((support, i) => (
+                <View key={i} style={styles.bulletRow}>
+                  <Image
+                    source={PAW}
+                    style={styles.bulletPaw}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.bulletText}>{support}</Text>
+                </View>
+              ))}
+          </ScrollView>
+
+          {needsScrollbar && (
+            <View style={styles.scrollTrack}>
+              <Animated.View
+                style={[
+                  styles.scrollThumb,
+                  {
+                    height: thumbHeight,
+                    transform: [{ translateY: thumbTranslateY }],
+                  },
+                ]}
+              />
+            </View>
+          )}
+        </View>
         <TouchableOpacity onPress={flip} activeOpacity={0.7}>
           <View
             style={[styles.tapHint, { backgroundColor: "rgba(44,26,14,0.06)" }]}
@@ -603,16 +646,32 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     marginTop: 10,
   },
+  scrollWrapper: {
+    flex: 1,
+    flexDirection: "row",
+    alignSelf: "stretch",
+  },
   bulletsScroll: {
     flex: 1,
-    alignSelf: "stretch",
   },
   bulletsContent: {
     flexGrow: 1,
     justifyContent: "center",
     gap: 10,
     paddingVertical: 10,
-    marginVertical: 10,
+    paddingRight: 10,
+  },
+  scrollTrack: {
+    width: 4,
+    marginLeft: 6,
+    borderRadius: 2,
+    backgroundColor: "rgba(44,26,14,0.08)",
+    overflow: "hidden",
+  },
+  scrollThumb: {
+    width: 4,
+    borderRadius: 2,
+    backgroundColor: ORANGE,
   },
   bulletRow: {
     flexDirection: "row",
