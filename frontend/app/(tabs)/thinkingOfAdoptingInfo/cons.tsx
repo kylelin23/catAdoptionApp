@@ -9,6 +9,7 @@ import {
   Animated,
   PanResponder,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
 import cons from "../../../app/data/thinkingOfAdopting/cons";
 import { mixpanel } from "../../../../frontend/lib/mixpanel";
@@ -67,30 +68,34 @@ function FlipCard({ con, index }: { con: any; index: number }) {
   };
 
   return (
-    <TouchableOpacity
-      onPress={flip}
-      activeOpacity={1}
-      style={styles.flipContainer}
-    >
-      <Animated.View
-        style={[
-          styles.card,
-          { backgroundColor: ORANGE_LIGHT },
-          { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
-        ]}
+    <View style={styles.flipContainer}>
+      <TouchableOpacity
+        onPress={flip}
+        disabled={flipped}
+        activeOpacity={1}
+        style={StyleSheet.absoluteFill}
       >
-        <Text style={styles.frontTitle}>{con.category}</Text>
-        <Image
-          source={CAT_IMAGES[index % CAT_IMAGES.length]}
-          style={styles.catSticker}
-          resizeMode="contain"
-        />
-        <View style={styles.tapHint}>
-          <Text style={styles.tapHintText}>Tap to learn more</Text>
-        </View>
-      </Animated.View>
+        <Animated.View
+          style={[
+            styles.card,
+            { backgroundColor: ORANGE_LIGHT },
+            { transform: [{ rotateY: frontInterpolate }], opacity: frontOpacity },
+          ]}
+        >
+          <Text style={styles.frontTitle}>{con.category}</Text>
+          <Image
+            source={CAT_IMAGES[index % CAT_IMAGES.length]}
+            style={styles.catSticker}
+            resizeMode="contain"
+          />
+          <View style={styles.tapHint}>
+            <Text style={styles.tapHintText}>Tap to learn more</Text>
+          </View>
+        </Animated.View>
+      </TouchableOpacity>
 
       <Animated.View
+        pointerEvents={flipped ? "auto" : "none"}
         style={[
           styles.card,
           styles.cardBack,
@@ -100,7 +105,12 @@ function FlipCard({ con, index }: { con: any; index: number }) {
       >
         <Text style={styles.backHeading}>{con.category}</Text>
         <View style={styles.divider} />
-        <View style={styles.bulletsArea}>
+        <ScrollView
+          style={styles.bulletsScroll}
+          contentContainerStyle={styles.bulletsContent}
+          showsVerticalScrollIndicator={false}
+          bounces={true}
+        >
           {[con.support1, con.support2, con.support3, con.support4]
             .filter((s) => s && s !== "")
             .map((support, i) => (
@@ -113,16 +123,18 @@ function FlipCard({ con, index }: { con: any; index: number }) {
                 <Text style={styles.bulletText}>{support}</Text>
               </View>
             ))}
-        </View>
-        <View
-          style={[styles.tapHint, { backgroundColor: "rgba(44,26,14,0.06)" }]}
-        >
-          <Text style={[styles.tapHintText, { color: INK_SOFT }]}>
-            Tap to flip back
-          </Text>
-        </View>
+        </ScrollView>
+        <TouchableOpacity onPress={flip} activeOpacity={0.7}>
+          <View
+            style={[styles.tapHint, { backgroundColor: "rgba(44,26,14,0.06)" }]}
+          >
+            <Text style={[styles.tapHintText, { color: INK_SOFT }]}>
+              Tap to flip back
+            </Text>
+          </View>
+        </TouchableOpacity>
       </Animated.View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -591,11 +603,15 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     marginTop: 10,
   },
-  bulletsArea: {
-    gap: 10,
+  bulletsScroll: {
     flex: 1,
-    justifyContent: "center",
     alignSelf: "stretch",
+  },
+  bulletsContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    gap: 10,
+    paddingVertical: 10,
     marginVertical: 10,
   },
   bulletRow: {
