@@ -177,6 +177,27 @@ export default function AreYou({ navigation }: { navigation: any }) {
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [scrollContainerHeight, setScrollContainerHeight] = useState(1);
+  const [scrollContentHeight, setScrollContentHeight] = useState(1);
+
+  const handleListScroll = (e: any) => {
+    scrollY.setValue(e.nativeEvent.contentOffset.y);
+  };
+
+  const needsScrollbar = scrollContentHeight > scrollContainerHeight + 1;
+  const thumbHeight = needsScrollbar
+    ? Math.max(
+        24,
+        (scrollContainerHeight / scrollContentHeight) * scrollContainerHeight,
+      )
+    : scrollContainerHeight;
+  const thumbTranslateY = scrollY.interpolate({
+    inputRange: [0, Math.max(scrollContentHeight - scrollContainerHeight, 1)],
+    outputRange: [0, Math.max(scrollContainerHeight - thumbHeight, 0)],
+    extrapolate: "clamp",
+  });
+
   useEffect(() => {
     mixpanel.track("Screen Opened", {
       "Screen Name": "Are You",
@@ -305,23 +326,46 @@ export default function AreYou({ navigation }: { navigation: any }) {
       </View>
 
       <View style={styles.whiteSection}>
-        <ScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingBottom: insets.bottom + 16 },
-          ]}
-          showsVerticalScrollIndicator={false}
-          bounces={true}
+        <View
+          style={styles.scrollWrapper}
+          onLayout={(e) =>
+            setScrollContainerHeight(e.nativeEvent.layout.height)
+          }
         >
-          {CATEGORIES.map((cat, i) => (
-            <CategoryCard
-              key={cat.key}
-              cat={cat}
-              index={i}
-              onPress={() => navigation.navigate(cat.route)}
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { paddingBottom: insets.bottom + 16 },
+            ]}
+            showsVerticalScrollIndicator={false}
+            bounces={true}
+            scrollEventThrottle={16}
+            onContentSizeChange={(_, h) => setScrollContentHeight(h)}
+            onScroll={handleListScroll}
+          >
+            {CATEGORIES.map((cat, i) => (
+              <CategoryCard
+                key={cat.key}
+                cat={cat}
+                index={i}
+                onPress={() => navigation.navigate(cat.route)}
+              />
+            ))}
+          </ScrollView>
+
+          <View style={styles.scrollTrack}>
+            <Animated.View
+              style={[
+                styles.scrollThumb,
+                {
+                  height: thumbHeight,
+                  transform: [{ translateY: thumbTranslateY }],
+                },
+              ]}
             />
-          ))}
-        </ScrollView>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -400,12 +444,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: WHITE,
   },
+  scrollWrapper: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 20,
     gap: 15,
     flexGrow: 1,
     justifyContent: "center",
+  },
+  scrollTrack: {
+    width: 4,
+    marginRight: 4,
+    marginVertical: 8,
+    borderRadius: 2,
+    backgroundColor: "rgba(44,26,14,0.08)",
+    overflow: "hidden",
+  },
+  scrollThumb: {
+    width: 4,
+    borderRadius: 2,
+    backgroundColor: "#7BAE6E",
   },
   cardWrapper: {
     shadowColor: INK,
