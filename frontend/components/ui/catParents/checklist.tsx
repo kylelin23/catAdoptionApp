@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Animated,
   Image,
+  ScrollView,
 } from "react-native";
 
 const INK = "#2C1A0E";
@@ -17,7 +18,7 @@ const PAW = require("../../../assets/images/paw.png");
 const ITEMS = [
   {
     route: "Toxic Foods, Plants and Items",
-    title: "Toxic Foods, Plants, Items",
+    title: "Tox\u00ADic Foods, Plants, Items",
     subtitle: "Keep your cat safe",
     border: "#C47A45",
     dark: "#9E5C2E",
@@ -26,8 +27,8 @@ const ITEMS = [
   },
   {
     route: "Cat Language",
-    title: "Cat Language",
-    subtitle: "Understand what they are saying",
+    title: "Cat Lan\u00ADguage",
+    subtitle: "Un\u00ADder\u00ADstand what they are say\u00ADing",
     border: "#7A9BBE",
     dark: "#5C7A9A",
     paw: "#7A9BBE",
@@ -35,7 +36,7 @@ const ITEMS = [
   },
   {
     route: "Poop Monitoring Scores",
-    title: "Poop Monitoring Scores",
+    title: "Poop Mon\u00ADit\u00ADor\u00ADing Scores",
     subtitle: "Track your cat's health",
     border: "#7BAE6E",
     dark: "#5A8F50",
@@ -120,10 +121,21 @@ function InfoCard({
               <Image source={PAW} style={styles.paw} resizeMode="contain" />
             </View>
 
-            <Text style={styles.cardTitle}>{item.title}</Text>
+            <Text
+              style={styles.cardTitle}
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={3}
+            >
+              {item.title}
+            </Text>
           </View>
 
-          <Text style={[styles.arrow, { color: item.border }]}>›</Text>
+          <Text
+            style={[styles.arrow, { color: item.border }]}
+            allowFontScaling={false}
+          >
+            ›
+          </Text>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -132,7 +144,11 @@ function InfoCard({
 
 export default function CheckList({ navigation }: { navigation: any }) {
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
       {ITEMS.map((item, i) => (
         <InfoCard
           key={i}
@@ -141,20 +157,23 @@ export default function CheckList({ navigation }: { navigation: any }) {
           onPress={() => navigation.navigate(item.route)}
         />
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+  },
+  container: {
+    flexGrow: 1,
     paddingHorizontal: 20,
     paddingVertical: 28,
     gap: 16,
+    justifyContent: "center",
   },
   cardWrapper: {
-    flex: 1,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.07,
@@ -162,19 +181,16 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   card: {
-    flex: 1,
     borderRadius: 24,
     borderWidth: 2.5,
     borderBottomWidth: 5,
     paddingVertical: 17,
     paddingHorizontal: 20,
-    justifyContent: "center",
   },
   cardTop: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    flex: 1,
   },
   leftRow: {
     flexDirection: "row",
@@ -188,6 +204,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
   },
   paw: {
     width: 22,

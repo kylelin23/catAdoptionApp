@@ -10,7 +10,7 @@ import {
   ScrollView,
   PanResponder,
 } from "react-native";
-import { mixpanel } from '../../../lib/mixpanel';
+import { mixpanel } from "../../../lib/mixpanel";
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
@@ -18,7 +18,7 @@ const WHITE = "#FFFAF5";
 const GREEN = "#7BAE6E";
 const GREEN_DARK = "#5A8F50";
 
-const { width: screenWidth } = Dimensions.get("window");
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const CARD_WIDTH = screenWidth * 0.88;
 
@@ -26,24 +26,24 @@ const CAT = require("../../../assets/images/walkingCat.png");
 
 const WORDS = [
   {
-    word: "Community Cats",
+    word: "Com\u00ADmun\u00ADity Cats",
     definition:
-      "• Could be feral cats who were never socialized to humans\n• Also known as stray cats who were once pets but got lost or were abandoned\n• Live in colonies\n• Survive by hunting and relying on neighbors or colony feeders",
+      "• Could be fer\u00ADal cats who were nev\u00ADer so\u00ADcial\u00ADized to hu\u00ADmans\n• Also known as stray cats who were once pets but got lost or were aban\u00ADdoned\n• Live in col\u00ADon\u00ADies\n• Sur\u00ADvive by hunt\u00ADing and re\u00ADly\u00ADing on neigh\u00ADbors or col\u00ADony feed\u00ADers",
   },
   {
     word: "Trap-Neuter-Return (TNR)",
     definition:
-      "• Is a humane and effective approach to controlling populations of community cats\n• Involves trapping cats/kittens and taking them to a shelter to be spayed or neutered\n• At the vet, they are also vaccinated and microchipped\n• During surgery, the cat's ear is tipped, signaling that they have already been spayed or neutered\n• After recovery (a few days), cats that are not socialized are returned to the colony where they were trapped\n• Cats who are friendly and socialized to people may be adopted into homes\n• Kittens under 8 weeks can often be socialized and adopted",
+      "• Is a hu\u00ADmane and ef\u00ADfect\u00ADive ap\u00ADproach to con\u00ADtrol\u00ADling pop\u00ADu\u00ADla\u00ADtions of com\u00ADmun\u00ADity cats\n• In\u00ADvolves trap\u00ADping cats/kittens and tak\u00ADing them to a shel\u00ADter to be spayed or neu\u00ADtered\n• At the vet, they are also vac\u00ADcin\u00ADated and micro\u00ADchipped\n• Dur\u00ADing sur\u00ADgery, the cat's ear is tipped, sig\u00ADnal\u00ADing that they have al\u00ADready been spayed or neu\u00ADtered\n• After re\u00ADcov\u00ADery (a few days), cats that are not so\u00ADcial\u00ADized are re\u00ADturned to the col\u00ADony where they were trapped\n• Cats who are friend\u00ADly and so\u00ADcial\u00ADized to people may be adop\u00ADted in\u00ADto homes\n• Kit\u00ADtens un\u00ADder 8 weeks can of\u00ADten be so\u00ADcial\u00ADized and adop\u00ADted",
   },
   {
-    word: "Caring for Colonies",
+    word: "Car\u00ADing for Col\u00ADon\u00ADies",
     definition:
-      "• Colony caretakers look after community cats\n• Provide fresh water and food daily\n• Keep feeding area clean to avoid complaints from neighborhood\n• Monitor cats for illness or injury\n• Build or provide weatherproof shelters\n• TNR to make sure all cats are spayed and neutered",
+      "• Col\u00ADony care\u00ADtakers look after com\u00ADmun\u00ADity cats\n• Pro\u00ADvide fresh wa\u00ADter and food daily\n• Keep feed\u00ADing area clean to avoid com\u00ADplaints from neigh\u00ADbor\u00ADhood\n• Mon\u00ADit\u00ADor cats for ill\u00ADness or in\u00ADjury\n• Build or pro\u00ADvide weath\u00ADer\u00ADproof shel\u00ADters\n• TNR to make sure all cats are spayed and neu\u00ADtered",
   },
   {
     word: "Barn Cats",
     definition:
-      "• Community cats who live in farms, barns or warehouses\n• Help to catch mice and control rodents\n• Lower maintenance than house cats\n• Should also be vaccinated and provided food daily\n• May never become indoor pets but some have become affectionate over time",
+      "• Com\u00ADmun\u00ADity cats who live in farms, barns or ware\u00ADhouses\n• Help to catch mice and con\u00ADtrol ro\u00ADdents\n• Lower main\u00ADten\u00ADance than house cats\n• Should also be vac\u00ADcin\u00ADated and pro\u00ADvided food daily\n• May nev\u00ADer be\u00ADcome in\u00ADdoor pets but some have be\u00ADcome af\u00ADfec\u00ADtion\u00ADate over time",
   },
 ];
 
@@ -107,12 +107,26 @@ function FlipCard({ word, color }: { word: (typeof WORDS)[0]; color: string }) {
             },
           ]}
         >
-          <Text style={styles.eyebrow}>COMMUNITY RESOURCES</Text>
+          <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+            COMMUNITY RESOURCES
+          </Text>
 
-          <Text style={styles.cardWord}>{word.word}</Text>
+          <Text
+            style={styles.cardWord}
+            maxFontSizeMultiplier={1.4}
+            numberOfLines={4}
+          >
+            {word.word}
+          </Text>
 
           <View style={styles.tapHint}>
-            <Text style={styles.tapHintText}>Tap to learn more</Text>
+            <Text
+              style={styles.tapHintText}
+              maxFontSizeMultiplier={1.2}
+              numberOfLines={1}
+            >
+              Tap to learn more
+            </Text>
           </View>
         </Animated.View>
       </TouchableOpacity>
@@ -136,8 +150,16 @@ function FlipCard({ word, color }: { word: (typeof WORDS)[0]; color: string }) {
         />
 
         <View style={styles.backContent} pointerEvents="box-none">
-          <Text style={styles.eyebrow}>OVERVIEW</Text>
-          <Text style={styles.cardWordSmall}>{word.word}</Text>
+          <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+            OVERVIEW
+          </Text>
+          <Text
+            style={styles.cardWordSmall}
+            maxFontSizeMultiplier={1.4}
+            numberOfLines={2}
+          >
+            {word.word}
+          </Text>
           <View style={styles.divider} />
 
           <ScrollView
@@ -282,10 +304,10 @@ export default function Community() {
     const currentCard = cardAnimations[idx];
     const nextCard = idx < WORDS.length - 1 ? cardAnimations[idx + 1] : null;
 
-    mixpanel.track('Community Card Swiped', {
-      'Screen Name': 'Community',
-      'Card Index': idx,
-      'Word': WORDS[idx].word,
+    mixpanel.track("Community Card Swiped", {
+      "Screen Name": "Community",
+      "Card Index": idx,
+      Word: WORDS[idx].word,
     });
 
     Animated.parallel([
@@ -365,116 +387,144 @@ export default function Community() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Animated.View
-        style={[
-          styles.container,
-          { opacity: fadeAnim, transform: [{ translateY: slideScreenAnim }] },
-        ]}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.progressArea}>
-          <Animated.Image
-            source={CAT}
-            style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
-            resizeMode="contain"
-          />
-
-          <View style={styles.progressTrack}>
-            <Animated.View
+        <Animated.View
+          style={[
+            styles.container,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideScreenAnim }],
+            },
+          ]}
+        >
+          <View style={styles.progressArea}>
+            <Animated.Image
+              source={CAT}
               style={[
-                styles.progressFill,
-                {
-                  width: catProgress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ["0%", "100%"],
-                    extrapolate: "clamp",
-                  }),
-                },
+                styles.progressCat,
+                { transform: [{ translateX: catX }] },
               ]}
+              resizeMode="contain"
             />
+
+            <View style={styles.progressTrack}>
+              <Animated.View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: catProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["0%", "100%"],
+                      extrapolate: "clamp",
+                    }),
+                  },
+                ]}
+              />
+            </View>
           </View>
-        </View>
 
-        <Text style={styles.instructionText}>
-          Click the flashcard to learn about community cats, and swipe left for
-          the next card!
-        </Text>
-
-        <View style={styles.cardArea}>
-          {showReviewScreen ? (
-            <Animated.View
-              style={[
-                styles.reviewContainer,
-                {
-                  opacity: reviewCardOpacity,
-                  transform: [{ translateY: reviewCardSlide }],
-                },
-              ]}
-            >
-              <Text style={styles.reviewHeading}>Great Job!</Text>
-              <Text style={styles.reviewSubheading}>
-                You've finished! Click below to go through the cards again!{" "}
-              </Text>
-
-              <Animated.View style={{ transform: [{ scale: reviewBtnScale }] }}>
-                <TouchableOpacity
-                  style={styles.reviewBtn}
-                  onPress={handleReviewAgainPress}
-                  activeOpacity={0.85}
-                >
-                  <Text style={styles.reviewBtnText}>Review Again</Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </Animated.View>
-          ) : (
-            WORDS.map((word, index) => {
-              if (index < currentIndex || index > currentIndex + 1) {
-                return null;
-              }
-
-              const cardAnim = cardAnimations[index];
-              const rotateCard = cardAnim.pan.x.interpolate({
-                inputRange: [-screenWidth / 2, 0, screenWidth / 2],
-                outputRange: ["-10deg", "0deg", "10deg"],
-                extrapolate: "clamp",
-              });
-
-              const animatedStyles = {
-                transform: [
-                  { translateX: cardAnim.pan.x },
-                  { translateY: cardAnim.pan.y },
-                  { scale: cardAnim.scale },
-                  { rotate: rotateCard },
-                ],
-                zIndex: WORDS.length - index,
-              };
-
-              const isCurrent = index === currentIndex;
-              const isUnderneath = index === currentIndex + 1;
-
-              return (
-                <Animated.View
-                  key={index}
-                  style={[
-                    styles.cardWrapper,
-                    animatedStyles,
-                    isUnderneath && styles.backgroundCard,
-                  ]}
-                  {...(isCurrent ? panResponder.panHandlers : {})}
-                >
-                  <FlipCard word={word} color={CARD_COLOR} />
-                </Animated.View>
-              );
-            })
-          )}
-        </View>
-
-        <View style={styles.bottomNav}>
-          <Text style={styles.pageCounter}>
-            {showReviewScreen ? WORDS.length : currentIndex + 1} /{" "}
-            {WORDS.length}
+          <Text style={styles.instructionText} maxFontSizeMultiplier={1.3}>
+            Click the flashcard to learn about community cats, and swipe left
+            for the next card!
           </Text>
-        </View>
-      </Animated.View>
+
+          <View style={styles.cardArea}>
+            {showReviewScreen ? (
+              <Animated.View
+                style={[
+                  styles.reviewContainer,
+                  {
+                    opacity: reviewCardOpacity,
+                    transform: [{ translateY: reviewCardSlide }],
+                  },
+                ]}
+              >
+                <Text style={styles.reviewHeading} maxFontSizeMultiplier={1.4}>
+                  Great Job!
+                </Text>
+                <Text
+                  style={styles.reviewSubheading}
+                  maxFontSizeMultiplier={1.4}
+                  numberOfLines={4}
+                >
+                  You've finished! Click below to go through the cards
+                  again!{" "}
+                </Text>
+
+                <Animated.View
+                  style={{ transform: [{ scale: reviewBtnScale }] }}
+                >
+                  <TouchableOpacity
+                    style={styles.reviewBtn}
+                    onPress={handleReviewAgainPress}
+                    activeOpacity={0.85}
+                  >
+                    <Text
+                      style={styles.reviewBtnText}
+                      maxFontSizeMultiplier={1.3}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      Review Again
+                    </Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              </Animated.View>
+            ) : (
+              WORDS.map((word, index) => {
+                if (index < currentIndex || index > currentIndex + 1) {
+                  return null;
+                }
+
+                const cardAnim = cardAnimations[index];
+                const rotateCard = cardAnim.pan.x.interpolate({
+                  inputRange: [-screenWidth / 2, 0, screenWidth / 2],
+                  outputRange: ["-10deg", "0deg", "10deg"],
+                  extrapolate: "clamp",
+                });
+
+                const animatedStyles = {
+                  transform: [
+                    { translateX: cardAnim.pan.x },
+                    { translateY: cardAnim.pan.y },
+                    { scale: cardAnim.scale },
+                    { rotate: rotateCard },
+                  ],
+                  zIndex: WORDS.length - index,
+                };
+
+                const isCurrent = index === currentIndex;
+                const isUnderneath = index === currentIndex + 1;
+
+                return (
+                  <Animated.View
+                    key={index}
+                    style={[
+                      styles.cardWrapper,
+                      animatedStyles,
+                      isUnderneath && styles.backgroundCard,
+                    ]}
+                    {...(isCurrent ? panResponder.panHandlers : {})}
+                  >
+                    <FlipCard word={word} color={CARD_COLOR} />
+                  </Animated.View>
+                );
+              })
+            )}
+          </View>
+
+          <View style={styles.bottomNav}>
+            <Text style={styles.pageCounter} maxFontSizeMultiplier={1.3}>
+              {showReviewScreen ? WORDS.length : currentIndex + 1} /{" "}
+              {WORDS.length}
+            </Text>
+          </View>
+        </Animated.View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -484,8 +534,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  container: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  container: {
+    minHeight: screenHeight,
     paddingHorizontal: 22,
     paddingVertical: 16,
     justifyContent: "space-between",
@@ -526,7 +582,7 @@ const styles = StyleSheet.create({
   },
 
   cardArea: {
-    flex: 1,
+    minHeight: 460 + 40,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
@@ -535,8 +591,7 @@ const styles = StyleSheet.create({
   cardWrapper: {
     position: "absolute",
     width: CARD_WIDTH,
-    height: "92%",
-    maxHeight: 460,
+    height: 460,
   },
   backgroundCard: {
     opacity: 1,
@@ -562,6 +617,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(44,26,14,0.06)",
     borderBottomWidth: 5,
     borderBottomColor: "rgba(44,26,14,0.12)",
+    overflow: "hidden",
   },
   cardBack: {
     position: "absolute",
@@ -628,6 +684,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 16,
     marginTop: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   tapHintText: {
     fontFamily: "Avenir",
@@ -639,8 +697,7 @@ const styles = StyleSheet.create({
 
   reviewContainer: {
     width: CARD_WIDTH,
-    height: "92%",
-    maxHeight: 460,
+    height: 460,
     borderRadius: 24,
     padding: 32,
     backgroundColor: WHITE,
@@ -682,6 +739,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
     color: WHITE,
+    textAlign: "center",
   },
 
   bottomNav: {

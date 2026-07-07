@@ -97,12 +97,13 @@ export default function Trivia() {
       let resultText = "";
       if (finalTotal < 16)
         resultText =
-          'Not Yet Ready. Nothing is ever a complete "no" but we want you to feel ready and be ready.';
+          'Not Yet Read\u00ADy. Noth\u00ADing is ever a com\u00ADplete "no" but we want you to feel read\u00ADy and be read\u00ADy.';
       else if (finalTotal < 22)
         resultText =
-          "Almost There. Go cat sit or hang out at a shelter before taking the plunge.";
+          "Al\u00ADmost There. Go cat sit or hang out at a shel\u00ADter be\u00ADfore tak\u00ADing the plunge.";
       else
-        resultText = "Ready to Adopt! You probably already have a name ready!";
+        resultText =
+          "Read\u00ADy to Adopt! You prob\u00ADably al\u00ADready have a name read\u00ADy!";
 
       mixpanel.track("Checklist Completed", {
         "Final Score": finalTotal + "/27",
@@ -147,19 +148,26 @@ export default function Trivia() {
   if (showResult) {
     return (
       <SafeAreaView style={styles.resultScreen}>
-        <View style={styles.resultCard}>
-          <Text style={styles.resultEyebrow}>YOUR RESULT</Text>
-          <Text style={[styles.resultText, { color: getResultColor() }]}>
-            {result}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.tryAgainBtn}
-          onPress={reset}
-          activeOpacity={0.85}
+        <ScrollView
+          contentContainerStyle={styles.resultScrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.tryAgainText}>Try Again</Text>
-        </TouchableOpacity>
+          <View style={styles.resultCard}>
+            <Text style={styles.resultEyebrow} maxFontSizeMultiplier={1.3}>
+              YOUR RESULT
+            </Text>
+            <Text style={[styles.resultText, { color: getResultColor() }]}>
+              {result}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.tryAgainBtn}
+            onPress={reset}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.tryAgainText}>Try Again</Text>
+          </TouchableOpacity>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -247,7 +255,7 @@ export default function Trivia() {
           activeOpacity={0.85}
         >
           <Text style={styles.nextBtnText}>
-            {isLast ? "Finish Quiz" : "Next"}
+            {isLast ? "Fin\u00ADish Quiz" : "Next"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -347,6 +355,7 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
     borderRadius: 16,
     paddingVertical: 16,
+    paddingHorizontal: 10,
     alignItems: "center",
     justifyContent: "center",
     borderBottomWidth: 4,
@@ -369,13 +378,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.5,
+    textAlign: "center",
   },
   resultScreen: {
     flex: 1,
     backgroundColor: "white",
+  },
+  resultScrollContent: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 28,
+    paddingVertical: 40,
     gap: 24,
   },
   resultCard: {
@@ -413,6 +427,7 @@ const styles = StyleSheet.create({
   tryAgainBtn: {
     width: "50%",
     paddingVertical: 18,
+    paddingHorizontal: 10,
     backgroundColor: GREEN,
     borderRadius: 16,
     alignItems: "center",
@@ -430,5 +445,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.5,
+    textAlign: "center",
   },
 });

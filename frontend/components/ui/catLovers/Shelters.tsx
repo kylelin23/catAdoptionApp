@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as Location from "expo-location";
-import { mixpanel } from '../../../lib/mixpanel';
+import { mixpanel } from "../../../lib/mixpanel";
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
@@ -141,8 +141,8 @@ export default function Shelters({ navigation }: { navigation: any }) {
   };
 
   const handleSearchSubmit = () => {
-    mixpanel.track('Shelter Searched', {
-      'Query': searchQuery.trim(),
+    mixpanel.track("Shelter Searched", {
+      Query: searchQuery.trim(),
     });
     fetchShelters(userLocation, searchQuery);
   };
@@ -200,7 +200,7 @@ export default function Shelters({ navigation }: { navigation: any }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.searchContainer}>
-        <Text style={styles.searchInstructions}>
+        <Text style={styles.searchInstructions} maxFontSizeMultiplier={1.5}>
           Search for your nearest cat shelter/rescue by city, zip code, or name!
         </Text>
         <TextInput
@@ -217,43 +217,62 @@ export default function Shelters({ navigation }: { navigation: any }) {
       </View>
 
       <ScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.searchDisclaimer}>
+        <Text style={styles.searchDisclaimer} maxFontSizeMultiplier={1.5}>
           Listings come from Google and may not be cat-specific. Please check a
           shelter/rescue's website to confirm before reaching out or visiting.
         </Text>
         {loadingShelters ? (
           <View style={styles.emptyState}>
             <ActivityIndicator color={GREEN} />
-            <Text style={styles.emptyText}>Finding cat shelter/rescues...</Text>
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
+              Finding cat shelter/rescues...
+            </Text>
           </View>
         ) : fetchError ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>
+            <Text
+              style={styles.emptyTitle}
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={2}
+            >
               Couldn't load shelters/rescues
             </Text>
-            <Text style={styles.emptyText}>
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
               Check your connection and try again.
             </Text>
             <TouchableOpacity
               onPress={() => fetchShelters(userLocation, searchQuery)}
               style={styles.retryBtn}
             >
-              <Text style={styles.retryBtnText}>Retry</Text>
+              <Text
+                style={styles.retryBtnText}
+                maxFontSizeMultiplier={1.3}
+                numberOfLines={1}
+              >
+                Retry
+              </Text>
             </TouchableOpacity>
           </View>
         ) : displayShelters.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>No shelters/rescues found</Text>
-            <Text style={styles.emptyText}>
+            <Text
+              style={styles.emptyTitle}
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={2}
+            >
+              No shelters/rescues found
+            </Text>
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
               Try a different city or keyword.
             </Text>
           </View>
         ) : (
           <>
-            <Text style={styles.resultsCount}>
+            <Text style={styles.resultsCount} maxFontSizeMultiplier={1.4}>
               Showing {displayShelters.length}{" "}
               {displayShelters.length === 1
                 ? "shelter/rescue"
@@ -263,9 +282,19 @@ export default function Shelters({ navigation }: { navigation: any }) {
             {displayShelters.map((shelter) => (
               <View key={shelter.id} style={styles.shelterCard}>
                 <View style={styles.cardHeader}>
-                  <Text style={styles.shelterName}>{shelter.name}</Text>
+                  <Text
+                    style={styles.shelterName}
+                    maxFontSizeMultiplier={1.5}
+                    numberOfLines={3}
+                  >
+                    {shelter.name}
+                  </Text>
                   {shelter.distanceStr ? (
-                    <Text style={styles.distanceBadge}>
+                    <Text
+                      style={styles.distanceBadge}
+                      maxFontSizeMultiplier={1.3}
+                      numberOfLines={1}
+                    >
                       {shelter.distanceStr}
                     </Text>
                   ) : null}
@@ -282,7 +311,14 @@ export default function Shelters({ navigation }: { navigation: any }) {
                       onPress={() => handleDirections(shelter.address)}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.routeBtnText}>Directions</Text>
+                      <Text
+                        style={styles.routeBtnText}
+                        maxFontSizeMultiplier={1.3}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                      >
+                        Directions
+                      </Text>
                     </TouchableOpacity>
                   ) : null}
 
@@ -292,7 +328,14 @@ export default function Shelters({ navigation }: { navigation: any }) {
                       onPress={() => handleWebsite(shelter.website)}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.webBtnText}>Website</Text>
+                      <Text
+                        style={styles.webBtnText}
+                        maxFontSizeMultiplier={1.3}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                      >
+                        Website
+                      </Text>
                     </TouchableOpacity>
                   ) : null}
                 </View>
@@ -311,7 +354,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: WHITE,
   },
-
+  scrollView: {
+    flex: 1,
+  },
   searchContainer: {
     paddingHorizontal: 22,
     paddingTop: 16,
@@ -436,7 +481,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    overflow: "hidden",
+    flexShrink: 0,
   },
   shelterAddress: {
     fontFamily: "Avenir",
@@ -454,7 +499,9 @@ const styles = StyleSheet.create({
   },
   actionBtn: {
     flex: 1,
+    minHeight: 40,
     paddingVertical: 10,
+    paddingHorizontal: 4,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",

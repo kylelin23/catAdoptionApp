@@ -112,7 +112,9 @@ export default function NewCatParents({ navigation }: { navigation: any }) {
         onPress={() => navigation.goBack()}
         activeOpacity={0.7}
       >
-        <Text style={styles.backText}>{"<"}</Text>
+        <Text style={styles.backText} allowFontScaling={false}>
+          {"<"}
+        </Text>
       </TouchableOpacity>
 
       <Animated.View
@@ -132,7 +134,9 @@ export default function NewCatParents({ navigation }: { navigation: any }) {
           <View style={styles.bubbleRow}>
             <View style={styles.tail} />
             <View style={styles.bubble}>
-              <Text style={styles.bubbleText}>New Cat Parents</Text>
+              <Text style={styles.bubbleText} maxFontSizeMultiplier={1.3}>
+                New Cat Par{"\u00AD"}ents
+              </Text>
             </View>
           </View>
         </Animated.View>
@@ -151,6 +155,9 @@ export default function NewCatParents({ navigation }: { navigation: any }) {
                 styles.tabPillText,
                 index === i && styles.tabPillTextActive,
               ]}
+              maxFontSizeMultiplier={1.2}
+              numberOfLines={1}
+              adjustsFontSizeToFit
             >
               {route.title}
             </Text>
@@ -237,6 +244,7 @@ const styles = StyleSheet.create({
   },
   bubbleWrapper: {
     flex: 1,
+    marginRight: 8,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
@@ -300,7 +308,9 @@ const styles = StyleSheet.create({
   },
   tabPill: {
     flex: 1,
+    minHeight: 40,
     paddingVertical: 10,
+    paddingHorizontal: 4,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",

@@ -224,21 +224,30 @@ export default function Trivia() {
   if (finished) {
     return (
       <SafeAreaView style={styles.resultScreen}>
-        <View style={styles.resultCard}>
-          <Text style={styles.resultEyebrow}>YOU DID IT!</Text>
-          <Text style={styles.resultText}>Congrats on finishing the quiz!</Text>
-          <Text style={styles.scoreText}>
-            {score} / {quiz.length} correct
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={styles.tryAgainBtn}
-          onPress={reset}
-          activeOpacity={0.85}
+        <ScrollView
+          contentContainerStyle={styles.resultScrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.tryAgainText}>Try Again</Text>
-        </TouchableOpacity>
+          <View style={styles.resultCard}>
+            <Text style={styles.resultEyebrow} maxFontSizeMultiplier={1.3}>
+              YOU DID IT!
+            </Text>
+            <Text style={styles.resultText}>
+              {"Con\u00ADgrats on fin\u00ADish\u00ADing the quiz!"}
+            </Text>
+            <Text style={styles.scoreText} maxFontSizeMultiplier={1.4}>
+              {score} / {quiz.length} {"cor\u00ADrect"}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.tryAgainBtn}
+            onPress={reset}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.tryAgainText}>Try Again</Text>
+          </TouchableOpacity>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -279,7 +288,7 @@ export default function Trivia() {
   const getBottomButtonProps = () => {
     if (!checked) {
       return {
-        text: "Check Answer",
+        text: "Check An\u00ADswer",
         onPress: handleCheck,
         disabled: !isSelected,
         style: [styles.nextBtn, !isSelected && styles.nextBtnDisabled],
@@ -287,7 +296,7 @@ export default function Trivia() {
     }
 
     return {
-      text: isLast ? "Finish Quiz" : "Next Question",
+      text: isLast ? "Fin\u00ADish Quiz" : "Next Ques\u00ADtion",
       onPress: handleNext,
       disabled: false,
       style: [
@@ -403,7 +412,7 @@ export default function Trivia() {
                   },
                 ]}
               >
-                {isCorrect ? "Correct!" : "Not quite!"}
+                {isCorrect ? "Cor\u00ADrect!" : "Not quite!"}
               </Text>
             </View>
           </View>
@@ -568,6 +577,7 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
     borderRadius: 16,
     paddingVertical: 16,
+    paddingHorizontal: 10,
     alignItems: "center",
     justifyContent: "center",
     borderBottomWidth: 4,
@@ -598,13 +608,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.5,
+    textAlign: "center",
   },
   resultScreen: {
     flex: 1,
     backgroundColor: WHITE,
+  },
+  resultScrollContent: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 28,
+    paddingVertical: 40,
     gap: 24,
   },
   resultCard: {
@@ -649,6 +664,7 @@ const styles = StyleSheet.create({
   tryAgainBtn: {
     width: "50%",
     paddingVertical: 18,
+    paddingHorizontal: 10,
     backgroundColor: GREEN,
     borderRadius: 16,
     alignItems: "center",
@@ -666,5 +682,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.5,
+    textAlign: "center",
   },
 });

@@ -103,14 +103,26 @@ function FlipCard({ con, index }: { con: any; index: number }) {
             },
           ]}
         >
-          <Text style={styles.frontTitle}>{con.category}</Text>
+          <Text
+            style={styles.frontTitle}
+            maxFontSizeMultiplier={1.5}
+            numberOfLines={4}
+          >
+            {con.category}
+          </Text>
           <Image
             source={CAT_IMAGES[index % CAT_IMAGES.length]}
             style={styles.catSticker}
             resizeMode="contain"
           />
           <View style={styles.tapHint}>
-            <Text style={styles.tapHintText}>Tap to learn more</Text>
+            <Text
+              style={styles.tapHintText}
+              maxFontSizeMultiplier={1.2}
+              numberOfLines={1}
+            >
+              Tap to learn more
+            </Text>
           </View>
         </Animated.View>
       </TouchableOpacity>
@@ -124,7 +136,13 @@ function FlipCard({ con, index }: { con: any; index: number }) {
           { transform: [{ rotateY: backInterpolate }], opacity: backOpacity },
         ]}
       >
-        <Text style={styles.backHeading}>{con.category}</Text>
+        <Text
+          style={styles.backHeading}
+          maxFontSizeMultiplier={1.4}
+          numberOfLines={3}
+        >
+          {con.category}
+        </Text>
         <View style={styles.divider} />
         <View
           style={styles.scrollWrapper}
@@ -171,7 +189,11 @@ function FlipCard({ con, index }: { con: any; index: number }) {
           <View
             style={[styles.tapHint, { backgroundColor: "rgba(44,26,14,0.06)" }]}
           >
-            <Text style={[styles.tapHintText, { color: INK_SOFT }]}>
+            <Text
+              style={[styles.tapHintText, { color: INK_SOFT }]}
+              maxFontSizeMultiplier={1.2}
+              numberOfLines={1}
+            >
               Tap to flip back
             </Text>
           </View>
@@ -383,110 +405,136 @@ export default function Cons({ navigation }: { navigation: any }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Animated.View
-        style={[
-          styles.container,
-          { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-        ]}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.backBtnText}>{"<"}</Text>
-          </TouchableOpacity>
-          <View style={styles.headerRow}>
-            <View style={styles.headerCenter}>
-              <Text style={styles.eyebrow}>THINKING OF ADOPTING</Text>
-              <Text style={styles.pageTitle}>The Cons</Text>
+        <Animated.View
+          style={[
+            styles.container,
+            { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+          ]}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.backBtnText} allowFontScaling={false}>
+                {"<"}
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.headerRow}>
+              <View style={styles.headerCenter}>
+                <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+                  THINKING OF ADOPTING
+                </Text>
+                <Text style={styles.pageTitle} maxFontSizeMultiplier={1.4}>
+                  The Cons
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.cardArea}>
-          {showReviewScreen ? (
-            <Animated.View
-              style={[
-                styles.reviewContainer,
-                {
-                  opacity: reviewCardOpacity,
-                  transform: [{ translateY: reviewCardSlide }],
-                },
-              ]}
-            >
-              <Text style={styles.reviewHeading}>Great Job!</Text>
-              <Text style={styles.reviewSubheading}>
-                You've finished! Click below to go through the cards again!{" "}
-              </Text>
-
-              <Animated.View style={{ transform: [{ scale: reviewBtnScale }] }}>
-                <TouchableOpacity
-                  style={styles.reviewBtn}
-                  onPress={handleReviewAgainPress}
-                  activeOpacity={0.85}
+          <View style={styles.cardArea}>
+            {showReviewScreen ? (
+              <Animated.View
+                style={[
+                  styles.reviewContainer,
+                  {
+                    opacity: reviewCardOpacity,
+                    transform: [{ translateY: reviewCardSlide }],
+                  },
+                ]}
+              >
+                <Text style={styles.reviewHeading} maxFontSizeMultiplier={1.4}>
+                  Great Job!
+                </Text>
+                <Text
+                  style={styles.reviewSubheading}
+                  maxFontSizeMultiplier={1.4}
+                  numberOfLines={4}
                 >
-                  <Text style={styles.reviewBtnText}>Review Again</Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </Animated.View>
-          ) : (
-            cons.map((con, index) => {
-              if (index < currentIndex || index > currentIndex + 1) {
-                return null;
-              }
+                  You've finished! Click below to go through the cards
+                  again!{" "}
+                </Text>
 
-              const cardAnim = cardAnimations[index];
-
-              const rotateCard = cardAnim.pan.x.interpolate({
-                inputRange: [-screenWidth / 2, 0, screenWidth / 2],
-                outputRange: ["-10deg", "0deg", "10deg"],
-                extrapolate: "clamp",
-              });
-
-              const animatedStyles = {
-                transform: [
-                  { translateX: cardAnim.pan.x },
-                  { translateY: cardAnim.pan.y },
-                  { scale: cardAnim.scale },
-                  { rotate: rotateCard },
-                ],
-                zIndex: cons.length - index,
-              };
-
-              const isCurrent = index === currentIndex;
-              const isUnderneath = index === currentIndex + 1;
-
-              return (
                 <Animated.View
-                  key={index}
-                  style={[
-                    styles.cardWrapper,
-                    animatedStyles,
-                    isUnderneath && styles.backgroundCard,
-                  ]}
-                  {...(isCurrent ? panResponder.panHandlers : {})}
+                  style={{ transform: [{ scale: reviewBtnScale }] }}
                 >
-                  <FlipCard con={con} index={index} />
+                  <TouchableOpacity
+                    style={styles.reviewBtn}
+                    onPress={handleReviewAgainPress}
+                    activeOpacity={0.85}
+                  >
+                    <Text
+                      style={styles.reviewBtnText}
+                      maxFontSizeMultiplier={1.3}
+                    >
+                      Review Again
+                    </Text>
+                  </TouchableOpacity>
                 </Animated.View>
-              );
-            })
+              </Animated.View>
+            ) : (
+              cons.map((con, index) => {
+                if (index < currentIndex || index > currentIndex + 1) {
+                  return null;
+                }
+
+                const cardAnim = cardAnimations[index];
+
+                const rotateCard = cardAnim.pan.x.interpolate({
+                  inputRange: [-screenWidth / 2, 0, screenWidth / 2],
+                  outputRange: ["-10deg", "0deg", "10deg"],
+                  extrapolate: "clamp",
+                });
+
+                const animatedStyles = {
+                  transform: [
+                    { translateX: cardAnim.pan.x },
+                    { translateY: cardAnim.pan.y },
+                    { scale: cardAnim.scale },
+                    { rotate: rotateCard },
+                  ],
+                  zIndex: cons.length - index,
+                };
+
+                const isCurrent = index === currentIndex;
+                const isUnderneath = index === currentIndex + 1;
+
+                return (
+                  <Animated.View
+                    key={index}
+                    style={[
+                      styles.cardWrapper,
+                      animatedStyles,
+                      isUnderneath && styles.backgroundCard,
+                    ]}
+                    {...(isCurrent ? panResponder.panHandlers : {})}
+                  >
+                    <FlipCard con={con} index={index} />
+                  </Animated.View>
+                );
+              })
+            )}
+          </View>
+
+          {!showReviewScreen && (
+            <Text style={styles.instructionText} maxFontSizeMultiplier={1.3}>
+              Swipe left to see the next card!
+            </Text>
           )}
-        </View>
 
-        {!showReviewScreen && (
-          <Text style={styles.instructionText}>
-            Swipe left to see the next card!
-          </Text>
-        )}
-
-        <View style={styles.bottomNav}>
-          <Text style={styles.pageCounter}>
-            {showReviewScreen ? cons.length : currentIndex + 1} / {cons.length}
-          </Text>
-        </View>
-      </Animated.View>
+          <View style={styles.bottomNav}>
+            <Text style={styles.pageCounter} maxFontSizeMultiplier={1.3}>
+              {showReviewScreen ? cons.length : currentIndex + 1} /{" "}
+              {cons.length}
+            </Text>
+          </View>
+        </Animated.View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -496,8 +544,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   container: {
-    flex: 1,
+    minHeight: screenHeight,
     width: "100%",
     maxWidth: 380,
     paddingVertical: 22,
@@ -558,7 +609,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   cardArea: {
-    flex: 1,
+    minHeight: CARD_HEIGHT + 40,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
@@ -621,6 +672,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingVertical: 6,
     paddingHorizontal: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
   },
   tapHintText: {
     fontFamily: "Avenir",

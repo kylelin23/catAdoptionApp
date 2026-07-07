@@ -8,8 +8,18 @@ import {
   Animated,
   Image,
   SafeAreaView,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from "react-native";
 import { mixpanel } from "../../../../frontend/lib/mixpanel";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
@@ -21,56 +31,56 @@ const STEPS = [
   {
     key: "separate",
     number: "01",
-    title: "Separate Spaces",
+    title: "Sep\u00ADar\u00ADate Spaces",
     tagline: "Keep them apart at first",
     accent: "#7A9BBE",
     dark: "#5C7A9A",
     bullets: [
-      "Keep the cats in separate spaces.",
-      "Set up the new cat in a quiet room with a litter box, food, water, a hiding spot, and a scratching post.",
+      "Keep the cats in sep\u00ADar\u00ADate spaces.",
+      "Set up the new cat in a qui\u00ADet room with a lit\u00ADter box, food, wa\u00ADter, a hid\u00ADing spot, and a scratch\u00ADing post.",
       "Keep the door closed.",
-      "Do not allow face-to-face contact for the first 3–5 days.",
+      "Do not al\u00ADlow face-to-face con\u00ADtact for the first 3–5 days.",
     ],
   },
   {
     key: "scent",
     number: "02",
-    title: "Exchange Scents",
-    tagline: "Cats recognize by scent before sight",
+    title: "Ex\u00ADchange Scents",
+    tagline: "Cats re\u00ADcog\u00ADnize by scent be\u00ADfore sight",
     accent: "#D4956A",
     dark: "#A86E45",
     bullets: [
-      "Exchange bedding or blankets between cats.",
-      "Feed cats on opposite sides of the closed door.",
-      "Provide treats so cats associate each other's scents with positive outcomes.",
+      "Ex\u00ADchange bed\u00ADding or blankets between cats.",
+      "Feed cats on op\u00ADpos\u00ADite sides of the closed door.",
+      "Pro\u00ADvide treats so cats as\u00ADso\u00ADci\u00ADate each oth\u00ADer's scents with pos\u00ADit\u00ADive out\u00ADcomes.",
     ],
   },
   {
     key: "supervised",
     number: "03",
-    title: "Supervised Meetings",
-    tagline: "Short and sweet visits",
+    title: "Su\u00ADper\u00ADvised Meet\u00ADings",
+    tagline: "Short and sweet vis\u00ADits",
     accent: "#7BAE6E",
     dark: "#5A8F50",
     bullets: [
-      "Cats are ready when they show curious sniffing at the door baseline.",
-      "After several days, crack open the door slightly.",
-      "Let the cats meet briefly under close watch.",
-      "Continue to provide treats and keep sessions deliberately short.",
+      "Cats are ready when they show cur\u00ADi\u00ADous sniff\u00ADing at the door base\u00ADline.",
+      "After sev\u00ADer\u00ADal days, crack open the door slightly.",
+      "Let the cats meet briefly un\u00ADder close watch.",
+      "Con\u00ADtin\u00ADue to pro\u00ADvide treats and keep ses\u00ADsions de\u00ADlib\u00ADer\u00ADately short.",
     ],
   },
   {
     key: "slow",
     number: "04",
-    title: "Slow and Gradual",
-    tagline: "Patience is key",
+    title: "Slow and Grad\u00ADu\u00ADal",
+    tagline: "Pa\u00ADtience is key",
     accent: "#C47A45",
     dark: "#9E5C2E",
     bullets: [
-      "Maintain the same gradual structure over days or weeks.",
-      "Keep your daily routines entirely consistent.",
-      "Do not force interactive spaces if either cat pulls away.",
-      "Remember: Hissing is safe communication and is totally common!",
+      "Main\u00ADtain the same grad\u00ADu\u00ADal struc\u00ADture over days or weeks.",
+      "Keep your daily rou\u00ADtines en\u00ADtirely con\u00ADsist\u00ADent.",
+      "Do not force in\u00ADter\u00ADact\u00ADive spaces if either cat pulls away.",
+      "Re\u00ADmem\u00ADber: Hiss\u00ADing is safe com\u00ADmu\u00ADnic\u00ADa\u00ADtion and is to\u00ADtally com\u00ADmon!",
     ],
   },
 ];
@@ -85,21 +95,13 @@ function StepItem({
   onPress: () => void;
 }) {
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  const contentHeightAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(rotateAnim, {
-        toValue: isOpen ? 1 : 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(contentHeightAnim, {
-        toValue: isOpen ? 1 : 0,
-        duration: 250,
-        useNativeDriver: false,
-      }),
-    ]).start();
+    Animated.timing(rotateAnim, {
+      toValue: isOpen ? 1 : 0,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
   }, [isOpen]);
 
   const rotate = rotateAnim.interpolate({
@@ -107,15 +109,10 @@ function StepItem({
     outputRange: ["0deg", "180deg"],
   });
 
-  const contentOpacity = contentHeightAnim.interpolate({
-    inputRange: [0, 0.4, 1],
-    outputRange: [0, 0, 1],
-  });
-
-  const maxHeight = contentHeightAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 320],
-  });
+  const handlePress = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    onPress();
+  };
 
   return (
     <View style={styles.itemWrapper}>
@@ -131,7 +128,7 @@ function StepItem({
       >
         <TouchableOpacity
           style={styles.headerRow}
-          onPress={onPress}
+          onPress={handlePress}
           activeOpacity={0.9}
         >
           <View
@@ -140,13 +137,30 @@ function StepItem({
               { backgroundColor: step.accent, borderBottomColor: step.dark },
             ]}
           >
-            <Text style={styles.numberText}>{step.number}</Text>
+            <Text style={styles.numberText} allowFontScaling={false}>
+              {step.number}
+            </Text>
           </View>
 
           <View style={styles.titleArea}>
-            <Text style={styles.eyebrow}>STEP {step.number}</Text>
-            <Text style={styles.cardTitle}>{step.title}</Text>
-            <Text style={styles.cardTagline}>{step.tagline}</Text>
+            <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+              {"STEP "}
+              {step.number}
+            </Text>
+            <Text
+              style={styles.cardTitle}
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={2}
+            >
+              {step.title}
+            </Text>
+            <Text
+              style={styles.cardTagline}
+              maxFontSizeMultiplier={1.3}
+              numberOfLines={2}
+            >
+              {step.tagline}
+            </Text>
           </View>
 
           <Animated.Image
@@ -159,9 +173,7 @@ function StepItem({
           />
         </TouchableOpacity>
 
-        <Animated.View
-          style={{ maxHeight, opacity: contentOpacity, overflow: "hidden" }}
-        >
+        {isOpen && (
           <View style={styles.bulletsArea}>
             <View style={styles.divider} />
             {step.bullets.map((bullet, i) => (
@@ -175,7 +187,7 @@ function StepItem({
               </View>
             ))}
           </View>
-        </Animated.View>
+        )}
       </View>
     </View>
   );

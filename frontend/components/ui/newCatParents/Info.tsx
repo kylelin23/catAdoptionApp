@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Animated,
   Image,
+  ScrollView,
 } from "react-native";
 
 const INK = "#2C1A0E";
@@ -21,8 +22,8 @@ const PAW = require("../../../assets/images/paw.png");
 const ITEMS = [
   {
     route: "What to Buy in Preparation",
-    title: "What to Buy in Preparation",
-    subtitle: "Make sure you are prepared!",
+    title: "What to Buy in Pre\u00ADpar\u00ADa\u00ADtion",
+    subtitle: "Make sure you are pre\u00ADpared!",
     border: BLUE,
     borderDark: BLUE_DARK,
     pawColor: BLUE,
@@ -30,8 +31,8 @@ const ITEMS = [
   },
   {
     route: "What to Expect in the First Week",
-    title: "What to Expect in First Week",
-    subtitle: "Know what to expect!",
+    title: "What to Ex\u00ADpect in First Week",
+    subtitle: "Know what to ex\u00ADpect!",
     border: GREEN,
     borderDark: GREEN_DARK,
     pawColor: GREEN,
@@ -109,12 +110,29 @@ function InfoCard({
           <View style={[styles.pawCircle, { backgroundColor: item.border }]}>
             <Image source={PAW} style={styles.paw} resizeMode="contain" />
           </View>
-          <Text style={[styles.arrow, { color: item.border }]}>›</Text>
+          <Text
+            style={[styles.arrow, { color: item.border }]}
+            allowFontScaling={false}
+          >
+            ›
+          </Text>
         </View>
 
         <View style={styles.cardBottom}>
-          <Text style={styles.cardTitle}>{item.title}</Text>
-          <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
+          <Text
+            style={styles.cardTitle}
+            maxFontSizeMultiplier={1.4}
+            numberOfLines={3}
+          >
+            {item.title}
+          </Text>
+          <Text
+            style={styles.cardSubtitle}
+            maxFontSizeMultiplier={1.3}
+            numberOfLines={2}
+          >
+            {item.subtitle}
+          </Text>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -123,7 +141,11 @@ function InfoCard({
 
 export default function Info({ navigation }: { navigation: any }) {
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
       {ITEMS.map((item, i) => (
         <InfoCard
           key={i}
@@ -132,21 +154,23 @@ export default function Info({ navigation }: { navigation: any }) {
           onPress={() => navigation.navigate(item.route)}
         />
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+  },
+  container: {
+    flexGrow: 1,
     paddingHorizontal: 20,
     paddingVertical: 32,
     gap: 20,
     justifyContent: "center",
   },
   cardWrapper: {
-    flex: 1,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.07,
@@ -154,13 +178,11 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   card: {
-    flex: 1,
     borderRadius: 24,
     borderWidth: 2.5,
     borderBottomWidth: 5,
     paddingVertical: 28,
     paddingHorizontal: 22,
-    justifyContent: "space-between",
   },
   cardTop: {
     flexDirection: "row",

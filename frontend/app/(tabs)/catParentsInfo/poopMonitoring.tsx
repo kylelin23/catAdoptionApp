@@ -29,8 +29,8 @@ const STOOL_IMAGES: { [key: number]: any } = {
 const TYPES = [
   {
     type: 1,
-    description: "Separate hard lumps",
-    label: "Severe Constipation",
+    description: "Sep\u00ADar\u00ADate hard lumps",
+    label: "Se\u00ADvere Con\u00ADstip\u00ADa\u00ADtion",
     rating: "See a Vet",
     border: "#C0392B",
     dark: "#922B21",
@@ -40,9 +40,9 @@ const TYPES = [
   },
   {
     type: 2,
-    description: "Lumpy and sausage-like",
-    label: "Mild Constipation",
-    rating: "Monitor",
+    description: "Lumpy and saus\u00ADage-like",
+    label: "Mild Con\u00ADstip\u00ADa\u00ADtion",
+    rating: "Mon\u00ADit\u00ADor",
     border: "#D4956A",
     dark: "#A86E45",
     cardColor: "#F2D9A0",
@@ -51,8 +51,8 @@ const TYPES = [
   },
   {
     type: 3,
-    description: "Sausage shape with cracks in the surface",
-    label: "Normal",
+    description: "Saus\u00ADage shape with cracks in the sur\u00ADface",
+    label: "Nor\u00ADmal",
     rating: "Great!",
     border: "#7BAE6E",
     dark: "#5A8F50",
@@ -62,9 +62,9 @@ const TYPES = [
   },
   {
     type: 4,
-    description: "Smooth, soft sausage or snake",
-    label: "Normal",
-    rating: "Perfect!",
+    description: "Smooth, soft saus\u00ADage or snake",
+    label: "Nor\u00ADmal",
+    rating: "Per\u00ADfect!",
     border: "#7BAE6E",
     dark: "#5A8F50",
     cardColor: "#C4DDB0",
@@ -74,8 +74,8 @@ const TYPES = [
   {
     type: 5,
     description: "Soft blobs with clear-cut edges",
-    label: "Lacking Fibre",
-    rating: "Monitor",
+    label: "Lack\u00ADing Fibre",
+    rating: "Mon\u00ADit\u00ADor",
     border: "#D4956A",
     dark: "#A86E45",
     cardColor: "#F2D9A0",
@@ -84,9 +84,9 @@ const TYPES = [
   },
   {
     type: 6,
-    description: "Mushy consistency with ragged edges",
-    label: "Mild Diarrhea",
-    rating: "Concerning",
+    description: "Mushy con\u00ADsist\u00ADency with ragged edges",
+    label: "Mild Di\u00ADar\u00ADrhea",
+    rating: "Con\u00ADcern\u00ADing",
     border: "#C47A45",
     dark: "#9E5C2E",
     cardColor: "#F2C9A0",
@@ -95,8 +95,8 @@ const TYPES = [
   },
   {
     type: 7,
-    description: "Liquid consistency with no solid pieces",
-    label: "Severe Diarrhea",
+    description: "Liquid con\u00ADsist\u00ADency with no sol\u00ADid pieces",
+    label: "Se\u00ADvere Di\u00ADar\u00ADrhea",
     rating: "See a Vet",
     border: "#C0392B",
     dark: "#922B21",
@@ -124,12 +124,26 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
-            <Text style={styles.backBtnText}>{"<"}</Text>
+            <Text style={styles.backBtnText} allowFontScaling={false}>
+              {"<"}
+            </Text>
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.eyebrow}>CAT PARENTS</Text>
-            <Text style={styles.pageTitle}>Poop Monitor</Text>
-            <Text style={styles.pageSub}>
+            <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+              CAT PARENTS
+            </Text>
+            <Text
+              style={styles.pageTitle}
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={2}
+            >
+              Poop Monitor
+            </Text>
+            <Text
+              style={styles.pageSub}
+              maxFontSizeMultiplier={1.3}
+              numberOfLines={2}
+            >
               Track your cat's health by poop type
             </Text>
           </View>
@@ -161,7 +175,9 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
                   },
                 ]}
               >
-                <Text style={styles.typeBadgeText}>{item.type}</Text>
+                <Text style={styles.typeBadgeText} allowFontScaling={false}>
+                  {item.type}
+                </Text>
               </View>
 
               <View style={styles.imageWrapper}>
@@ -177,8 +193,15 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
               </View>
 
               <View style={styles.cardMiddle}>
-                <Text style={styles.typeDescription}>{item.description}</Text>
-                <Text style={styles.typeLabel}>{item.label}</Text>
+                <Text
+                  style={styles.typeDescription}
+                  maxFontSizeMultiplier={1.5}
+                >
+                  {item.description}
+                </Text>
+                <Text style={styles.typeLabel} maxFontSizeMultiplier={1.4}>
+                  {item.label}
+                </Text>
               </View>
 
               <View
@@ -187,7 +210,11 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
                   { backgroundColor: item.ratingColor },
                 ]}
               >
-                <Text style={[styles.ratingText, { color: item.textColor }]}>
+                <Text
+                  style={[styles.ratingText, { color: item.textColor }]}
+                  maxFontSizeMultiplier={1.4}
+                  numberOfLines={2}
+                >
                   {item.rating}
                 </Text>
               </View>
@@ -212,13 +239,20 @@ export default function PoopMonitoring({ navigation }: { navigation: any }) {
             >
               {selectedImage && (
                 <>
-                  <Text style={styles.modalTitle}>Type {selectedImage}</Text>
+                  <Text style={styles.modalTitle} maxFontSizeMultiplier={1.4}>
+                    {"Type "}
+                    {selectedImage}
+                  </Text>
                   <Image
                     source={STOOL_IMAGES[selectedImage]}
                     style={styles.modalImage}
                     resizeMode="contain"
                   />
-                  <Text style={styles.modalCloseText}>
+                  <Text
+                    style={styles.modalCloseText}
+                    maxFontSizeMultiplier={1.3}
+                    numberOfLines={2}
+                  >
                     Tap anywhere outside to close
                   </Text>
                 </>
@@ -328,6 +362,7 @@ const styles = StyleSheet.create({
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
+    flexShrink: 0,
   },
   stoolImage: {
     width: 52,

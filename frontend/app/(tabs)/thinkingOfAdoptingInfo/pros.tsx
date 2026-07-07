@@ -103,14 +103,22 @@ function FlipCard({ pro, index }: { pro: any; index: number }) {
             },
           ]}
         >
-          <Text style={styles.frontTitle}>{pro.fact}</Text>
+          <Text
+            style={styles.frontTitle}
+            maxFontSizeMultiplier={1.5}
+            numberOfLines={4}
+          >
+            {pro.fact}
+          </Text>
           <Image
             source={CAT_IMAGES[index % CAT_IMAGES.length]}
             style={styles.catSticker}
             resizeMode="contain"
           />
           <View style={styles.tapHint}>
-            <Text style={styles.tapHintText}>Tap to see why</Text>
+            <Text style={styles.tapHintText} maxFontSizeMultiplier={1.2}>
+              Tap to see why
+            </Text>
           </View>
         </Animated.View>
       </TouchableOpacity>
@@ -124,7 +132,13 @@ function FlipCard({ pro, index }: { pro: any; index: number }) {
           { transform: [{ rotateY: backInterpolate }], opacity: backOpacity },
         ]}
       >
-        <Text style={styles.backHeading}>{pro.fact}</Text>
+        <Text
+          style={styles.backHeading}
+          maxFontSizeMultiplier={1.4}
+          numberOfLines={3}
+        >
+          {pro.fact}
+        </Text>
         <View style={styles.divider} />
         <View
           style={styles.scrollWrapper}
@@ -171,7 +185,10 @@ function FlipCard({ pro, index }: { pro: any; index: number }) {
           <View
             style={[styles.tapHint, { backgroundColor: "rgba(44,26,14,0.06)" }]}
           >
-            <Text style={[styles.tapHintText, { color: INK_SOFT }]}>
+            <Text
+              style={[styles.tapHintText, { color: INK_SOFT }]}
+              maxFontSizeMultiplier={1.2}
+            >
               Tap to flip back
             </Text>
           </View>
@@ -393,12 +410,18 @@ export default function Pros({ navigation }: { navigation: any }) {
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
-            <Text style={styles.backBtnText}>{"<"}</Text>
+            <Text style={styles.backBtnText} allowFontScaling={false}>
+              {"<"}
+            </Text>
           </TouchableOpacity>
           <View style={styles.headerRow}>
             <View style={styles.headerCenter}>
-              <Text style={styles.eyebrow}>THINKING OF ADOPTING</Text>
-              <Text style={styles.pageTitle}>The Pros</Text>
+              <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+                THINKING OF ADOPTING
+              </Text>
+              <Text style={styles.pageTitle} maxFontSizeMultiplier={1.4}>
+                The Pros
+              </Text>
             </View>
           </View>
         </View>
@@ -414,8 +437,14 @@ export default function Pros({ navigation }: { navigation: any }) {
                 },
               ]}
             >
-              <Text style={styles.reviewHeading}>Great Job!</Text>
-              <Text style={styles.reviewSubheading}>
+              <Text style={styles.reviewHeading} maxFontSizeMultiplier={1.4}>
+                Great Job!
+              </Text>
+              <Text
+                style={styles.reviewSubheading}
+                maxFontSizeMultiplier={1.4}
+                numberOfLines={4}
+              >
                 You've finished! Click below to go through the cards again!{" "}
               </Text>
 
@@ -425,7 +454,12 @@ export default function Pros({ navigation }: { navigation: any }) {
                   onPress={handleReviewAgainPress}
                   activeOpacity={0.85}
                 >
-                  <Text style={styles.reviewBtnText}>Review Again</Text>
+                  <Text
+                    style={styles.reviewBtnText}
+                    maxFontSizeMultiplier={1.3}
+                  >
+                    Review Again
+                  </Text>
                 </TouchableOpacity>
               </Animated.View>
             </Animated.View>
@@ -473,13 +507,13 @@ export default function Pros({ navigation }: { navigation: any }) {
         </View>
 
         {!showReviewScreen && (
-          <Text style={styles.instructionText}>
+          <Text style={styles.instructionText} maxFontSizeMultiplier={1.3}>
             Swipe left to see the next card!
           </Text>
         )}
 
         <View style={styles.bottomNav}>
-          <Text style={styles.pageCounter}>
+          <Text style={styles.pageCounter} maxFontSizeMultiplier={1.3}>
             {showReviewScreen ? pros.length : currentIndex + 1} / {pros.length}
           </Text>
         </View>

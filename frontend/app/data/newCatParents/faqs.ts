@@ -1,53 +1,66 @@
 type FAQ = {
-    question: string;
-    answer: string;
-}
+  question: string;
+  answer: string;
+};
 
 const faqs: FAQ[] = [
   {
-    question: 'What do I need for the first week?',
-    answer: 'Start out with the basics! Litter (and litter box), wet and dry food (and food and water bowls) and some simple toys! Key here is to not over buy.'
-  },
-      {
-    question: 'How can I prepare the house?',
-    answer: 'Identify an enclosed room that will serve as the safe room. Cats will need time to adjust so be prepared to have them in the room for a couple of weeks. Make sure you clear the room of potentially toxic plants and items. Hop over to our Cat Parents category for more info.'
+    question: "What do I need for the first week?",
+    answer:
+      "Start out with the ba\u00ADsics! Lit\u00ADter (and lit\u00ADter box), wet and dry food (and food and wa\u00ADter bowls) and some simple toys! Key here is to not over buy.",
   },
   {
-    question: 'My cat is not eating, what do I do?',
-    answer: "It's common for cats to hide and not eat in new surroundings. Offer wet food as they're more likely to be enticed by the smell. Leave them alone and they're more likely to eat when no one is around."
+    question: "How can I pre\u00ADpare the house?",
+    answer:
+      "Iden\u00ADti\u00ADfy an en\u00ADclosed room that will serve as the safe room. Cats will need time to ad\u00ADjust so be pre\u00ADpared to have them in the room for a couple of weeks. Make sure you clear the room of po\u00ADten\u00ADtially tox\u00ADic plants and items. Hop over to our Cat Par\u00ADents cat\u00ADeg\u00ADory for more info.",
   },
   {
-    question: 'How often should I be cleaning the litter box?',
-    answer: "At least once a day to make sure they're using the litter box and not constipated or dehydrated."
+    question: "My cat is not eat\u00ADing, what do I do?",
+    answer:
+      "It's com\u00ADmon for cats to hide and not eat in new sur\u00ADround\u00ADings. Of\u00ADfer wet food as they're more likely to be en\u00ADticed by the smell. Leave them alone and they're more likely to eat when no one is around.",
+  },
+  {
+    question:
+      "How of\u00ADten should I be clean\u00ADing the lit\u00ADter box?",
+    answer:
+      "At least once a day to make sure they're us\u00ADing the lit\u00ADter box and not con\u00ADstip\u00ADated or de\u00ADhy\u00ADdrated.",
   },
   {
     question: "I can't find my cat!",
-    answer: 'That happens to lots of new cat parents the first day! It helps to keep your cat contained in one room for the first week (sometimes more!). But make sure there are covered cat beds or spaces for them to use and decompress.'
+    answer:
+      "That hap\u00ADpens to lots of new cat par\u00ADents the first day! It helps to keep your cat con\u00ADtained in one room for the first week (some\u00ADtimes more!). But make sure there are covered cat beds or spaces for them to use and de\u00ADcom\u00ADpress.",
   },
   {
-    question: 'My resident cat is hissing at our new cat',
-    answer: "There's not much to do here but give it time and take it slow. Continue to spend time with your resident cat so they don't feel threatened or sad that they may be losing you."
+    question: "My res\u00ADid\u00ADent cat is hiss\u00ADing at our new cat",
+    answer:
+      "There's not much to do here but give it time and take it slow. Con\u00ADtin\u00ADue to spend time with your res\u00ADid\u00ADent cat so they don't feel threat\u00ADened or sad that they may be los\u00ADing you.",
   },
   {
     question: "I can't sleep at night",
-    answer: "Cats are nocturnal and zoomies is the term we use when cats get their burst of energy at night! Over time, they will get used to your family's sleeping schedule and I promise, it will work itself out!"
+    answer:
+      "Cats are noc\u00ADturn\u00ADal and zoomies is the term we use when cats get their burst of en\u00ADergy at night! Over time, they will get used to your fam\u00ADily's sleep\u00ADing sched\u00ADule and I prom\u00ADise, it will work it\u00ADself out!",
   },
   {
-    question: 'Am I feeding enough? Too much?',
-    answer: 'Cats need different amounts of food at different phases. Kittens and nursing mothers need a lot more! Always check the suggested amount on the instructions listed on the dry and wet food and avoid overfeeding.'
+    question: "Am I feed\u00ADing enough? Too much?",
+    answer:
+      "Cats need dif\u00ADfer\u00ADent amounts of food at dif\u00ADfer\u00ADent phases. Kit\u00ADtens and nurs\u00ADing moth\u00ADers need a lot more! Al\u00ADways check the sug\u00ADges\u00ADted amount on the in\u00ADstruc\u00ADtions listed on the dry and wet food and avoid over\u00ADfeed\u00ADing.",
   },
   {
-    question: 'How can I make my cat a lap cat?',
-    answer: "The key word here is 'make'. Cats are infamous for not being made to do anything and that is the truth, not a myth. Love your cats for who they are, not who you want them to be!"
+    question: "How can I make my cat a lap cat?",
+    answer:
+      "The key word here is 'make'. Cats are in\u00ADfam\u00ADous for not be\u00ADing made to do any\u00ADthing and that is the truth, not a myth. Love your cats for who they are, not who you want them to be!",
   },
   {
-    question: 'Should I let my cat on the kitchen counter? Bed? Anywhere they want?',
-    answer: "Honestly, I haven't met anyone who's been successful at keeping their cat off counters or beds! If you're worried about germs, it's always a good idea to wipe down counters and avoid eating food directly from counters. As for the bed, they actually make great sleeping partners!"
+    question:
+      "Should I let my cat on the kit\u00ADchen coun\u00ADter? Bed? Any\u00ADwhere they want?",
+    answer:
+      "Hon\u00ADestly, I haven't met any\u00ADone who's been suc\u00ADcess\u00ADful at keep\u00ADing their cat off coun\u00ADters or beds! If you're wor\u00ADried about germs, it's al\u00ADways a good idea to wipe down coun\u00ADters and avoid eat\u00ADing food dir\u00ADectly from coun\u00ADters. As for the bed, they ac\u00ADtu\u00ADally make great sleep\u00ADing part\u00ADners!",
   },
   {
-    question: 'Do I need to bathe my cat?',
-    answer: 'Nope! Unless they got into a messy situation, cats are fussy about grooming themselves and keeping themselves clean. In fact, if they stop grooming, it\'s a sign of illness and time to watch out for what could be wrong.'
-  }
+    question: "Do I need to bathe my cat?",
+    answer:
+      "Nope! Un\u00ADless they got in\u00ADto a messy situ\u00ADa\u00ADtion, cats are fussy about groom\u00ADing them\u00ADselves and keep\u00ADing them\u00ADselves clean. In fact, if they stop groom\u00ADing, it's a sign of ill\u00ADness and time to watch out for what could be wrong.",
+  },
 ];
 
 export default faqs;

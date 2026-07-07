@@ -7,6 +7,7 @@ import {
   Animated,
   Image,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
 import food, {
   plants,
@@ -27,7 +28,7 @@ const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 const LISTS = [food, plants, householdItems, others];
-const LIST_LABELS = ["Foods", "Plants", "Household", "Others"];
+const LIST_LABELS = ["Foods", "Plants", "House\u00ADhold", "Oth\u00ADers"];
 const CONFETTI_COLORS = [
   "#D4956A",
   "#E8C9A0",
@@ -236,190 +237,252 @@ export default function CatList1({ navigation }: { navigation: any }) {
     <SafeAreaView style={styles.safeArea}>
       <Confetti show={showConfetti} />
 
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.backBtnText}>{"<"}</Text>
-          </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.eyebrow}>CAT PARENTS</Text>
-            <Text style={styles.pageTitle}>Are These Toxic?</Text>
-          </View>
-        </View>
-
-        <View style={styles.tabRow}>
-          {LIST_LABELS.map((label, i) => (
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.container}>
+          <View style={styles.header}>
             <TouchableOpacity
-              key={i}
-              style={[styles.tabPill, listIndex === i && styles.tabPillActive]}
-              onPress={() => i !== listIndex && animateToList(i)}
-              activeOpacity={0.8}
+              style={styles.backBtn}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
             >
-              <Text
-                style={[
-                  styles.tabPillText,
-                  listIndex === i && styles.tabPillTextActive,
-                ]}
-              >
-                {label}
+              <Text style={styles.backBtnText} allowFontScaling={false}>
+                {"<"}
               </Text>
             </TouchableOpacity>
-          ))}
-        </View>
-
-        <View style={styles.progressArea}>
-          <Animated.Image
-            source={CAT}
-            style={[styles.progressCat, { transform: [{ translateX: catX }] }]}
-            resizeMode="contain"
-          />
-          <View style={styles.progressTrack}>
-            <Animated.View
-              style={[
-                styles.progressFill,
-                {
-                  width: catProgress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ["0%", "100%"],
-                    extrapolate: "clamp",
-                  }),
-                },
-              ]}
-            />
+            <View style={styles.headerCenter}>
+              <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+                CAT PARENTS
+              </Text>
+              <Text
+                style={styles.pageTitle}
+                maxFontSizeMultiplier={1.4}
+                numberOfLines={2}
+              >
+                Are These Toxic?
+              </Text>
+            </View>
           </View>
-        </View>
 
-        {completed ? (
-          <View style={styles.completedArea}>
-            <Image
+          <View style={styles.tabRow}>
+            {LIST_LABELS.map((label, i) => (
+              <TouchableOpacity
+                key={i}
+                style={[
+                  styles.tabPill,
+                  listIndex === i && styles.tabPillActive,
+                ]}
+                onPress={() => i !== listIndex && animateToList(i)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[
+                    styles.tabPillText,
+                    listIndex === i && styles.tabPillTextActive,
+                  ]}
+                  maxFontSizeMultiplier={1.2}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={styles.progressArea}>
+            <Animated.Image
               source={CAT}
-              style={styles.completedCat}
+              style={[
+                styles.progressCat,
+                { transform: [{ translateX: catX }] },
+              ]}
               resizeMode="contain"
             />
-            <View style={styles.completedCard}>
-              <Text style={styles.completedEyebrow}>RESULT</Text>
-              <Text style={styles.completedTitle}>
-                {score === currentList.length ? "Perfect!" : "Done!"}
-              </Text>
-              <Text style={styles.completedScore}>
-                {score} / {currentList.length} correct
-              </Text>
+            <View style={styles.progressTrack}>
+              <Animated.View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: catProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["0%", "100%"],
+                      extrapolate: "clamp",
+                    }),
+                  },
+                ]}
+              />
             </View>
-            <TouchableOpacity
-              style={styles.retryBtn}
-              onPress={resetList}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.retryBtnText}>Try Again</Text>
-            </TouchableOpacity>
           </View>
-        ) : (
-          <View style={styles.questionArea}>
-            <Animated.View
-              style={[
-                styles.itemCard,
-                { transform: [{ translateX: slideAnim }] },
-              ]}
-            >
-              <Text style={styles.itemQuestion}>Is this toxic to cats?</Text>
-              <Text style={styles.itemName}>{currentItem.item}</Text>
-            </Animated.View>
 
-            <View style={styles.resultBannerContainer}>
-              {answered && (
-                <View
-                  style={[
-                    styles.resultBanner,
-                    answered === "correct"
-                      ? styles.resultCorrect
-                      : styles.resultWrong,
-                  ]}
+          {completed ? (
+            <View style={styles.completedArea}>
+              <Image
+                source={CAT}
+                style={styles.completedCat}
+                resizeMode="contain"
+              />
+              <View style={styles.completedCard}>
+                <Text
+                  style={styles.completedEyebrow}
+                  maxFontSizeMultiplier={1.3}
                 >
-                  <Text
+                  RESULT
+                </Text>
+                <Text style={styles.completedTitle} maxFontSizeMultiplier={1.4}>
+                  {score === currentList.length ? "Per\u00ADfect!" : "Done!"}
+                </Text>
+                <Text style={styles.completedScore} maxFontSizeMultiplier={1.4}>
+                  {score} / {currentList.length} {"cor\u00ADrect"}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.retryBtn}
+                onPress={resetList}
+                activeOpacity={0.85}
+              >
+                <Text
+                  style={styles.retryBtnText}
+                  maxFontSizeMultiplier={1.3}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  Try Again
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.questionArea}>
+              <Animated.View
+                style={[
+                  styles.itemCard,
+                  { transform: [{ translateX: slideAnim }] },
+                ]}
+              >
+                <Text style={styles.itemQuestion} maxFontSizeMultiplier={1.4}>
+                  Is this toxic to cats?
+                </Text>
+                <Text
+                  style={styles.itemName}
+                  maxFontSizeMultiplier={1.4}
+                  numberOfLines={4}
+                >
+                  {currentItem.item}
+                </Text>
+              </Animated.View>
+
+              <View style={styles.resultBannerContainer}>
+                {answered && (
+                  <View
                     style={[
-                      styles.resultText,
-                      { color: answered === "correct" ? GREEN : RED },
+                      styles.resultBanner,
+                      answered === "correct"
+                        ? styles.resultCorrect
+                        : styles.resultWrong,
                     ]}
                   >
-                    {answered === "correct"
-                      ? currentItem.answer === "yes"
-                        ? "Yes, toxic!"
-                        : "Correct, safe!"
-                      : currentItem.answer === "yes"
-                        ? "Actually toxic!"
-                        : "Actually safe!"}
-                  </Text>
-                </View>
-              )}
-            </View>
+                    <Text
+                      style={[
+                        styles.resultText,
+                        { color: answered === "correct" ? GREEN : RED },
+                      ]}
+                      maxFontSizeMultiplier={1.3}
+                      numberOfLines={2}
+                    >
+                      {answered === "correct"
+                        ? currentItem.answer === "yes"
+                          ? "Yes, toxic!"
+                          : "Correct, safe!"
+                        : currentItem.answer === "yes"
+                          ? "Actually toxic!"
+                          : "Actually safe!"}
+                    </Text>
+                  </View>
+                )}
+              </View>
 
-            <View style={styles.choiceRow}>
-              <TouchableOpacity
-                style={[
-                  styles.choiceBtn,
-                  styles.choiceToxic,
-                  answered &&
-                    currentItem.answer === "yes" &&
-                    styles.choiceBtnCorrect,
-                  answered &&
-                    answered === "incorrect" &&
-                    currentItem.answer !== "yes" &&
-                    styles.choiceBtnWrong,
-                ]}
-                onPress={() => handleAnswer("yes")}
-                disabled={answered !== null}
-                activeOpacity={0.85}
-              >
-                <Text style={styles.choiceLabel}>Toxic!</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.choiceBtn,
-                  styles.choiceSafe,
-                  answered &&
-                    currentItem.answer === "no" &&
-                    styles.choiceBtnCorrect,
-                  answered &&
-                    answered === "incorrect" &&
-                    currentItem.answer !== "no" &&
-                    styles.choiceBtnWrong,
-                ]}
-                onPress={() => handleAnswer("no")}
-                disabled={answered !== null}
-                activeOpacity={0.85}
-              >
-                <Text style={styles.choiceLabel}>Safe!</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.nextBtnContainer}>
-              {answered && (
+              <View style={styles.choiceRow}>
                 <TouchableOpacity
                   style={[
-                    styles.nextBtn,
-                    answered === "correct"
-                      ? styles.nextBtnCorrect
-                      : styles.nextBtnWrong,
+                    styles.choiceBtn,
+                    styles.choiceToxic,
+                    answered &&
+                      currentItem.answer === "yes" &&
+                      styles.choiceBtnCorrect,
+                    answered &&
+                      answered === "incorrect" &&
+                      currentItem.answer !== "yes" &&
+                      styles.choiceBtnWrong,
                   ]}
-                  onPress={handleNext}
+                  onPress={() => handleAnswer("yes")}
+                  disabled={answered !== null}
                   activeOpacity={0.85}
                 >
-                  <Text style={styles.nextBtnText}>
-                    {currentItemIndex === currentList.length - 1
-                      ? "SEE RESULTS"
-                      : "NEXT"}
+                  <Text
+                    style={styles.choiceLabel}
+                    maxFontSizeMultiplier={1.3}
+                    numberOfLines={1}
+                  >
+                    Toxic!
                   </Text>
                 </TouchableOpacity>
-              )}
+
+                <TouchableOpacity
+                  style={[
+                    styles.choiceBtn,
+                    styles.choiceSafe,
+                    answered &&
+                      currentItem.answer === "no" &&
+                      styles.choiceBtnCorrect,
+                    answered &&
+                      answered === "incorrect" &&
+                      currentItem.answer !== "no" &&
+                      styles.choiceBtnWrong,
+                  ]}
+                  onPress={() => handleAnswer("no")}
+                  disabled={answered !== null}
+                  activeOpacity={0.85}
+                >
+                  <Text
+                    style={styles.choiceLabel}
+                    maxFontSizeMultiplier={1.3}
+                    numberOfLines={1}
+                  >
+                    Safe!
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.nextBtnContainer}>
+                {answered && (
+                  <TouchableOpacity
+                    style={[
+                      styles.nextBtn,
+                      answered === "correct"
+                        ? styles.nextBtnCorrect
+                        : styles.nextBtnWrong,
+                    ]}
+                    onPress={handleNext}
+                    activeOpacity={0.85}
+                  >
+                    <Text
+                      style={styles.nextBtnText}
+                      maxFontSizeMultiplier={1.3}
+                      numberOfLines={2}
+                    >
+                      {currentItemIndex === currentList.length - 1
+                        ? "SEE RESULTS"
+                        : "NEXT"}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
-        )}
-      </View>
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -429,8 +492,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: WHITE,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   container: {
-    flex: 1,
+    minHeight: screenHeight,
     paddingHorizontal: 22,
     paddingTop: 12,
     paddingBottom: 28,
@@ -476,9 +542,12 @@ const styles = StyleSheet.create({
   },
   tabPill: {
     flex: 1,
+    minHeight: 36,
     paddingVertical: 9,
+    paddingHorizontal: 4,
     borderRadius: 50,
     alignItems: "center",
+    justifyContent: "center",
   },
   tabPillActive: {
     backgroundColor: INK,
@@ -560,7 +629,7 @@ const styles = StyleSheet.create({
     lineHeight: 40,
   },
   resultBannerContainer: {
-    height: 52,
+    minHeight: 52,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -587,6 +656,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "900",
     letterSpacing: 0.3,
+    textAlign: "center",
   },
   choiceRow: {
     flexDirection: "row",
@@ -631,12 +701,13 @@ const styles = StyleSheet.create({
     color: INK,
   },
   nextBtnContainer: {
-    height: 62,
+    minHeight: 62,
     justifyContent: "center",
   },
   nextBtn: {
     borderRadius: 16,
     paddingVertical: 18,
+    paddingHorizontal: 10,
     alignItems: "center",
     borderBottomWidth: 4,
     shadowColor: INK,
@@ -659,6 +730,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "900",
     letterSpacing: 1,
+    textAlign: "center",
   },
   completedArea: {
     flex: 1,
@@ -724,5 +796,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "900",
     letterSpacing: 0.5,
+    textAlign: "center",
   },
 });

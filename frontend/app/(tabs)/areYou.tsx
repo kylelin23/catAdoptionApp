@@ -8,6 +8,7 @@ import {
   Dimensions,
   Image,
   StatusBar,
+  ScrollView,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { mixpanel } from "../../../frontend/lib/mixpanel";
@@ -31,8 +32,8 @@ const CATEGORIES = [
   {
     key: "thinking",
     route: "Thinking of Adopting",
-    title: "Thinking of Adopting",
-    subtitle: "Considering getting a cat",
+    title: "Think\u00ADing of Adopt\u00ADing",
+    subtitle: "Consid\u00ADering get\u00ADting a cat",
     color: "#C4DDB0",
     border: "#7BAE6E",
     dark: "#5A8F50",
@@ -40,7 +41,7 @@ const CATEGORIES = [
   {
     key: "new",
     route: "New Cat Parents",
-    title: "New Cat Parents",
+    title: "New Cat Par\u00ADents",
     subtitle: "Just brought a cat home",
     color: "#C8D8E8",
     border: "#7A9BBE",
@@ -49,8 +50,8 @@ const CATEGORIES = [
   {
     key: "parents",
     route: "Cat Parents",
-    title: "Cat Parents",
-    subtitle: "Already a cat parent",
+    title: "Cat Par\u00ADents",
+    subtitle: "Al\u00ADready a cat par\u00ADent",
     color: "#F2C9A0",
     border: "#D4956A",
     dark: "#A86E45",
@@ -58,8 +59,8 @@ const CATEGORIES = [
   {
     key: "lovers",
     route: "Cat Lovers",
-    title: "Cat Lovers",
-    subtitle: "Just obsessed with cats!",
+    title: "Cat Lov\u00ADers",
+    subtitle: "Just ob\u00ADsessed with cats!",
     color: "#F9D5D5",
     border: "#E29A9A",
     dark: "#B56B6B",
@@ -153,7 +154,9 @@ function CategoryCard({
             { backgroundColor: cat.border, borderBottomColor: cat.dark },
           ]}
         >
-          <Text style={styles.chevronText}>›</Text>
+          <Text style={styles.chevronText} allowFontScaling={false}>
+            ›
+          </Text>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -269,8 +272,12 @@ export default function AreYou({ navigation }: { navigation: any }) {
             { opacity: headerOp, transform: [{ translateY: headerY }] },
           ]}
         >
-          <Text style={styles.eyebrow}>CATWISE</Text>
-          <Text style={styles.pageTitle}>Who are you?</Text>
+          <Text style={styles.eyebrow} maxFontSizeMultiplier={1.4}>
+            CATWISE
+          </Text>
+          <Text style={styles.pageTitle} maxFontSizeMultiplier={1.6}>
+            Who are you?
+          </Text>
         </Animated.View>
 
         <View style={styles.mascotArea}>
@@ -297,21 +304,24 @@ export default function AreYou({ navigation }: { navigation: any }) {
         </View>
       </View>
 
-      <View
-        style={[styles.whiteSection, { paddingBottom: insets.bottom + 16 }]}
-      >
-        <View style={styles.flexSpacer} />
-
-        {CATEGORIES.map((cat, i) => (
-          <CategoryCard
-            key={cat.key}
-            cat={cat}
-            index={i}
-            onPress={() => navigation.navigate(cat.route)}
-          />
-        ))}
-
-        <View style={styles.flexSpacer} />
+      <View style={styles.whiteSection}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: insets.bottom + 16 },
+          ]}
+          showsVerticalScrollIndicator={false}
+          bounces={true}
+        >
+          {CATEGORIES.map((cat, i) => (
+            <CategoryCard
+              key={cat.key}
+              cat={cat}
+              index={i}
+              onPress={() => navigation.navigate(cat.route)}
+            />
+          ))}
+        </ScrollView>
       </View>
     </View>
   );
@@ -334,6 +344,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 6,
     gap: 2,
+    paddingHorizontal: 16,
   },
   eyebrow: {
     fontFamily: "Avenir",
@@ -348,6 +359,7 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: INK,
     letterSpacing: -0.5,
+    textAlign: "center",
   },
   mascotArea: {
     flex: 1,
@@ -386,16 +398,16 @@ const styles = StyleSheet.create({
   },
   whiteSection: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 5,
-    gap: 15,
     backgroundColor: WHITE,
   },
-  flexSpacer: {
-    flex: 0.3,
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    gap: 15,
+    flexGrow: 1,
+    justifyContent: "center",
   },
   cardWrapper: {
-    flex: 1,
     shadowColor: INK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -403,10 +415,11 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   card: {
-    flex: 1,
+    minHeight: 74,
     borderRadius: 20,
     flexDirection: "row",
     alignItems: "center",
+    paddingVertical: 12,
     paddingLeft: 14,
     paddingRight: 16,
     borderWidth: 2.5,

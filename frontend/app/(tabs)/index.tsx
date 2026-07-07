@@ -262,7 +262,9 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           { opacity: logoOp, transform: [{ translateY: logoY }] },
         ]}
       >
-        <Text style={styles.logoText}>catwise</Text>
+        <Text style={styles.logoText} maxFontSizeMultiplier={1.2}>
+          catwise
+        </Text>
       </Animated.View>
 
       <View style={styles.mascotArea}>
@@ -290,8 +292,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
 
       <View style={styles.whiteContent}>
         <View style={styles.factContainer}>
-          <Text style={styles.factLabel}>Did you know?</Text>
-          <Text style={styles.factText}>{currentFact}</Text>
+          <Text style={styles.factLabel} maxFontSizeMultiplier={1.3}>
+            Did you know?
+          </Text>
+          <Text style={styles.factText} maxFontSizeMultiplier={1.4}>
+            {currentFact}
+          </Text>
         </View>
 
         <View style={styles.progressArea}>

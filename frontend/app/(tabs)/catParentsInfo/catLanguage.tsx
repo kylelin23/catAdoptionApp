@@ -27,28 +27,28 @@ const CAT = require("../../../assets/images/walkingCat.png");
 const MOODS = [
   {
     key: "happy",
-    label: "Happy and Relaxed",
+    label: "Happy and Re\u00ADlaxed",
     color: "#C4DDB0",
     border: "#7BAE6E",
     dark: "#5A8F50",
   },
   {
     key: "loving",
-    label: "Loving Cat",
+    label: "Lov\u00ADing Cat",
     color: "#F2C9A0",
     border: "#D4956A",
     dark: "#A86E45",
   },
   {
     key: "excited",
-    label: "Excited and Playful",
+    label: "Ex\u00ADcited and Play\u00ADful",
     color: "#C8D8E8",
     border: "#7A9BBE",
     dark: "#5C7A9A",
   },
   {
     key: "angry",
-    label: "Angry, Fearful and Anxious",
+    label: "An\u00ADgry, Fear\u00ADful and Anxious",
     color: "#E8C8B8",
     border: "#C47A45",
     dark: "#9E5C2E",
@@ -249,17 +249,31 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
-            <Text style={styles.backBtnText}>{"<"}</Text>
+            <Text style={styles.backBtnText} allowFontScaling={false}>
+              {"<"}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.headerCenter}>
-            <Text style={styles.eyebrow}>CAT PARENTS</Text>
-            <Text style={styles.pageTitle}>Cat Language</Text>
+            <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+              CAT PARENTS
+            </Text>
+            <Text
+              style={styles.pageTitle}
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={2}
+            >
+              Cat Language
+            </Text>
           </View>
 
           <View style={styles.counterBadge}>
-            <Text style={styles.counterNum}>{currentIndex + 1}</Text>
-            <Text style={styles.counterDenom}>/{cards.length}</Text>
+            <Text style={styles.counterNum} allowFontScaling={false}>
+              {currentIndex + 1}
+            </Text>
+            <Text style={styles.counterDenom} allowFontScaling={false}>
+              /{cards.length}
+            </Text>
           </View>
         </View>
 
@@ -294,7 +308,11 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
               ]}
             >
               <View style={styles.card}>
-                <Text style={styles.cardTitle}>
+                <Text
+                  style={styles.cardTitle}
+                  maxFontSizeMultiplier={1.4}
+                  numberOfLines={3}
+                >
                   {cards[currentIndex - 1].title}
                 </Text>
               </View>
@@ -394,12 +412,13 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
                 styles.arrowText,
                 currentIndex === 0 && styles.arrowDisabled,
               ]}
+              allowFontScaling={false}
             >
               ←
             </Text>
           </TouchableOpacity>
 
-          <Text style={styles.counterText}>
+          <Text style={styles.counterText} maxFontSizeMultiplier={1.3}>
             {currentIndex + 1} / {cards.length}
           </Text>
 
@@ -416,7 +435,12 @@ export default function CatLanguage({ navigation }: { navigation: any }) {
             disabled={currentIndex === cards.length - 1}
             activeOpacity={0.8}
           >
-            <Text style={[styles.arrowText, styles.arrowNext]}>→</Text>
+            <Text
+              style={[styles.arrowText, styles.arrowNext]}
+              allowFontScaling={false}
+            >
+              →
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -546,6 +570,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 4,
+    overflow: "hidden",
   },
   cardScrollContent: {
     paddingBottom: 20,

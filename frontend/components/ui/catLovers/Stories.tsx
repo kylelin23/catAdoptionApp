@@ -17,7 +17,7 @@ import {
   Linking,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { mixpanel } from '../../../lib/mixpanel';
+import { mixpanel } from "../../../lib/mixpanel";
 
 const INK = "#2C1A0E";
 const INK_SOFT = "#6B4C35";
@@ -405,15 +405,29 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
       >
         <View style={styles.storyHeader}>
           <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
-            <Text style={styles.avatarText}>
+            <Text style={styles.avatarText} allowFontScaling={false}>
               {(item.name || "A")[0].toUpperCase()}
             </Text>
           </View>
           <View style={styles.storyMeta}>
-            <Text style={styles.storyName}>{item.name || "Anonymous"}</Text>
-            <Text style={styles.storyCatBadge}>{item.cat_name}</Text>
+            <Text
+              style={styles.storyName}
+              maxFontSizeMultiplier={1.5}
+              numberOfLines={2}
+            >
+              {item.name || "Anonymous"}
+            </Text>
+            <Text
+              style={styles.storyCatBadge}
+              maxFontSizeMultiplier={1.5}
+              numberOfLines={1}
+            >
+              {item.cat_name}
+            </Text>
           </View>
-          <Text style={styles.expandIcon}>{expanded ? "↑" : "↓"}</Text>
+          <Text style={styles.expandIcon} allowFontScaling={false}>
+            {expanded ? "↑" : "↓"}
+          </Text>
         </View>
 
         {photoUrls.length > 0 && (
@@ -436,9 +450,11 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
                   }}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.photoNavText}>‹</Text>
+                  <Text style={styles.photoNavText} allowFontScaling={false}>
+                    ‹
+                  </Text>
                 </TouchableOpacity>
-                <Text style={styles.photoNavCount}>
+                <Text style={styles.photoNavCount} maxFontSizeMultiplier={1.3}>
                   {photoIndex + 1} / {photoUrls.length}
                 </Text>
                 <TouchableOpacity
@@ -453,7 +469,9 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
                   }}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.photoNavText}>›</Text>
+                  <Text style={styles.photoNavText} allowFontScaling={false}>
+                    ›
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -519,7 +537,13 @@ function StoryCard({ item, index }: { item: Story; index: number }) {
               onPress={handleContact}
               activeOpacity={0.8}
             >
-              <Text style={styles.contactBtnText}>Request edit or removal</Text>
+              <Text
+                style={styles.contactBtnText}
+                maxFontSizeMultiplier={1.4}
+                numberOfLines={2}
+              >
+                Request edit or removal
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -655,9 +679,19 @@ function StoryModal({
         >
           <View style={styles.handleBar} />
           <View style={styles.modalHeader}>
-            <View>
-              <Text style={styles.modalTitle}>Share Your Story</Text>
-              <Text style={styles.modalSub}>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={styles.modalTitle}
+                maxFontSizeMultiplier={1.4}
+                numberOfLines={2}
+              >
+                Share Your Story
+              </Text>
+              <Text
+                style={styles.modalSub}
+                maxFontSizeMultiplier={1.4}
+                numberOfLines={2}
+              >
                 Answer as many or as few as you want
               </Text>
             </View>
@@ -666,7 +700,9 @@ function StoryModal({
               onPress={onClose}
               activeOpacity={0.7}
             >
-              <Text style={styles.closeBtnText}>✕</Text>
+              <Text style={styles.closeBtnText} allowFontScaling={false}>
+                ✕
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -715,7 +751,12 @@ function StoryModal({
                         onPress={() => removePhoto(i)}
                         activeOpacity={0.8}
                       >
-                        <Text style={styles.photoRemoveText}>✕</Text>
+                        <Text
+                          style={styles.photoRemoveText}
+                          allowFontScaling={false}
+                        >
+                          ✕
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   ))}
@@ -732,8 +773,19 @@ function StoryModal({
                       <ActivityIndicator color={INK_SOFT} size="small" />
                     ) : (
                       <>
-                        <Text style={styles.photoEmptyIcon}>+</Text>
-                        <Text style={styles.photoAddMoreText}>Add more</Text>
+                        <Text
+                          style={styles.photoEmptyIcon}
+                          allowFontScaling={false}
+                        >
+                          +
+                        </Text>
+                        <Text
+                          style={styles.photoAddMoreText}
+                          maxFontSizeMultiplier={1.3}
+                          numberOfLines={2}
+                        >
+                          Add more
+                        </Text>
                       </>
                     )}
                   </TouchableOpacity>
@@ -753,14 +805,27 @@ function StoryModal({
                   {picking ? (
                     <View style={styles.photoEmpty}>
                       <ActivityIndicator color={INK_SOFT} size="small" />
-                      <Text style={styles.photoEmptyText}>
+                      <Text
+                        style={styles.photoEmptyText}
+                        maxFontSizeMultiplier={1.4}
+                        numberOfLines={2}
+                      >
                         Opening library…
                       </Text>
                     </View>
                   ) : (
                     <View style={styles.photoEmpty}>
-                      <Text style={styles.photoEmptyIcon}>+</Text>
-                      <Text style={styles.photoEmptyText}>
+                      <Text
+                        style={styles.photoEmptyIcon}
+                        allowFontScaling={false}
+                      >
+                        +
+                      </Text>
+                      <Text
+                        style={styles.photoEmptyText}
+                        maxFontSizeMultiplier={1.4}
+                        numberOfLines={2}
+                      >
                         Add photos of your cat
                       </Text>
                     </View>
@@ -782,7 +847,14 @@ function StoryModal({
               {loading || uploading ? (
                 <ActivityIndicator color={WHITE} />
               ) : (
-                <Text style={styles.submitBtnText}>Share Story</Text>
+                <Text
+                  style={styles.submitBtnText}
+                  maxFontSizeMultiplier={1.3}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  Share Story
+                </Text>
               )}
             </TouchableOpacity>
             <View style={styles.modalBottomSpacer} />
@@ -910,7 +982,11 @@ export default function CatStories({ navigation }: { navigation: any }) {
               { opacity: bannerOp, transform: [{ translateY: bannerY }] },
             ]}
           >
-            <Text style={styles.successText}>
+            <Text
+              style={styles.successText}
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={3}
+            >
               Thanks! Your story was submitted for review.
             </Text>
           </Animated.View>
@@ -922,19 +998,31 @@ export default function CatStories({ navigation }: { navigation: any }) {
           <TouchableOpacity
             style={styles.sharePromptBtn}
             onPress={() => {
-              mixpanel.track('Share Story Button Pressed');
+              mixpanel.track("Share Story Button Pressed");
               setShowModal(true);
             }}
             activeOpacity={0.85}
           >
             <View style={styles.sharePromptInner}>
               <View style={styles.sharePromptText}>
-                <Text style={styles.sharePromptTitle}>Share your story</Text>
-                <Text style={styles.sharePromptSub}>
+                <Text
+                  style={styles.sharePromptTitle}
+                  maxFontSizeMultiplier={1.5}
+                  numberOfLines={2}
+                >
+                  Share your story
+                </Text>
+                <Text
+                  style={styles.sharePromptSub}
+                  maxFontSizeMultiplier={1.4}
+                  numberOfLines={3}
+                >
                   Answer as many or as few questions as you want
                 </Text>
               </View>
-              <Text style={styles.sharePromptArrow}>›</Text>
+              <Text style={styles.sharePromptArrow} allowFontScaling={false}>
+                ›
+              </Text>
             </View>
           </TouchableOpacity>
         </Animated.View>
@@ -943,8 +1031,18 @@ export default function CatStories({ navigation }: { navigation: any }) {
           style={{ opacity: sectionOp, transform: [{ translateY: sectionY }] }}
         >
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>From the Community</Text>
-            <Text style={styles.sectionCount}>
+            <Text
+              style={styles.sectionTitle}
+              maxFontSizeMultiplier={1.5}
+              numberOfLines={2}
+            >
+              From the Community
+            </Text>
+            <Text
+              style={styles.sectionCount}
+              maxFontSizeMultiplier={1.3}
+              numberOfLines={1}
+            >
               {stories.length} {stories.length === 1 ? "story" : "stories"}
             </Text>
           </View>
@@ -1317,6 +1415,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(44,26,14,0.08)",
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
+    marginLeft: 12,
   },
   closeBtnText: {
     fontSize: 14,
@@ -1465,7 +1565,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 4,
     borderBottomColor: GREEN_DARK,
   },
-  submitBtnDisabled: { opacity: 0.4 },
+  submitBtnDisabled: {
+    opacity: 0.4,
+  },
   submitBtnText: {
     fontFamily: "Avenir",
     color: WHITE,
