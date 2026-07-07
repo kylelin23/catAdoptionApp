@@ -8,7 +8,10 @@ import { notifyModerator } from "../apis/notifyModerator";
 
 export const storiesRouter = Router();
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 1024 },
+});
 
 const CreateStorySchema = z.object({
   name: z.string().max(100).optional(),
@@ -29,7 +32,26 @@ function validateCreateStory(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+function handleUploadErrors(
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ error: "Photo must be 5MB or smaller" });
+  }
+  if (err)
+    return res.status(400).json({ error: err.message || "Upload failed" });
+  next();
+}
+
 storiesRouter.get("/", getApprovedStories);
 storiesRouter.post("/", validateCreateStory, createStory);
-storiesRouter.post("/photos", upload.single("file"), uploadPhoto);
+storiesRouter.post(
+  "/photos",
+  upload.single("file"),
+  handleUploadErrors,
+  uploadPhoto,
+);
 storiesRouter.post("/notify", notifyModerator);
