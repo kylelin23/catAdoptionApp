@@ -27,6 +27,7 @@ const GREEN = "#7BAE6E";
 const GREEN_DARK = "#5A8F50";
 const WARM = "#D4956A";
 const WARM_DARK = "#A86E45";
+const RED = "#C0564A";
 
 const YOUR_EMAIL = "catwise78@gmail.com";
 
@@ -158,7 +159,9 @@ async function submitStory(
 }
 
 // URL stored in database and actual photo in Supabase Storage
-async function uploadPhotoToBackend(uri: string): Promise<string | null> {
+async function uploadPhotoToBackend(
+  uri: string,
+): Promise<{ url: string | null; error?: string }> {
   try {
     const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
     const formData = new FormData();
@@ -170,14 +173,19 @@ async function uploadPhotoToBackend(uri: string): Promise<string | null> {
     });
 
     if (!res.ok) {
-      console.log("upload failed:", res.status);
-      return null;
+      let message = "Photo upload failed";
+      try {
+        const body = await res.json();
+        if (body?.error) message = body.error;
+      } catch {}
+      console.log("upload failed:", res.status, message);
+      return { url: null, error: message };
     }
     const data = await res.json();
-    return data.url as string;
+    return { url: data.url as string };
   } catch (e) {
     console.log("upload exception:", e);
-    return null;
+    return { url: null, error: "Photo upload failed" };
   }
 }
 
@@ -573,6 +581,7 @@ function StoryModal({
   const [photoUris, setPhotoUris] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [picking, setPicking] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (visible) {
@@ -605,6 +614,7 @@ function StoryModal({
         setTimeout(() => {
           setForm(EMPTY_FORM);
           setPhotoUris([]);
+          setUploadError(null);
         }, 0);
       });
     }
@@ -613,6 +623,7 @@ function StoryModal({
   const pickPhotos = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") return;
+    setUploadError(null);
     setPicking(true);
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"] as any,
@@ -633,14 +644,25 @@ function StoryModal({
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
+    setUploadError(null);
     let uploadedUrls: string[] = [];
     if (photoUris.length > 0) {
       setUploading(true);
       const results = await Promise.all(
         photoUris.map((uri) => uploadPhotoToBackend(uri)),
       );
-      uploadedUrls = results.filter(Boolean) as string[];
       setUploading(false);
+
+      const failures = results.filter((r) => !r.url);
+      uploadedUrls = results.filter((r) => r.url).map((r) => r.url as string);
+
+      if (failures.length > 0) {
+        setUploadError(
+          failures[0].error ||
+            "One or more photos couldn't be uploaded. Please try again.",
+        );
+        return;
+      }
     }
     await onSubmit(form, uploadedUrls);
     setTimeout(() => {
@@ -729,7 +751,9 @@ function StoryModal({
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>
                 Photos{" "}
-                <Text style={styles.photosOptionalLabel}>(optional)</Text>
+                <Text style={styles.photosOptionalLabel}>
+                  (optional, max 5MB each)
+                </Text>
               </Text>
 
               {photoUris.length > 0 && (
@@ -831,6 +855,15 @@ function StoryModal({
                     </View>
                   )}
                 </TouchableOpacity>
+              )}
+
+              {uploadError && (
+                <Text
+                  style={styles.uploadErrorText}
+                  maxFontSizeMultiplier={1.4}
+                >
+                  {uploadError}
+                </Text>
               )}
             </View>
 
@@ -1555,6 +1588,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "600",
     color: INK_SOFT,
+  },
+
+  uploadErrorText: {
+    fontFamily: "Avenir",
+    fontSize: 12,
+    fontWeight: "600",
+    color: RED,
+    marginTop: 4,
   },
 
   submitBtn: {
