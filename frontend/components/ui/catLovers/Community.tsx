@@ -541,10 +541,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   container: {
-    minHeight: screenHeight,
+    flexGrow: 1,
     paddingHorizontal: 22,
     paddingVertical: 16,
-    justifyContent: "space-between",
   },
 
   progressArea: {
@@ -582,7 +581,8 @@ const styles = StyleSheet.create({
   },
 
   cardArea: {
-    minHeight: 460 + 40,
+    flex: 1,
+    minHeight: 280,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
   cardWrapper: {
     position: "absolute",
     width: CARD_WIDTH,
-    height: 460,
+    height: "100%",
   },
   backgroundCard: {
     opacity: 1,
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
 
   reviewContainer: {
     width: CARD_WIDTH,
-    height: 460,
+    height: "100%",
     borderRadius: 24,
     padding: 32,
     backgroundColor: WHITE,

@@ -541,7 +541,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   container: {
-    minHeight: screenHeight,
     width: "100%",
     maxWidth: 380,
     paddingVertical: 22,

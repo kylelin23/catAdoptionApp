@@ -398,126 +398,135 @@ export default function Pros({ navigation }: { navigation: any }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Animated.View
-        style={[
-          styles.container,
-          { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-        ]}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.backBtnText} allowFontScaling={false}>
-              {"<"}
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.headerRow}>
-            <View style={styles.headerCenter}>
-              <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
-                THINKING OF ADOPTING
+        <Animated.View
+          style={[
+            styles.container,
+            { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+          ]}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.backBtnText} allowFontScaling={false}>
+                {"<"}
               </Text>
-              <Text style={styles.pageTitle} maxFontSizeMultiplier={1.4}>
-                The Pros
-              </Text>
+            </TouchableOpacity>
+            <View style={styles.headerRow}>
+              <View style={styles.headerCenter}>
+                <Text style={styles.eyebrow} maxFontSizeMultiplier={1.3}>
+                  THINKING OF ADOPTING
+                </Text>
+                <Text style={styles.pageTitle} maxFontSizeMultiplier={1.4}>
+                  The Pros
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.cardArea}>
-          {showReviewScreen ? (
-            <Animated.View
-              style={[
-                styles.reviewContainer,
-                {
-                  opacity: reviewCardOpacity,
-                  transform: [{ translateY: reviewCardSlide }],
-                },
-              ]}
-            >
-              <Text style={styles.reviewHeading} maxFontSizeMultiplier={1.4}>
-                Great Job!
-              </Text>
-              <Text
-                style={styles.reviewSubheading}
-                maxFontSizeMultiplier={1.4}
-                numberOfLines={4}
+          <View style={styles.cardArea}>
+            {showReviewScreen ? (
+              <Animated.View
+                style={[
+                  styles.reviewContainer,
+                  {
+                    opacity: reviewCardOpacity,
+                    transform: [{ translateY: reviewCardSlide }],
+                  },
+                ]}
               >
-                You've finished! Click below to go through the cards again!{" "}
-              </Text>
-
-              <Animated.View style={{ transform: [{ scale: reviewBtnScale }] }}>
-                <TouchableOpacity
-                  style={styles.reviewBtn}
-                  onPress={handleReviewAgainPress}
-                  activeOpacity={0.85}
+                <Text style={styles.reviewHeading} maxFontSizeMultiplier={1.4}>
+                  Great Job!
+                </Text>
+                <Text
+                  style={styles.reviewSubheading}
+                  maxFontSizeMultiplier={1.4}
+                  numberOfLines={4}
                 >
-                  <Text
-                    style={styles.reviewBtnText}
-                    maxFontSizeMultiplier={1.3}
-                  >
-                    Review Again
-                  </Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </Animated.View>
-          ) : (
-            pros.map((pro, index) => {
-              if (index < currentIndex || index > currentIndex + 1) {
-                return null;
-              }
+                  You've finished! Click below to go through the cards
+                  again!{" "}
+                </Text>
 
-              const cardAnim = cardAnimations[index];
-              const rotateCard = cardAnim.pan.x.interpolate({
-                inputRange: [-screenWidth / 2, 0, screenWidth / 2],
-                outputRange: ["-10deg", "0deg", "10deg"],
-                extrapolate: "clamp",
-              });
-
-              const animatedStyles = {
-                transform: [
-                  { translateX: cardAnim.pan.x },
-                  { translateY: cardAnim.pan.y },
-                  { scale: cardAnim.scale },
-                  { rotate: rotateCard },
-                ],
-                zIndex: pros.length - index,
-              };
-
-              const isCurrent = index === currentIndex;
-              const isUnderneath = index === currentIndex + 1;
-
-              return (
                 <Animated.View
-                  key={index}
-                  style={[
-                    styles.cardWrapper,
-                    animatedStyles,
-                    isUnderneath && styles.backgroundCard,
-                  ]}
-                  {...(isCurrent ? panResponder.panHandlers : {})}
+                  style={{ transform: [{ scale: reviewBtnScale }] }}
                 >
-                  <FlipCard pro={pro} index={index} />
+                  <TouchableOpacity
+                    style={styles.reviewBtn}
+                    onPress={handleReviewAgainPress}
+                    activeOpacity={0.85}
+                  >
+                    <Text
+                      style={styles.reviewBtnText}
+                      maxFontSizeMultiplier={1.3}
+                    >
+                      Review Again
+                    </Text>
+                  </TouchableOpacity>
                 </Animated.View>
-              );
-            })
+              </Animated.View>
+            ) : (
+              pros.map((pro, index) => {
+                if (index < currentIndex || index > currentIndex + 1) {
+                  return null;
+                }
+
+                const cardAnim = cardAnimations[index];
+                const rotateCard = cardAnim.pan.x.interpolate({
+                  inputRange: [-screenWidth / 2, 0, screenWidth / 2],
+                  outputRange: ["-10deg", "0deg", "10deg"],
+                  extrapolate: "clamp",
+                });
+
+                const animatedStyles = {
+                  transform: [
+                    { translateX: cardAnim.pan.x },
+                    { translateY: cardAnim.pan.y },
+                    { scale: cardAnim.scale },
+                    { rotate: rotateCard },
+                  ],
+                  zIndex: pros.length - index,
+                };
+
+                const isCurrent = index === currentIndex;
+                const isUnderneath = index === currentIndex + 1;
+
+                return (
+                  <Animated.View
+                    key={index}
+                    style={[
+                      styles.cardWrapper,
+                      animatedStyles,
+                      isUnderneath && styles.backgroundCard,
+                    ]}
+                    {...(isCurrent ? panResponder.panHandlers : {})}
+                  >
+                    <FlipCard pro={pro} index={index} />
+                  </Animated.View>
+                );
+              })
+            )}
+          </View>
+
+          {!showReviewScreen && (
+            <Text style={styles.instructionText} maxFontSizeMultiplier={1.3}>
+              Swipe left to see the next card!
+            </Text>
           )}
-        </View>
 
-        {!showReviewScreen && (
-          <Text style={styles.instructionText} maxFontSizeMultiplier={1.3}>
-            Swipe left to see the next card!
-          </Text>
-        )}
-
-        <View style={styles.bottomNav}>
-          <Text style={styles.pageCounter} maxFontSizeMultiplier={1.3}>
-            {showReviewScreen ? pros.length : currentIndex + 1} / {pros.length}
-          </Text>
-        </View>
-      </Animated.View>
+          <View style={styles.bottomNav}>
+            <Text style={styles.pageCounter} maxFontSizeMultiplier={1.3}>
+              {showReviewScreen ? pros.length : currentIndex + 1} /{" "}
+              {pros.length}
+            </Text>
+          </View>
+        </Animated.View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -527,8 +536,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   container: {
-    flex: 1,
     width: "100%",
     maxWidth: 380,
     paddingVertical: 22,
@@ -589,7 +600,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   cardArea: {
-    flex: 1,
+    minHeight: CARD_HEIGHT + 40,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",

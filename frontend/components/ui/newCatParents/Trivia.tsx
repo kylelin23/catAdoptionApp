@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
   },
   resultScreen: {
     flex: 1,
-    backgroundColor: WHITE,
+    backgroundColor: 'white',
   },
   resultScrollContent: {
     flexGrow: 1,
