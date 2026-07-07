@@ -22,7 +22,7 @@ export async function notifyModerator(req: Request, res: Response) {
           template_params: {
             name: name || "Anonymous",
             message: `A new cat story was submitted for "${cat_name}". Open the moderation panel to review it.`,
-            email: "linkyle0924@gmail.com",
+            email: "catwise78@gmail.com",
           },
         }),
       },
