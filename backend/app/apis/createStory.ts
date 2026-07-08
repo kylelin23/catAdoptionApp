@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { supabase } from "../supabaseClient";
 
-const MAX_PENDING_STORIES = 3;
+const MAX_PENDING_STORIES = 200;
 
 export async function createStory(req: Request, res: Response) {
   const input = (req as any).validated;
