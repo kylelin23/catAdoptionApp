@@ -5,3 +5,7 @@ node_modules
 credentials.json
 credentials/
 dist/
+android
+ios
+big.jpg
+small.jpg
