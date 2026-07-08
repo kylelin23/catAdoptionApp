@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 const requestsByIp = new Map<string, number[]>();
 
 const WINDOW_MS = 1 * 60 * 1000;
-const MAX_REQUESTS = 2;
+const MAX_REQUESTS = 60;
 
 function getClientIp(req: Request): string {
   return (req.headers["cf-connecting-ip"] as string) || req.ip || "unknown";
