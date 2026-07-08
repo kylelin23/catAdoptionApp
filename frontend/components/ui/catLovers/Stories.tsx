@@ -136,7 +136,7 @@ async function fetchApprovedStories(): Promise<{
 async function submitStory(
   form: Record<string, string>,
   photoUrls: string[],
-): Promise<boolean> {
+): Promise<{ ok: boolean; error?: string }> {
   try {
     const res = await fetch(`${BACKEND_URL}/api/stories`, {
       method: "POST",
@@ -151,10 +151,18 @@ async function submitStory(
         photos: photoUrls,
       }),
     });
-    return res.ok;
+
+    if (res.ok) return { ok: true };
+
+    let message = "Something went wrong. Please try again.";
+    try {
+      const body = await res.json();
+      if (body?.error) message = body.error;
+    } catch {}
+    return { ok: false, error: message };
   } catch (e) {
     console.log("submitStory failed:", e);
-    return false;
+    return { ok: false, error: "Something went wrong. Please try again." };
   }
 }
 
@@ -571,7 +579,7 @@ function StoryModal({
   onSubmit: (
     form: Record<string, string>,
     photoUrls: string[],
-  ) => Promise<void>;
+  ) => Promise<{ ok: boolean; error?: string }>;
   loading: boolean;
 }) {
   const slideAnim = useRef(new Animated.Value(700)).current;
@@ -582,6 +590,7 @@ function StoryModal({
   const [uploading, setUploading] = useState(false);
   const [picking, setPicking] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (visible) {
@@ -615,6 +624,7 @@ function StoryModal({
           setForm(EMPTY_FORM);
           setPhotoUris([]);
           setUploadError(null);
+          setSubmitError(null);
         }, 0);
       });
     }
@@ -645,6 +655,7 @@ function StoryModal({
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setUploadError(null);
+    setSubmitError(null);
     let uploadedUrls: string[] = [];
     if (photoUris.length > 0) {
       setUploading(true);
@@ -664,11 +675,15 @@ function StoryModal({
         return;
       }
     }
-    await onSubmit(form, uploadedUrls);
-    setTimeout(() => {
-      setForm(EMPTY_FORM);
-      setPhotoUris([]);
-    }, 0);
+    const result = await onSubmit(form, uploadedUrls);
+    if (result.ok) {
+      setTimeout(() => {
+        setForm(EMPTY_FORM);
+        setPhotoUris([]);
+      }, 0);
+    } else {
+      setSubmitError(result.error || "Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -867,6 +882,12 @@ function StoryModal({
               )}
             </View>
 
+            {submitError && (
+              <Text style={styles.uploadErrorText} maxFontSizeMultiplier={1.4}>
+                {submitError}
+              </Text>
+            )}
+
             <TouchableOpacity
               style={[
                 styles.submitBtn,
@@ -987,17 +1008,18 @@ export default function CatStories({ navigation }: { navigation: any }) {
   const handleSubmit = async (
     form: Record<string, string>,
     photoUrls: string[],
-  ): Promise<void> => {
+  ): Promise<{ ok: boolean; error?: string }> => {
     setLoading(true);
-    const ok = await submitStory(form, photoUrls);
+    const result = await submitStory(form, photoUrls);
     setLoading(false);
-    if (ok) {
+    if (result.ok) {
       setShowModal(false);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3500);
       showSuccessBanner();
       notifyModerator(form.cat_name.trim(), form.name.trim());
     }
+    return result;
   };
 
   return (
