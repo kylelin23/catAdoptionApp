@@ -285,6 +285,9 @@ export default function Cationary() {
   const reviewCardSlide = useRef(new Animated.Value(0)).current;
   const reviewBtnScale = useRef(new Animated.Value(0)).current;
 
+  const scrollRef = useRef<ScrollView>(null);
+  const [outerScrollEnabled, setOuterScrollEnabled] = useState(true);
+
   const catProgress = useRef(new Animated.Value(0)).current;
   const CAT_SIZE = 36;
   const TRACK_WIDTH = screenWidth - 44;
@@ -439,8 +442,13 @@ export default function Cationary() {
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) =>
-        Math.abs(g.dx) > 5 && Math.abs(g.dx) > Math.abs(g.dy),
+      onStartShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponderCapture: (_, g) =>
+        Math.abs(g.dx) > 5 && Math.abs(g.dx) > Math.abs(g.dy) * 1.5,
+
+      onPanResponderGrant: () => {
+        setOuterScrollEnabled(false);
+      },
 
       onPanResponderMove: (_, g) => {
         const idx = currentIndexRef.current;
@@ -458,6 +466,7 @@ export default function Cationary() {
       },
 
       onPanResponderRelease: (_, g) => {
+        setOuterScrollEnabled(true);
         const idx = currentIndexRef.current;
         const swipedLeft = g.dx < -SWIPE_THRESHOLD || g.vx < -SWIPE_VELOCITY;
 
@@ -482,12 +491,18 @@ export default function Cationary() {
           ).start();
         }
       },
+
+      onPanResponderTerminate: () => {
+        setOuterScrollEnabled(true);
+      },
     }),
   ).current;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
+        ref={scrollRef}
+        scrollEnabled={outerScrollEnabled}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
