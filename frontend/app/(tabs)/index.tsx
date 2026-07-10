@@ -19,7 +19,7 @@ const SAND = "#E8C9A0";
 const WHITE = "#FFFAF5";
 const GREEN = "#7BAE6E";
 
-const CAT_IMG = require("../../assets/images/catWave.png");
+const CAT_IMG = require("../../assets/images/cat.png");
 const PAW = require("../../assets/images/paw.png");
 const WALKING_CAT = require("../../assets/images/walkingCat.png");
 

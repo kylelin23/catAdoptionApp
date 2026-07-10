@@ -24,7 +24,7 @@ const SAND = "#E8C9A0";
 const WHITE = "#FFFAF5";
 const GREEN = "#7BAE6E";
 
-const CAT_IMG = require("../../../assets/images/catWave.png");
+const CAT_IMG = require("../../../assets/images/cat.png");
 
 export default function ThinkingOfAdopting({
   navigation,

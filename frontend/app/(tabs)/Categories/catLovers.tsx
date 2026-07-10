@@ -24,7 +24,7 @@ const INK_SOFT = "#6B4C35";
 const SAND = "#E8C9A0";
 const WHITE = "#FFFAF5";
 
-const CAT_IMG = require("../../../assets/images/catWave.png");
+const CAT_IMG = require("../../../assets/images/cat.png");
 
 export default function CatLovers({ navigation }: { navigation: any }) {
   const [index, setIndex] = React.useState(0);

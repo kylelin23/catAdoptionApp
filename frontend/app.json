@@ -2,9 +2,9 @@
   "expo": {
     "name": "CatWise",
     "slug": "CatWise",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon2.png",
     "scheme": "maggy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,

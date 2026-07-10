@@ -23,7 +23,7 @@ const INK_SOFT = "#6B4C35";
 const SAND = "#E8C9A0";
 const WHITE = "#FFFAF5";
 
-const CAT_IMG = require("../../../assets/images/catWave.png");
+const CAT_IMG = require("../../../assets/images/cat.png");
 
 const CatssentialLists = ({ navigation }: { navigation: any }) => (
   <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
