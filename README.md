@@ -13,7 +13,8 @@ CatWise is your all-in-one resource for cat adoption, created with React Native.
 - [Privacy Policy](#Privacy-Policy)
 
 ## Demo
-**Youtube Link:** [https://youtube.com/shorts/cos28Tr-IbI](https://www.youtube.com/shorts/iBNfsPolkwY)
+- **App Store:** https://apps.apple.com/us/app/catwise/id6772019033
+- **Youtube Link:** [https://youtube.com/shorts/cos28Tr-IbI](https://www.youtube.com/shorts/iBNfsPolkwY)
 
 ### App Screenshots
 
