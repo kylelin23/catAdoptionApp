@@ -8,33 +8,30 @@ CatWise is your all-in-one resource for cat adoption, created with React Native.
 - [App Screenshots](#App-Screenshots)
 - [Features](#Features)
 - [Tech Stack](#Tech-Stack)
+- [APIs](#APIs)
 - [Support](#Support)
 - [Privacy Policy](#Privacy-Policy)
 
 ## Demo
-**Youtube Link:** https://youtube.com/shorts/cos28Tr-IbI
+**Youtube Link:** [https://youtube.com/shorts/cos28Tr-IbI](https://www.youtube.com/shorts/iBNfsPolkwY)
 
 ### App Screenshots
 
 <p align="center">
-  <img width="220" alt="image" src="https://github.com/user-attachments/assets/1b32342e-ed6b-4220-9b18-13c7c862793e" />
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/c50625fd-9ad3-460d-9dba-b2e49c90e282" />
 </p>
 <p align="center">
-  <img width="220" alt="Simulator Screenshot - iPhone 15 Plus - 2026-06-23 at 14 25 58" src="https://github.com/user-attachments/assets/ccded081-d08d-4ff5-8dc6-2bba3e609b2c" />
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/f61dac87-5439-4f4e-b8a8-79599159ffa2" />
 </p>
 <p align="center">
-  <img width="220" alt="image" src="https://github.com/user-attachments/assets/d001cf62-4332-4d0d-bab2-93df62188b69" />
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/b64d2a43-24d1-4c0f-bc04-93feb640fb69" />
 </p>
 <p align="center">
-  <img width="220" alt="image" src="https://github.com/user-attachments/assets/865438be-177a-45c8-adcc-fbb9c00efbd0" />
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/f227b982-2e72-4791-9d7d-7255a7d061f8" />
 </p>
 <p align="center">
-  <img width="220" alt="image" src="https://github.com/user-attachments/assets/8536336b-66ef-4344-ab6c-3f3ab5113bc4" />
+  <img width="220" alt="image" src="https://github.com/user-attachments/assets/86436741-7421-4dbd-a746-e00abcbe4549" />
 </p>
-<p align="center">
-  <img width="220" alt="image" src="https://github.com/user-attachments/assets/1fe21ca6-a09e-46fe-ab5a-b2780d878526" />
-</p>
-
 
 ## Features
 - **Interactive Quizzes**: Trivia with instant answer checking, confetti feedback, and animated progress bars
@@ -42,7 +39,6 @@ CatWise is your all-in-one resource for cat adoption, created with React Native.
 - **Gamification**: Game-style UI to learn which foods, plants, and household items are dangerous to cats
 - **Cat Stories**: User-submitted stories that connect cat lovers through shared experiences
 - **Cat Shelter Finder**: Location-based shelter finder that displays nearby cat shelters using the user’s real-time location
-- **Animations** — Spring transitions, walking cat progress bars, slide animations, and entrance effects throughout
 
 ## Tech Stack
 - React Native
@@ -51,8 +47,65 @@ CatWise is your all-in-one resource for cat adoption, created with React Native.
 - Express
 - Supabase
 
+## APIs
+#### CreateStory
+`POST /api/stories`
+Request
+~~~
+name: str (optional)
+cat_name: str
+how_met: str (optional)
+cat_description: str (optional)
+memorable_story: str (optional)
+best_part: str (optional)
+photos: list[str] (optional)
+~~~
+Response
+~~~
+story: dict
+~~~
+#### GetApprovedStories
+`GET /api/stories`
+Response
+~~~
+stories: [dict]
+~~~
+#### UploadPhoto
+`POST /api/stories/photos`
+Request
+~~~
+file: File
+~~~
+Response
+~~~
+url: str
+~~~
+#### NotifyModerator
+`POST /api/stories/notify`
+Request
+~~~
+cat_name: str
+name: str
+~~~
+Response
+~~~
+ok: bool
+~~~
+#### SearchShelters
+`GET /api/shelters`
+Request
+~~~
+query: str
+lat: str
+lng: str
+~~~
+Response
+~~~
+shelters: [dict]
+searchedLocality: str
+~~~
+
 ## Support
 **Support URL**: https://cat-wise-support-page.vercel.app/
-
 ## Privacy Policy
 **Privacy Policy URL**: https://cat-wise-support-page.vercel.app/privacy
