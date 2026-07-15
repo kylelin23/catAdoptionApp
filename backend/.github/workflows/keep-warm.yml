@@ -1,0 +1,13 @@
+name: Keep Render warm
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend
+        run: curl -s -o /dev/null -w "Status: %{http_code}\n" https://catwise-backend.onrender.com/api/stories

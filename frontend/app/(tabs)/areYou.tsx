@@ -24,7 +24,6 @@ const PAW = require("../../assets/images/paw.png");
 
 const CAT_IMAGES = [
   require("../../assets/images/cat.png"),
-  require("../../assets/images/catWave.png"),
   require("../../assets/images/catStretch.png"),
 ];
 
