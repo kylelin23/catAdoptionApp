@@ -5,6 +5,7 @@ import { createStory } from "../apis/createStory";
 import { getApprovedStories } from "../apis/getApprovedStories";
 import { uploadPhoto } from "../apis/uploadPhoto";
 import { notifyModerator } from "../apis/notifyModerator";
+import { getHealth } from "../apis/health";
 
 export const storiesRouter = Router();
 
@@ -46,6 +47,7 @@ function handleUploadErrors(
   next();
 }
 
+storiesRouter.get("/health", getHealth);
 storiesRouter.get("/", getApprovedStories);
 storiesRouter.post("/", validateCreateStory, createStory);
 storiesRouter.post(
